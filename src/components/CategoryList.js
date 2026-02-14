@@ -2,16 +2,17 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { getOptimizedCloudinaryUrl } from "../utils/cloudinary";
 
-const CATEGORY_ICONS = {
-  "cat-1": "??",
-  "cat-2": "??",
-  "cat-3": "???",
-  "cat-4": "??",
-  "cat-5": "?"
-};
-
 // Grilla responsive enfocada en conversion por categoria.
-export default function CategoryList({ categories }) {
+export default function CategoryList({ categories, products }) {
+  const firstProductImageByCategory = React.useMemo(() => {
+    return products.reduce((acc, product) => {
+      if (!acc[product.categoryId] && product.image) {
+        acc[product.categoryId] = product.image;
+      }
+      return acc;
+    }, {});
+  }, [products]);
+
   if (!categories.length) {
     return (
       <section className="mx-auto max-w-6xl px-4 pb-8 sm:px-6">
@@ -31,44 +32,58 @@ export default function CategoryList({ categories }) {
         <h2 className="section-heading mt-2">Explora por categoria</h2>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-2 xl:grid-cols-3">
         {categories.map((category, index) => (
-          <Link
+          <article
             key={category.id}
-            to={`/categoria/${category.id}`}
-            className="card-reveal group overflow-hidden rounded-[1.65rem] border border-white/70 bg-white/90 shadow-candy transition duration-300 hover:-translate-y-1"
+            className="card-reveal"
             style={{ animationDelay: `${index * 90}ms` }}
-            aria-label={`Ver modelos de ${category.title}`}
           >
-            <div className="relative aspect-[4/3]">
-              <img
-                src={getOptimizedCloudinaryUrl(category.image, {
-                  width: 900,
-                  height: 700,
-                  crop: "fill",
-                  gravity: "auto"
-                })}
-                alt={category.title}
-                className="h-full w-full object-cover"
-                loading="lazy"
-                decoding="async"
-              />
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#2e46611f] to-transparent" />
-            </div>
-            <div className="flex min-h-[8.8rem] flex-col items-center justify-between p-3 text-center">
-              <div className="w-full">
-                <h3 className="font-title text-[1.95rem] leading-[1.02] text-ink">
+            <Link
+              to={`/categoria/${category.id}`}
+              className="group block overflow-hidden rounded-2xl border border-white/80 bg-white/85 p-2 shadow-candy transition duration-300 hover:-translate-y-1"
+              aria-label={`Ver modelos de ${category.title}`}
+            >
+              <div className="relative h-24 overflow-hidden rounded-xl sm:h-28">
+                <img
+                  src={getOptimizedCloudinaryUrl(category.image, {
+                    width: 560,
+                    height: 360,
+                    crop: "fill",
+                    gravity: "auto"
+                  })}
+                  alt={category.title}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+
+              <div className="flex min-h-[4.8rem] items-center justify-center px-1 py-2 text-center sm:min-h-[5.2rem]">
+                <h3 className="text-[1.6rem] leading-[1] text-ink sm:text-[1.75rem]">
                   {category.title}
                 </h3>
-                <div className="mt-2 h-7 text-3xl leading-none">
-                  {CATEGORY_ICONS[category.id] || "??"}
-                </div>
               </div>
-              <p className="mt-1 text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#68809f]">
-                Ver modelos
-              </p>
-            </div>
-          </Link>
+
+              <div className="relative h-16 overflow-hidden rounded-xl sm:h-20">
+                <img
+                  src={getOptimizedCloudinaryUrl(
+                    firstProductImageByCategory[category.id] || category.image,
+                    {
+                      width: 560,
+                      height: 260,
+                      crop: "fill",
+                      gravity: "auto"
+                    }
+                  )}
+                  alt={`${category.title} - referencia inferior`}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+            </Link>
+          </article>
         ))}
       </div>
     </section>

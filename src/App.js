@@ -119,7 +119,7 @@ export default function App() {
                 onWhatsappClick={handleWhatsappClick}
                 clickCount={clickCount}
               />
-              <CategoryList categories={config.categories} />
+              <CategoryList categories={config.categories} products={products} />
               <FAQ faqItems={config.faq} />
               <Testimonials items={config.testimonials} />
             </>

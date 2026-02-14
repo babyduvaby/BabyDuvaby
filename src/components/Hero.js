@@ -30,7 +30,7 @@ export default function Hero({
           {brand.subtitle}
         </p>
 
-        <div className="baby-section-glow relative mt-6 overflow-hidden rounded-[2rem] bg-white/70 p-2 shadow-candy">
+        <div className="hero-image-shell mt-6">
           <img
             src={getOptimizedCloudinaryUrl(brand.heroImage, {
               width: 1600,
@@ -39,7 +39,7 @@ export default function Hero({
               gravity: "auto"
             })}
             alt="Bebe con ropa tierna de Baby Duvaby"
-            className="hero-image h-[18rem] w-full rounded-[1.5rem] object-cover sm:h-[24rem]"
+            className="hero-image hero-image-blend h-[18rem] w-full object-cover sm:h-[24rem]"
             loading="eager"
             decoding="async"
           />

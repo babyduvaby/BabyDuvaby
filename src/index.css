@@ -61,6 +61,32 @@
     animation: float-soft 6s ease-in-out infinite;
   }
 
+  .hero-image-shell {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.6rem;
+    background: transparent;
+  }
+
+  .hero-image-shell::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      ellipse 86% 74% at 50% 46%,
+      rgba(0, 0, 0, 0) 58%,
+      rgba(248, 232, 240, 0.35) 74%,
+      rgba(242, 230, 243, 0.66) 88%,
+      rgba(220, 231, 251, 0.86) 100%
+    );
+  }
+
+  .hero-image-blend {
+    border-radius: 1.6rem;
+    box-shadow: none;
+  }
+
   .cta-pulse {
     animation: pulse-soft 2.6s ease-in-out infinite;
   }

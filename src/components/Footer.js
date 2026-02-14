@@ -6,7 +6,7 @@ import { ADMIN_PANEL_URL } from "../data/defaultContent";
 export default function Footer({ categories }) {
   return (
     <footer className="mx-auto mt-4 w-full max-w-6xl px-4 pb-28 sm:px-6 sm:pb-10">
-      <div className="rounded-3xl border border-white/70 bg-white/85 p-6 shadow-candy">
+      <div className="glass-panel rounded-3xl p-6 shadow-candy">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
           <div>
             <p className="font-title text-4xl leading-none">
@@ -14,7 +14,7 @@ export default function Footer({ categories }) {
               <span className="text-[#6bb2ec]">Duvaby</span>
             </p>
             <p className="mt-2 text-sm font-semibold text-ink/85">
-              Todo en ropita y accesorios para bebé con estilo tierno y calidad.
+              Diseñado para mamás y papás que buscan ternura, calidad y estilo.
             </p>
           </div>
 
@@ -43,7 +43,7 @@ export default function Footer({ categories }) {
               href={ADMIN_PANEL_URL}
               target="_blank"
               rel="noreferrer"
-              className="mt-2 inline-flex rounded-full bg-[#eef4ff] px-4 py-2 text-sm font-bold text-[#4e6788] transition hover:bg-[#dfeaff]"
+              className="mt-2 inline-flex rounded-full border border-[#dce8ff] bg-[#f3f8ff] px-4 py-2 text-sm font-bold text-[#4e6788] transition hover:bg-white"
             >
               Panel Administrador
             </a>
@@ -60,4 +60,3 @@ export default function Footer({ categories }) {
     </footer>
   );
 }
-

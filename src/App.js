@@ -41,7 +41,7 @@ export default function App() {
   if (isLoading) {
     return (
       <main className="min-h-screen bg-gradient-to-b from-[#fce9f2] to-[#deebff] px-4 py-12">
-        <div className="mx-auto max-w-xl animate-pulse rounded-3xl bg-white/70 p-6 shadow-candy">
+        <div className="mx-auto max-w-xl animate-pulse rounded-3xl bg-white/80 p-6 shadow-candy">
           <div className="h-8 w-3/4 rounded-xl bg-[#e9f2ff]" />
           <div className="mt-3 h-5 w-full rounded-xl bg-[#e9f2ff]" />
           <div className="mt-6 h-72 rounded-3xl bg-[#e9f2ff]" />
@@ -51,7 +51,7 @@ export default function App() {
   }
 
   return (
-    <main className="app-shell min-h-screen overflow-x-hidden bg-gradient-to-b from-[#fce9f2] via-[#f8f4fb] to-[#deebff] pb-24 text-ink sm:pb-0">
+    <main className="app-shell min-h-screen overflow-x-hidden bg-gradient-to-b from-[#fce9f2] via-[#f8f4fb] to-[#deebff] pb-28 text-ink sm:pb-0">
       <div className="pointer-events-none fixed inset-0 -z-10">
         <div className="ambient ambient-top" />
         <div className="ambient ambient-bottom" />

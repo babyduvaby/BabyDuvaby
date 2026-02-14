@@ -13,19 +13,21 @@ export default function FAQ({ faqItems }) {
   }
 
   return (
-    <section className="mx-auto max-w-3xl px-4 pb-12 sm:px-6">
-      <div className="rounded-[2rem] bg-white/85 p-4 shadow-candy sm:p-8">
-        <h2 className="mb-5 text-center font-title text-4xl text-ink sm:text-5xl">
+    <section className="mx-auto max-w-4xl px-4 pb-14 sm:px-6">
+      <div className="glass-panel rounded-[2rem] p-5 shadow-candy sm:p-8">
+        <h2 className="mb-5 text-center font-title text-5xl text-ink sm:text-6xl">
           Preguntas Frecuentes
         </h2>
         <div className="space-y-3">
-          {faqItems.map((item) => (
+          {faqItems.map((item, index) => (
             <div
               key={item.id}
-              className="rounded-2xl border border-white bg-[#f6f9ff] p-4 text-ink"
+              className={`rounded-2xl border border-white p-4 text-ink ${
+                index % 2 === 0 ? "bg-[#f6f9ff]" : "bg-[#fff5fb]"
+              }`}
             >
-              <p className="text-lg font-bold">{item.question}</p>
-              <p className="mt-1 text-lg font-semibold text-ink/90">{item.answer}</p>
+              <p className="text-lg font-extrabold">{item.question}</p>
+              <p className="mt-1 text-lg font-bold text-ink/85">{item.answer}</p>
             </div>
           ))}
         </div>
@@ -33,4 +35,3 @@ export default function FAQ({ faqItems }) {
     </section>
   );
 }
-

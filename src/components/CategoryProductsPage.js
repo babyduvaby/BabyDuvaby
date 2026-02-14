@@ -16,7 +16,7 @@ export default function CategoryProductsPage({
   if (!category) {
     return (
       <section className="mx-auto max-w-5xl px-4 pb-12 pt-6 sm:px-6">
-        <div className="rounded-3xl bg-white/85 p-6 text-center shadow-candy">
+        <div className="glass-panel rounded-3xl p-6 text-center shadow-candy">
           <h1 className="font-title text-4xl text-ink">Categoría no encontrada</h1>
           <Link
             to="/"
@@ -31,7 +31,7 @@ export default function CategoryProductsPage({
 
   return (
     <section className="mx-auto max-w-6xl px-4 pb-12 pt-6 sm:px-6">
-      <div className="rounded-3xl bg-white/85 p-5 shadow-candy sm:p-7">
+      <div className="glass-panel rounded-3xl p-5 shadow-candy sm:p-7">
         <div className="mb-6 flex items-center justify-between gap-3">
           <div>
             <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#6f84a2]">
@@ -45,7 +45,7 @@ export default function CategoryProductsPage({
             to="/"
             className="rounded-full bg-[#eef4ff] px-4 py-2 text-sm font-bold text-[#526988] transition hover:bg-[#e1ecff]"
           >
-            Volver
+            ← Volver
           </Link>
         </div>
 
@@ -58,19 +58,19 @@ export default function CategoryProductsPage({
               return (
                 <article
                   key={product.id}
-                  className="overflow-hidden rounded-3xl border border-white/70 bg-white shadow-candy"
+                  className="overflow-hidden rounded-3xl border border-white/80 bg-white/95 shadow-candy transition duration-300 hover:-translate-y-1"
                 >
                   <img
                     src={product.image}
                     alt={product.model}
-                    className="h-48 w-full object-cover"
+                    className="h-52 w-full object-cover"
                     loading="lazy"
                   />
                   <div className="p-4">
                     <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-[#7f93b0]">
                       Modelo
                     </p>
-                    <h2 className="mt-1 font-title text-3xl leading-tight text-ink">
+                    <h2 className="mt-1 font-title text-[2rem] leading-tight text-ink">
                       {product.model}
                     </h2>
                     <p className="mt-2 text-sm font-semibold text-ink/85">
@@ -103,4 +103,3 @@ export default function CategoryProductsPage({
     </section>
   );
 }
-

@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 
 // Barra superior fija con identidad visual de la marca.
-export default function TopBar({ brand, categories = [] }) {
+export default function TopBar({ brand, categories = [], pinToViewport = false }) {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   React.useEffect(() => {
@@ -31,7 +31,12 @@ export default function TopBar({ brand, categories = [] }) {
 
   return (
     <>
-      <header className="sticky top-0 z-40 px-3 pt-3 sm:px-6">
+      {pinToViewport ? <div aria-hidden="true" className="h-[5.25rem] sm:h-[5.75rem]" /> : null}
+      <header
+        className={`z-40 px-3 pt-3 sm:px-6 ${
+          pinToViewport ? "fixed inset-x-0 top-0" : "sticky top-0"
+        }`}
+      >
         <div className="baby-section-glow mx-auto grid w-full max-w-6xl grid-cols-[3rem,1fr,3rem] items-center rounded-2xl px-2 py-2 sm:grid-cols-[3.25rem,1fr,3.25rem] sm:px-4 sm:py-3">
           <button
             type="button"

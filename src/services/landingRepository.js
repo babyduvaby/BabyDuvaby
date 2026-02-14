@@ -43,7 +43,10 @@ function sanitizeConfig(rawConfig) {
         .map((item, index) => ({
           id: String(item.id || `cat-${index + 1}`),
           title: String(item.title || `Categoria ${index + 1}`),
-          image: String(item.image || "")
+          image: String(item.image || defaults.categories[index]?.image || ""),
+          secondaryImage: String(
+            item.secondaryImage || item.image || defaults.categories[index]?.secondaryImage || ""
+          )
         }))
     : defaults.categories;
 

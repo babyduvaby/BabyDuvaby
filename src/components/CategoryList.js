@@ -68,7 +68,9 @@ export default function CategoryList({ categories, products }) {
               <div className="relative h-16 overflow-hidden rounded-xl sm:h-20">
                 <img
                   src={getOptimizedCloudinaryUrl(
-                    firstProductImageByCategory[category.id] || category.image,
+                    category.secondaryImage ||
+                      firstProductImageByCategory[category.id] ||
+                      category.image,
                     {
                       width: 560,
                       height: 260,

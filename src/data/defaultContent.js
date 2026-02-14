@@ -17,27 +17,32 @@ export const defaultLandingConfig = {
     {
       id: "cat-1",
       title: "Panaleras y Mochilas",
-      image: "https://source.unsplash.com/900x700/?baby,diaper,bag,pastel,pink"
+      image: "https://source.unsplash.com/900x700/?baby,diaper,bag,pastel,pink",
+      secondaryImage: "https://source.unsplash.com/900x500/?baby,diaper,bag,accessories,pink"
     },
     {
       id: "cat-2",
       title: "Mantas, Frazadas, Muselinas, Colchas",
-      image: "https://source.unsplash.com/900x700/?baby,blanket,soft,pastel"
+      image: "https://source.unsplash.com/900x700/?baby,blanket,soft,pastel",
+      secondaryImage: "https://source.unsplash.com/900x500/?baby,blanket,folded,pastel"
     },
     {
       id: "cat-3",
       title: "Baberos y Mandiles",
-      image: "https://source.unsplash.com/900x700/?baby,bib,clothes"
+      image: "https://source.unsplash.com/900x700/?baby,bib,clothes",
+      secondaryImage: "https://source.unsplash.com/900x500/?baby,bib,set,pink"
     },
     {
       id: "cat-4",
       title: "Gorros y Turbantes",
-      image: "https://source.unsplash.com/900x700/?baby,hat,turban,pink"
+      image: "https://source.unsplash.com/900x700/?baby,hat,turban,pink",
+      secondaryImage: "https://source.unsplash.com/900x500/?baby,turban,accessories,pastel"
     },
     {
       id: "cat-5",
       title: "Accesorios",
-      image: "https://source.unsplash.com/900x700/?baby,accessories,adorable"
+      image: "https://source.unsplash.com/900x700/?baby,accessories,adorable",
+      secondaryImage: "https://source.unsplash.com/900x500/?baby,accessories,pink,soft"
     }
   ],
   faq: [

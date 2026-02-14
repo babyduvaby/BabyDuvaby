@@ -304,7 +304,8 @@ export default function AdminPanelPage({
         {
           id: createId("cat"),
           title: "Nueva categoria",
-          image: ""
+          image: "",
+          secondaryImage: ""
         }
       ]
     }));
@@ -704,14 +705,23 @@ export default function AdminPanelPage({
                     onChange={(event) => updateCategory(index, "title", event.target.value)}
                   />
                   <Field
-                    label="URL imagen"
+                    label="URL imagen superior"
                     value={category.image}
                     onChange={(event) => updateCategory(index, "image", event.target.value)}
                   />
                 </div>
                 <div className="mt-3">
+                  <Field
+                    label="URL imagen inferior"
+                    value={category.secondaryImage || ""}
+                    onChange={(event) =>
+                      updateCategory(index, "secondaryImage", event.target.value)
+                    }
+                  />
+                </div>
+                <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <ImageDropField
-                    label="Subir o arrastrar imagen categoria"
+                    label="Subir o arrastrar imagen superior"
                     isUploading={uploadingKey === `category-${category.id}`}
                     onFileSelected={(file) =>
                       runUpload(file, `category-${category.id}`, "landing/categories", (url) =>
@@ -719,12 +729,38 @@ export default function AdminPanelPage({
                       )
                     }
                   />
-                </div>
-                <div className="mt-3">
-                  <ImagePreview
-                    src={category.image}
-                    alt={`Previsualizacion categoria ${category.title}`}
+                  <ImageDropField
+                    label="Subir o arrastrar imagen inferior"
+                    isUploading={uploadingKey === `category-secondary-${category.id}`}
+                    onFileSelected={(file) =>
+                      runUpload(
+                        file,
+                        `category-secondary-${category.id}`,
+                        "landing/categories",
+                        (url) => updateCategory(index, "secondaryImage", url)
+                      )
+                    }
                   />
+                </div>
+                <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div>
+                    <p className="mb-1 text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
+                      Previsualizacion superior
+                    </p>
+                    <ImagePreview
+                      src={category.image}
+                      alt={`Previsualizacion superior categoria ${category.title}`}
+                    />
+                  </div>
+                  <div>
+                    <p className="mb-1 text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
+                      Previsualizacion inferior
+                    </p>
+                    <ImagePreview
+                      src={category.secondaryImage || category.image}
+                      alt={`Previsualizacion inferior categoria ${category.title}`}
+                    />
+                  </div>
                 </div>
               </div>
             ))}

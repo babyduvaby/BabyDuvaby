@@ -1,8 +1,39 @@
 import React from "react";
 import { defaultLandingConfig } from "../data/defaultContent";
 
+const AVATAR_POOL = [
+  "https://randomuser.me/api/portraits/women/44.jpg",
+  "https://randomuser.me/api/portraits/women/63.jpg",
+  "https://randomuser.me/api/portraits/women/26.jpg",
+  "https://randomuser.me/api/portraits/women/68.jpg",
+  "https://randomuser.me/api/portraits/women/39.jpg",
+  "https://randomuser.me/api/portraits/women/12.jpg",
+  "https://randomuser.me/api/portraits/women/50.jpg",
+  "https://randomuser.me/api/portraits/women/33.jpg",
+  "https://randomuser.me/api/portraits/women/56.jpg",
+  "https://randomuser.me/api/portraits/women/71.jpg"
+];
+
 function clampRating(value) {
   return Math.max(1, Math.min(5, Number(value) || 5));
+}
+
+function buildUniqueAvatar(preferredAvatar, index, usedAvatars) {
+  const normalizedPreferred = String(preferredAvatar || "").trim();
+  if (normalizedPreferred && !usedAvatars.has(normalizedPreferred)) {
+    usedAvatars.add(normalizedPreferred);
+    return normalizedPreferred;
+  }
+
+  const nextPoolAvatar = AVATAR_POOL.find((avatar) => !usedAvatars.has(avatar));
+  if (nextPoolAvatar) {
+    usedAvatars.add(nextPoolAvatar);
+    return nextPoolAvatar;
+  }
+
+  const fallbackAvatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=baby-duvaby-${index + 1}`;
+  usedAvatars.add(fallbackAvatar);
+  return fallbackAvatar;
 }
 
 function normalizeTestimonials(items) {
@@ -34,7 +65,11 @@ function normalizeTestimonials(items) {
     )
   ];
 
-  return merged.slice(0, 10);
+  const usedAvatars = new Set();
+  return merged.slice(0, 10).map((item, index) => ({
+    ...item,
+    avatar: buildUniqueAvatar(item.avatar, index, usedAvatars)
+  }));
 }
 
 function Stars({ rating }) {
@@ -167,7 +202,7 @@ export default function Testimonials({ items }) {
             >
               <div className="flex items-center gap-3">
                 <img
-                  src={item.avatar || "https://randomuser.me/api/portraits/women/42.jpg"}
+                  src={item.avatar}
                   alt={`Foto de ${item.name}`}
                   loading="lazy"
                   decoding="async"

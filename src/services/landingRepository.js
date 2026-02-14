@@ -4,7 +4,7 @@ import {
   productCatalog,
   STORAGE_KEYS
 } from "../data/defaultContent";
-import { firebaseAuth, firebaseDb } from "../firebase";
+import { firebaseDb } from "../firebase";
 
 const LANDING_DOC_REF = doc(firebaseDb, "landing", "main");
 
@@ -177,16 +177,6 @@ export async function saveLandingState(nextConfig, nextProducts, nextAnalytics) 
   const products = sanitizeProducts(nextProducts, config.categories);
   const analytics = sanitizeAnalytics(nextAnalytics);
   writeLocalConfig(config, products, analytics);
-
-  if (!firebaseAuth.currentUser) {
-    return {
-      config,
-      products,
-      analytics,
-      persistedInFirebase: false,
-      reason: "auth-missing"
-    };
-  }
 
   try {
     await setDoc(

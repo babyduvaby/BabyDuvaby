@@ -83,8 +83,16 @@ export function useLandingConfig() {
     setClickAnalytics(saveResult.analytics);
     setClickCount(saveResult.analytics.total);
 
-    if (!saveResult.persistedInFirebase && saveResult.reason !== "auth-missing") {
-      setError("Guardado local completado. No se pudo sincronizar con Firebase.");
+    if (!saveResult.persistedInFirebase) {
+      if (saveResult.reason === "permission-denied") {
+        setError(
+          "Guardado local completado. Firebase rechazo escritura por permisos (permission-denied)."
+        );
+      } else if (saveResult.reason === "network-unavailable") {
+        setError("Guardado local completado. Firebase no disponible por red en este momento.");
+      } else {
+        setError("Guardado local completado. No se pudo sincronizar con Firebase.");
+      }
     }
 
     setIsSaving(false);

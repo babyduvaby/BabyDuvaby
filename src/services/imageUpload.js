@@ -14,6 +14,19 @@ function sanitizePublicId(fileName) {
   return baseName || "image";
 }
 
+function buildCanonicalCloudinaryUrl(cloudName, uploadResult) {
+  const version = uploadResult?.version ? `v${uploadResult.version}` : "";
+  const publicId = uploadResult?.public_id || "";
+  const format = uploadResult?.format ? `.${uploadResult.format}` : "";
+
+  if (!publicId) {
+    return "";
+  }
+
+  const versionSegment = version ? `${version}/` : "";
+  return `https://res.cloudinary.com/${cloudName}/image/upload/${versionSegment}${publicId}${format}`;
+}
+
 export async function uploadLandingImage(file, folderName) {
   if (!file) {
     throw new Error("Selecciona una imagen.");
@@ -66,5 +79,6 @@ export async function uploadLandingImage(file, folderName) {
     throw new Error("Cloudinary no devolvio una URL valida.");
   }
 
-  return result.secure_url;
+  const canonicalUrl = buildCanonicalCloudinaryUrl(CLOUDINARY_CLOUD_NAME, result);
+  return canonicalUrl || result.secure_url;
 }

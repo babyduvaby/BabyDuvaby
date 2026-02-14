@@ -6,6 +6,7 @@ export default function AdminLoginPage({ onLogin }) {
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState("");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [showPassword, setShowPassword] = React.useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -40,16 +41,52 @@ export default function AdminLoginPage({ onLogin }) {
           <label className="block text-sm font-bold text-ink/85" htmlFor="admin-password">
             Contrasena
           </label>
-          <input
-            id="admin-password"
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            placeholder="Ingresa tu contrasena"
-            className="h-12 w-full rounded-2xl border border-[#d9e7ff] bg-white/95 px-4 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dbe9ff]"
-            autoComplete="current-password"
-            required
-          />
+          <div className="relative">
+            <input
+              id="admin-password"
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="Ingresa tu contrasena"
+              className="h-12 w-full rounded-2xl border border-[#d9e7ff] bg-white/95 pl-4 pr-12 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dbe9ff]"
+              autoComplete="current-password"
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-3 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-[#5f789b] transition hover:bg-[#edf4ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#bcd4fb]"
+              aria-label={showPassword ? "Ocultar contrasena" : "Mostrar contrasena"}
+            >
+              {showPassword ? (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  className="h-5 w-5"
+                >
+                  <path d="M3 3l18 18" />
+                  <path d="M10.58 10.58A2 2 0 0 0 12 14a2 2 0 0 0 1.42-.58" />
+                  <path d="M9.88 5.09A10.94 10.94 0 0 1 12 5c5 0 9.27 3.11 11 7-1 2.2-2.65 4.06-4.73 5.31" />
+                  <path d="M6.61 6.61C4.62 7.86 3 9.69 2 12c1.73 3.89 6 7 10 7 1.35 0 2.66-.24 3.88-.68" />
+                </svg>
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  className="h-5 w-5"
+                >
+                  <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              )}
+            </button>
+          </div>
 
           {error ? (
             <p className="rounded-xl border border-[#ffd3dd] bg-[#fff1f6] px-3 py-2 text-sm font-bold text-[#b03e66]">

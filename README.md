@@ -20,3 +20,11 @@ npm run build
 ## Panel administrador
 - URL: `https://baby-duvaby.vercel.app/admin/login`
 - El panel ya no se muestra dentro de la landing pública.
+
+## Deploy automatico a Vercel
+En cada push a `main` se ejecuta `.github/workflows/vercel-production-deploy.yml`.
+
+Configura estos secrets en GitHub (`Settings > Secrets and variables > Actions`):
+- `VERCEL_TOKEN`
+- `VERCEL_ORG_ID`
+- `VERCEL_PROJECT_ID`

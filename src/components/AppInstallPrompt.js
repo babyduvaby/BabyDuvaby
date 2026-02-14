@@ -26,7 +26,7 @@ function isIosSafari() {
   return isIos && isWebkitSafari;
 }
 
-export default function AppInstallPrompt({ enabled = true }) {
+export default function AppInstallPrompt({ enabled = true, onVisibilityChange }) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [isInstalled, setIsInstalled] = React.useState(false);
   const [mode, setMode] = React.useState("native");
@@ -80,6 +80,12 @@ export default function AppInstallPrompt({ enabled = true }) {
     };
   }, [enabled]);
 
+  React.useEffect(() => {
+    if (typeof onVisibilityChange === "function") {
+      onVisibilityChange(isOpen && !isInstalled);
+    }
+  }, [isOpen, isInstalled, onVisibilityChange]);
+
   const closePrompt = () => {
     sessionStorage.setItem(DISMISSED_SESSION_KEY, "1");
     setIsOpen(false);
@@ -108,7 +114,7 @@ export default function AppInstallPrompt({ enabled = true }) {
 
   return (
     <div
-      className="fixed inset-0 z-[70] flex items-end justify-center bg-[#20102766] p-3 sm:items-center sm:p-6"
+      className="fixed inset-0 z-[120] flex items-end justify-center bg-[#20102766] p-3 sm:items-center sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-label="Instalar aplicacion Baby Duvaby"
@@ -153,4 +159,3 @@ export default function AppInstallPrompt({ enabled = true }) {
     </div>
   );
 }
-

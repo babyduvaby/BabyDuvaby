@@ -117,7 +117,6 @@ export default function App() {
                 brand={config.brand}
                 whatsappHref={whatsappHref}
                 onWhatsappClick={handleWhatsappClick}
-                clickCount={clickCount}
               />
               <CategoryList categories={config.categories} products={products} />
               <FAQ faqItems={config.faq} />

@@ -41,7 +41,7 @@ export default function CategoryList({ categories, products }) {
           >
             <Link
               to={`/categoria/${category.id}`}
-              className="group block overflow-hidden rounded-2xl border border-white/80 bg-white/85 p-2 shadow-candy transition duration-300 hover:-translate-y-1"
+              className="baby-section-glow group block overflow-hidden rounded-2xl border border-white/80 bg-white/85 p-2 shadow-candy transition duration-300 hover:-translate-y-1"
               aria-label={`Ver modelos de ${category.title}`}
             >
               <div className="relative h-24 overflow-hidden rounded-xl sm:h-28">

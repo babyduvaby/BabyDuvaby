@@ -8,7 +8,7 @@ export default function Footer({ categories, brand, whatsappPhone }) {
 
   return (
     <footer className="mx-auto mt-4 w-full max-w-6xl px-4 pb-28 sm:px-6 sm:pb-10">
-      <div className="glass-panel rounded-3xl p-6 shadow-candy">
+      <div className="glass-panel baby-section-glow rounded-3xl p-6 shadow-candy">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
           <div>
             <p className="font-title text-4xl leading-none">

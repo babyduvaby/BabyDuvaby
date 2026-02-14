@@ -21,7 +21,7 @@ export default function Testimonials({ items }) {
         {items.map((item) => (
           <article
             key={item.id}
-            className="glass-panel-baby rounded-3xl border border-white/80 p-5 shadow-candy"
+            className="glass-panel-baby baby-section-glow rounded-3xl border border-white/80 p-5 shadow-candy"
           >
             <p className="text-base font-bold text-ink/90">"{item.quote}"</p>
             <p className="mt-4 text-sm font-extrabold text-[#5f789b]">

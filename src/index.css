@@ -1,0 +1,93 @@
+@import url("https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@500;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: "Nunito", sans-serif;
+    color: #56637f;
+    background: linear-gradient(180deg, #fce9f2 0%, #deebff 100%);
+  }
+}
+
+@layer components {
+  .font-title {
+    font-family: "Baloo 2", cursive;
+  }
+
+  .app-shell {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .ambient {
+    position: absolute;
+    border-radius: 999px;
+    filter: blur(56px);
+    opacity: 0.45;
+  }
+
+  .ambient-top {
+    width: 17rem;
+    height: 17rem;
+    top: -3rem;
+    left: -3rem;
+    background: #ffd2e8;
+  }
+
+  .ambient-bottom {
+    width: 16rem;
+    height: 16rem;
+    right: -2rem;
+    bottom: 10rem;
+    background: #cbe6ff;
+  }
+
+  .hero-image {
+    animation: float-soft 6s ease-in-out infinite;
+  }
+
+  .cta-pulse {
+    animation: pulse-soft 2.6s ease-in-out infinite;
+  }
+
+  .card-reveal {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+    animation: reveal-up 500ms ease-out forwards;
+  }
+}
+
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes pulse-soft {
+  0%,
+  100% {
+    box-shadow: 0 10px 24px rgba(41, 185, 150, 0.28);
+  }
+  50% {
+    box-shadow: 0 14px 28px rgba(41, 185, 150, 0.42);
+  }
+}
+
+@keyframes reveal-up {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

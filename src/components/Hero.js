@@ -1,0 +1,52 @@
+import React from "react";
+
+// Sección principal con CTA prioritario a WhatsApp.
+export default function Hero({
+  brand,
+  whatsappHref,
+  onWhatsappClick,
+  clickCount
+}) {
+  const [firstWord, secondWord, ...restWords] = brand.name.split(" ");
+  const restLabel = restWords.join(" ");
+
+  return (
+    <section className="relative z-10 mx-auto max-w-xl px-4 pb-10 pt-8 text-center sm:px-6">
+      <div className="mx-auto mb-4 inline-flex rounded-full bg-white/70 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-ink shadow-sm">
+        Tienda de ropita para bebé
+      </div>
+
+      <h1 className="font-title text-5xl leading-none sm:text-6xl">
+        <span className="text-[#f27ea6]">{firstWord || ""}</span>{" "}
+        <span className="text-[#6bb2ec]">{secondWord || ""}</span>{" "}
+        <span className="text-[#f27ea6]">{restLabel}</span>
+      </h1>
+      <p className="mt-4 text-lg font-semibold text-ink/90 sm:text-xl">
+        {brand.subtitle}
+      </p>
+
+      <div className="relative mt-6 overflow-hidden rounded-[2rem] bg-white/70 p-2 shadow-candy">
+        <img
+          src={brand.heroImage}
+          alt="Bebé sonriente con ropa tierna"
+          className="hero-image h-[18rem] w-full rounded-[1.5rem] object-cover sm:h-[24rem]"
+        />
+      </div>
+
+      <a
+        href={whatsappHref}
+        target="_blank"
+        rel="noreferrer"
+        onClick={onWhatsappClick}
+        className="cta-pulse mt-7 inline-flex min-h-14 w-full items-center justify-center rounded-full bg-gradient-to-r from-[#48d7a8] to-[#24b191] px-6 text-xl font-extrabold text-white shadow-candy transition duration-300 hover:scale-[1.01] hover:brightness-105 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#89f0ce] sm:w-auto"
+      >
+        {brand.whatsappButtonText}
+      </a>
+
+      <p className="mt-4 text-lg font-bold text-ink/90">{brand.shippingMessage}</p>
+      <p className="mt-2 text-sm font-semibold text-ink/80">
+        Clics en WhatsApp: {clickCount}
+      </p>
+    </section>
+  );
+}

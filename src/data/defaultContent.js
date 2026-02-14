@@ -60,21 +60,93 @@ export const defaultLandingConfig = {
   testimonials: [
     {
       id: "t-1",
-      name: "Carla M.",
-      quote: "Me encanto la calidad. Llegaron rapido y en perfecto estado.",
-      location: "Lima"
+      name: "Daniela R.",
+      quote:
+        "Compre por WhatsApp en minutos y me ayudaron a elegir talla. Todo llego rapido y hermoso.",
+      location: "Lima",
+      rating: 5,
+      avatar: "https://randomuser.me/api/portraits/women/44.jpg"
     },
     {
       id: "t-2",
-      name: "Andrea P.",
-      quote: "La atencion por WhatsApp fue super clara y amable.",
-      location: "Arequipa"
+      name: "Paola M.",
+      quote:
+        "Pedi por unidad para regalo y la presentacion fue preciosa. Excelente atencion por WhatsApp.",
+      location: "Arequipa",
+      rating: 5,
+      avatar: "https://randomuser.me/api/portraits/women/63.jpg"
     },
     {
       id: "t-3",
       name: "Rosa L.",
-      quote: "Los colores y telas son bellisimos, volvere a comprar.",
-      location: "Trujillo"
+      quote:
+        "Hice compra por mayor para mi tienda y los descuentos salieron super bien. Mis clientas felices.",
+      location: "Trujillo",
+      rating: 5,
+      avatar: "https://randomuser.me/api/portraits/women/26.jpg"
+    },
+    {
+      id: "t-4",
+      name: "Milagros C.",
+      quote:
+        "Las promociones por temporada son buenisimas. Recibi mi pedido en provincia sin problemas.",
+      location: "Piura",
+      rating: 4,
+      avatar: "https://randomuser.me/api/portraits/women/68.jpg"
+    },
+    {
+      id: "t-5",
+      name: "Katherine V.",
+      quote:
+        "Compre baberos y mantas por unidad, todo suavecito y de muy buena calidad. Recomendado.",
+      location: "Cusco",
+      rating: 5,
+      avatar: "https://randomuser.me/api/portraits/women/39.jpg"
+    },
+    {
+      id: "t-6",
+      name: "Vanessa T.",
+      quote:
+        "Hice pedido por WhatsApp para baby shower y me asesoraron super rapido. Quede feliz.",
+      location: "Chiclayo",
+      rating: 5,
+      avatar: "https://randomuser.me/api/portraits/women/12.jpg"
+    },
+    {
+      id: "t-7",
+      name: "Angie P.",
+      quote:
+        "La compra por mayor me ayudo mucho con precios. Todo llego ordenado y en excelente estado.",
+      location: "Huancayo",
+      rating: 4,
+      avatar: "https://randomuser.me/api/portraits/women/50.jpg"
+    },
+    {
+      id: "t-8",
+      name: "Sheyla G.",
+      quote:
+        "Me encanto la rapidez y el trato por WhatsApp. Aproveche descuento y compre accesorios hermosos.",
+      location: "Iquitos",
+      rating: 5,
+      avatar: "https://randomuser.me/api/portraits/women/33.jpg"
+    },
+    {
+      id: "t-9",
+      name: "Brenda A.",
+      quote:
+        "Compre gorritos por unidad y luego hice otro pedido mayorista. Calidad top y envio puntual.",
+      location: "Tacna",
+      rating: 5,
+      avatar: "https://randomuser.me/api/portraits/women/56.jpg"
+    },
+    {
+      id: "t-10",
+      name: "Yuliana F.",
+      quote:
+        "Excelente experiencia, siempre responden rapido por WhatsApp y tienen promociones lindas para bebes.",
+      location: "Puno",
+      rating: 4,
+      avatar: "https://randomuser.me/api/portraits/women/71.jpg"
     }
   ]
 };

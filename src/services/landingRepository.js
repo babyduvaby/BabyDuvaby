@@ -64,8 +64,20 @@ function sanitizeConfig(rawConfig) {
           id: String(item.id || `t-${index + 1}`),
           name: String(item.name || `Cliente ${index + 1}`),
           quote: String(item.quote || ""),
-          location: String(item.location || "")
+          location: String(item.location || ""),
+          rating: Math.max(1, Math.min(5, Number(item.rating) || 5)),
+          avatar: String(item.avatar || "")
         }))
+    : defaults.testimonials;
+
+  const mergedTestimonials = testimonials.length
+    ? [
+        ...testimonials,
+        ...defaults.testimonials.filter(
+          (defaultItem) =>
+            !testimonials.some((item) => String(item.id) === String(defaultItem.id))
+        )
+      ].slice(0, 10)
     : defaults.testimonials;
 
   const brandRaw = isRecord(rawConfig.brand) ? rawConfig.brand : {};
@@ -85,7 +97,7 @@ function sanitizeConfig(rawConfig) {
     },
     categories,
     faq,
-    testimonials
+    testimonials: mergedTestimonials
   };
 }
 

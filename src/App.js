@@ -19,7 +19,6 @@ export default function App() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith("/admin");
   const [floatingMessage, setFloatingMessage] = React.useState("");
-  const [isInstallPromptVisible, setIsInstallPromptVisible] = React.useState(false);
 
   const {
     config,
@@ -186,7 +185,7 @@ export default function App() {
         />
       ) : null}
 
-      {!isAdminRoute && !isInstallPromptVisible ? (
+      {!isAdminRoute ? (
         <FloatingWhatsappButton
           whatsappHref={whatsappHref}
           onWhatsappClick={handleWhatsappClick}
@@ -194,10 +193,7 @@ export default function App() {
         />
       ) : null}
 
-      <AppInstallPrompt
-        enabled={!isAdminRoute}
-        onVisibilityChange={setIsInstallPromptVisible}
-      />
+      <AppInstallPrompt enabled={!isAdminRoute} />
     </main>
   );
 }

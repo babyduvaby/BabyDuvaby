@@ -86,7 +86,7 @@ export default function TopBar({ brand, categories = [], pinToViewport = false }
           role="dialog"
           aria-modal="true"
           aria-label="Menu de categorias"
-          className={`baby-side-menu relative h-full w-[84vw] max-w-sm px-4 py-5 transition-transform duration-300 sm:w-80 ${
+          className={`baby-side-menu relative h-full w-[50vw] px-3 py-5 transition-transform duration-300 sm:w-80 sm:px-4 ${
             isMenuOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >

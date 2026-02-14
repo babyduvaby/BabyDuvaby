@@ -42,7 +42,7 @@ export default function Hero({
           href={whatsappHref}
           target="_blank"
           rel="noreferrer"
-          onClick={onWhatsappClick}
+          onClick={() => onWhatsappClick("hero_cta")}
           className="cta-pulse mt-7 hidden min-h-14 w-full items-center justify-center rounded-full bg-gradient-to-r from-[#49d8ab] to-[#22b191] px-6 text-xl font-extrabold text-white shadow-candy transition duration-300 hover:scale-[1.01] hover:brightness-105 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#89f0ce] sm:inline-flex sm:w-auto"
         >
           {brand.whatsappButtonText}

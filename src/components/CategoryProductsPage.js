@@ -80,7 +80,7 @@ export default function CategoryProductsPage({
                       href={whatsappHref}
                       target="_blank"
                       rel="noreferrer"
-                      onClick={onWhatsappClick}
+                      onClick={() => onWhatsappClick("product_card")}
                       className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-full bg-gradient-to-r from-[#45d4a6] to-[#24b191] px-4 text-base font-extrabold text-white transition duration-300 hover:brightness-105 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#9af2d7]"
                     >
                       Consultar por WhatsApp

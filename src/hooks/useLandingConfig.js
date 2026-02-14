@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { STORAGE_KEYS } from "../data/defaultContent";
 import {
+  buildNextAnalytics,
+  clearAnalytics,
   getDefaultLandingState,
   loadLandingState,
   saveLandingState
@@ -10,7 +12,8 @@ export function useLandingConfig() {
   const defaults = getDefaultLandingState();
   const [config, setConfig] = useState(defaults.config);
   const [products, setProducts] = useState(defaults.products);
-  const [clickCount, setClickCount] = useState(0);
+  const [clickAnalytics, setClickAnalytics] = useState(defaults.analytics);
+  const [clickCount, setClickCount] = useState(defaults.analytics.total);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
@@ -20,15 +23,6 @@ export function useLandingConfig() {
 
     async function hydrateLanding() {
       try {
-        const savedClicksRaw = localStorage.getItem(STORAGE_KEYS.clicks);
-
-        if (savedClicksRaw) {
-          const parsedClicks = Number(savedClicksRaw);
-          if (!Number.isNaN(parsedClicks) && isMounted) {
-            setClickCount(parsedClicks);
-          }
-        }
-
         const loadedState = await loadLandingState();
 
         if (!isMounted) {
@@ -37,6 +31,8 @@ export function useLandingConfig() {
 
         setConfig(loadedState.config);
         setProducts(loadedState.products);
+        setClickAnalytics(loadedState.analytics);
+        setClickCount(loadedState.analytics.total);
       } catch {
         if (isMounted) {
           setError("No se pudo cargar el contenido. Se usaron valores por defecto.");
@@ -55,26 +51,37 @@ export function useLandingConfig() {
     };
   }, []);
 
-  const incrementWhatsAppClicks = () => {
-    setClickCount((prevCount) => {
-      const nextCount = prevCount + 1;
-      localStorage.setItem(STORAGE_KEYS.clicks, String(nextCount));
-      return nextCount;
+  const incrementWhatsAppClicks = (zone = "unknown") => {
+    setClickAnalytics((prevAnalytics) => {
+      const nextAnalytics = buildNextAnalytics(prevAnalytics, zone);
+      setClickCount(nextAnalytics.total);
+      localStorage.setItem(STORAGE_KEYS.clickAnalytics, JSON.stringify(nextAnalytics));
+      localStorage.setItem(STORAGE_KEYS.clicks, String(nextAnalytics.total));
+
+      // Sincronizacion no bloqueante para no impactar el click de conversion.
+      saveLandingState(config, products, nextAnalytics);
+      return nextAnalytics;
     });
   };
 
   const resetClickCount = () => {
+    const emptyAnalytics = clearAnalytics();
+    setClickAnalytics(emptyAnalytics);
     setClickCount(0);
+    localStorage.setItem(STORAGE_KEYS.clickAnalytics, JSON.stringify(emptyAnalytics));
     localStorage.setItem(STORAGE_KEYS.clicks, "0");
+    saveLandingState(config, products, emptyAnalytics);
   };
 
-  const saveContent = async (nextConfig, nextProducts) => {
+  const saveContent = async (nextConfig, nextProducts, nextAnalytics = clickAnalytics) => {
     setIsSaving(true);
     setError("");
 
-    const saveResult = await saveLandingState(nextConfig, nextProducts);
+    const saveResult = await saveLandingState(nextConfig, nextProducts, nextAnalytics);
     setConfig(saveResult.config);
     setProducts(saveResult.products);
+    setClickAnalytics(saveResult.analytics);
+    setClickCount(saveResult.analytics.total);
 
     if (!saveResult.persistedInFirebase) {
       setError("Guardado local completado. No se pudo sincronizar con Firebase.");
@@ -86,13 +93,21 @@ export function useLandingConfig() {
 
   const restoreDefaultContent = async () => {
     const defaultState = getDefaultLandingState();
-    return saveContent(defaultState.config, defaultState.products);
+    return saveContent(defaultState.config, defaultState.products, defaultState.analytics);
+  };
+
+  const importLandingSnapshot = async (snapshotData) => {
+    const nextConfig = snapshotData?.config || config;
+    const nextProducts = snapshotData?.products || products;
+    const nextAnalytics = snapshotData?.analytics || clickAnalytics;
+    return saveContent(nextConfig, nextProducts, nextAnalytics);
   };
 
   return {
     config,
     products,
     clickCount,
+    clickAnalytics,
     isLoading,
     isSaving,
     error,
@@ -102,6 +117,7 @@ export function useLandingConfig() {
     incrementWhatsAppClicks,
     resetClickCount,
     saveContent,
-    restoreDefaultContent
+    restoreDefaultContent,
+    importLandingSnapshot
   };
 }

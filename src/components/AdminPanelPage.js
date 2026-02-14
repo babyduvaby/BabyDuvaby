@@ -4,8 +4,26 @@ import { uploadLandingImage } from "../services/imageUpload";
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
 
+const ZONE_LABELS = {
+  hero_cta: "Hero CTA",
+  mobile_bar: "Barra movil",
+  product_card: "Tarjeta producto",
+  unknown: "Sin zona"
+};
+
 function createId(prefix) {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function moveItem(items, fromIndex, toIndex) {
+  if (fromIndex === toIndex) {
+    return items;
+  }
+
+  const nextItems = [...items];
+  const [movedItem] = nextItems.splice(fromIndex, 1);
+  nextItems.splice(toIndex, 0, movedItem);
+  return nextItems;
 }
 
 function Field({ label, value, onChange, placeholder }) {
@@ -41,14 +59,130 @@ function TextArea({ label, value, onChange, placeholder }) {
   );
 }
 
+function ImageDropField({ label, onFileSelected, isUploading }) {
+  const [isDragging, setIsDragging] = React.useState(false);
+
+  const handleDrop = (event) => {
+    event.preventDefault();
+    setIsDragging(false);
+    const file = event.dataTransfer.files?.[0];
+    if (file) {
+      onFileSelected(file);
+    }
+  };
+
+  return (
+    <div>
+      <span className="mb-1 block text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
+        {label}
+      </span>
+      <label
+        onDragOver={(event) => {
+          event.preventDefault();
+          setIsDragging(true);
+        }}
+        onDragLeave={() => setIsDragging(false)}
+        onDrop={handleDrop}
+        className={`flex min-h-24 w-full cursor-pointer items-center justify-center rounded-xl border-2 border-dashed px-4 py-4 text-center text-sm font-bold transition ${
+          isDragging
+            ? "border-[#7ca2d9] bg-[#eef5ff] text-[#496a91]"
+            : "border-[#d8e6ff] bg-white text-[#5f799b]"
+        }`}
+      >
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            if (file) {
+              onFileSelected(file);
+            }
+            event.target.value = "";
+          }}
+          className="hidden"
+        />
+        {isUploading ? "Subiendo imagen..." : "Arrastra imagen aqui o haz clic para subir"}
+      </label>
+    </div>
+  );
+}
+
+function WhatsAppAnalyticsChart({ analytics }) {
+  const byZone = analytics?.byZone || {};
+  const zoneRows = Object.entries(byZone).map(([zone, count]) => ({
+    zone,
+    label: ZONE_LABELS[zone] || zone,
+    count: Number(count) || 0
+  }));
+  const maxClicks = Math.max(1, ...zoneRows.map((item) => item.count));
+
+  const byDay = analytics?.byDay || {};
+  const dailyRows = Object.keys(byDay)
+    .sort((a, b) => a.localeCompare(b))
+    .slice(-7)
+    .map((key) => ({ date: key, count: Number(byDay[key]) || 0 }));
+
+  return (
+    <article className="glass-panel rounded-3xl p-5 shadow-candy sm:p-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="font-title text-4xl text-ink">Analitica WhatsApp</h2>
+        <p className="rounded-full border border-[#d8e6ff] bg-white px-4 py-2 text-sm font-extrabold text-[#5f789b]">
+          Total: {analytics?.total || 0}
+        </p>
+      </div>
+
+      <div className="mt-4 space-y-3">
+        {zoneRows.map((row) => (
+          <div key={row.zone}>
+            <div className="mb-1 flex items-center justify-between text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
+              <span>{row.label}</span>
+              <span>{row.count} clics</span>
+            </div>
+            <div className="h-3 rounded-full bg-[#e8f0ff]">
+              <div
+                className="h-3 rounded-full bg-gradient-to-r from-[#5f93d1] to-[#49c6ad]"
+                style={{ width: `${(row.count / maxClicks) * 100}%` }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-6">
+        <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
+          Ultimos 7 dias
+        </p>
+        {dailyRows.length ? (
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
+            {dailyRows.map((row) => (
+              <div key={row.date} className="rounded-xl border border-[#dce8ff] bg-white p-3 text-center">
+                <p className="text-[10px] font-extrabold uppercase tracking-[0.1em] text-[#738bab]">
+                  {row.date.slice(5)}
+                </p>
+                <p className="mt-1 text-lg font-extrabold text-[#4f6f97]">{row.count}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-xl border border-[#dce8ff] bg-white p-3 text-sm font-semibold text-[#5f799b]">
+            Aun no hay clics registrados por dia.
+          </div>
+        )}
+      </div>
+    </article>
+  );
+}
+
 export default function AdminPanelPage({
   config,
   products,
   clickCount,
+  clickAnalytics,
   isSaving,
   onSaveContent,
   onRestoreDefaultContent,
   onResetClickCount,
+  onImportSnapshot,
   onLogout
 }) {
   const navigate = useNavigate();
@@ -57,6 +191,7 @@ export default function AdminPanelPage({
   const [status, setStatus] = React.useState("");
   const [error, setError] = React.useState("");
   const [uploadingKey, setUploadingKey] = React.useState("");
+  const [dragMeta, setDragMeta] = React.useState(null);
 
   React.useEffect(() => {
     setDraftConfig(clone(config));
@@ -115,6 +250,13 @@ export default function AdminPanelPage({
         categories: nextCategories
       };
     });
+  };
+
+  const reorderCategories = (fromIndex, toIndex) => {
+    setDraftConfig((prev) => ({
+      ...prev,
+      categories: moveItem(prev.categories, fromIndex, toIndex)
+    }));
   };
 
   const addCategory = () => {
@@ -185,6 +327,10 @@ export default function AdminPanelPage({
     });
   };
 
+  const reorderProducts = (fromIndex, toIndex) => {
+    setDraftProducts((prev) => moveItem(prev, fromIndex, toIndex));
+  };
+
   const addProduct = () => {
     const firstCategoryId = draftConfig.categories[0]?.id || "cat-1";
     setDraftProducts((prev) => [
@@ -206,7 +352,7 @@ export default function AdminPanelPage({
   const handleSave = async () => {
     setStatus("");
     setError("");
-    const persistedInFirebase = await onSaveContent(draftConfig, draftProducts);
+    const persistedInFirebase = await onSaveContent(draftConfig, draftProducts, clickAnalytics);
 
     if (persistedInFirebase) {
       setStatus("Cambios guardados en Firebase.");
@@ -223,9 +369,61 @@ export default function AdminPanelPage({
     setStatus("Contenido restaurado.");
   };
 
+  const handleExportBackup = () => {
+    const payload = {
+      config: draftConfig,
+      products: draftProducts,
+      analytics: clickAnalytics,
+      exportedAt: new Date().toISOString()
+    };
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {
+      type: "application/json"
+    });
+    const downloadUrl = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = downloadUrl;
+    anchor.download = `baby-duvaby-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    anchor.click();
+    URL.revokeObjectURL(downloadUrl);
+    setStatus("Backup exportado correctamente.");
+  };
+
+  const handleImportBackup = async (file) => {
+    if (!file) {
+      return;
+    }
+
+    try {
+      const raw = await file.text();
+      const parsed = JSON.parse(raw);
+      await onImportSnapshot(parsed);
+      setStatus("Backup importado y aplicado.");
+      setError("");
+    } catch {
+      setError("No se pudo importar el backup. Verifica formato JSON.");
+    }
+  };
+
   const handleLogout = async () => {
     await onLogout();
     navigate("/admin/login", { replace: true });
+  };
+
+  const handleDropReorder = (type, toIndex) => {
+    if (!dragMeta || dragMeta.type !== type) {
+      return;
+    }
+
+    if (type === "category") {
+      reorderCategories(dragMeta.index, toIndex);
+    }
+
+    if (type === "product") {
+      reorderProducts(dragMeta.index, toIndex);
+    }
+
+    setDragMeta(null);
   };
 
   const categoryOptions = draftConfig.categories.map((item) => ({
@@ -275,7 +473,7 @@ export default function AdminPanelPage({
           onClick={onResetClickCount}
           className="ml-3 rounded-full border border-[#cde0ff] bg-white px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#5f799b] transition hover:bg-[#eff5ff]"
         >
-          Reiniciar contador
+          Limpiar analitica
         </button>
       </div>
 
@@ -291,6 +489,40 @@ export default function AdminPanelPage({
       ) : null}
 
       <div className="space-y-4">
+        <WhatsAppAnalyticsChart analytics={clickAnalytics} />
+
+        <article className="glass-panel rounded-3xl p-5 shadow-candy sm:p-6">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <h2 className="font-title text-4xl text-ink">Herramientas admin</h2>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={handleExportBackup}
+                className="rounded-full border border-[#d6e5ff] bg-white px-4 py-2 text-xs font-extrabold uppercase tracking-wide text-[#5d7698] transition hover:bg-[#f5f9ff]"
+              >
+                Exportar backup
+              </button>
+              <label className="cursor-pointer rounded-full border border-[#d6e5ff] bg-white px-4 py-2 text-xs font-extrabold uppercase tracking-wide text-[#5d7698] transition hover:bg-[#f5f9ff]">
+                Importar backup
+                <input
+                  type="file"
+                  accept="application/json"
+                  className="hidden"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0];
+                    handleImportBackup(file);
+                    event.target.value = "";
+                  }}
+                />
+              </label>
+            </div>
+          </div>
+          <p className="text-sm font-semibold text-[#5f799b]">
+            Arrastra tarjetas para cambiar el orden de categorias y modelos. Tambien puedes
+            arrastrar imagenes en cada bloque para actualizar rapido.
+          </p>
+        </article>
+
         <article className="glass-panel rounded-3xl p-5 shadow-candy sm:p-6">
           <h2 className="font-title text-4xl text-ink">Marca y Hero</h2>
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -319,32 +551,19 @@ export default function AdminPanelPage({
               onChange={(event) => updateBrandField("shippingMessage", event.target.value)}
             />
           </div>
-          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto]">
+          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field
               label="URL imagen principal"
               value={draftConfig.brand.heroImage}
               onChange={(event) => updateBrandField("heroImage", event.target.value)}
             />
-            <label className="block">
-              <span className="mb-1 block text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
-                Subir archivo
-              </span>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(event) => {
-                  const file = event.target.files?.[0];
-                  runUpload(file, "hero", "landing/hero", (url) =>
-                    updateBrandField("heroImage", url)
-                  );
-                  event.target.value = "";
-                }}
-                className="w-full rounded-xl border border-[#d8e6ff] bg-white px-3 py-2 text-sm font-semibold text-ink file:mr-3 file:rounded-full file:border-0 file:bg-[#eef5ff] file:px-3 file:py-1 file:text-xs file:font-extrabold file:text-[#5b7698]"
-              />
-              {uploadingKey === "hero" ? (
-                <p className="mt-1 text-xs font-bold text-[#5f7a9c]">Subiendo imagen...</p>
-              ) : null}
-            </label>
+            <ImageDropField
+              label="Subir o arrastrar imagen"
+              isUploading={uploadingKey === "hero"}
+              onFileSelected={(file) =>
+                runUpload(file, "hero", "landing/hero", (url) => updateBrandField("heroImage", url))
+              }
+            />
           </div>
         </article>
 
@@ -378,16 +597,30 @@ export default function AdminPanelPage({
 
           <div className="space-y-3">
             {draftConfig.categories.map((category, index) => (
-              <div key={category.id} className="rounded-2xl border border-[#dce8ff] bg-white/90 p-4">
+              <div
+                key={category.id}
+                draggable
+                onDragStart={() => setDragMeta({ type: "category", index })}
+                onDragOver={(event) => event.preventDefault()}
+                onDrop={() => handleDropReorder("category", index)}
+                className="rounded-2xl border border-[#dce8ff] bg-white/90 p-4"
+              >
                 <div className="mb-3 flex items-center justify-between gap-2">
-                  <p className="text-sm font-extrabold text-ink">ID: {category.id}</p>
-                  <button
-                    type="button"
-                    onClick={() => removeCategory(category.id)}
-                    className="rounded-full border border-[#ffd5df] bg-[#fff3f7] px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#a64b6b] transition hover:bg-[#ffe8ef]"
-                  >
-                    Eliminar
-                  </button>
+                  <p className="text-sm font-extrabold text-ink">
+                    ID: {category.id} | Orden: {index + 1}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-full border border-[#dce8ff] bg-[#f6f9ff] px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#5f799b]">
+                      Arrastrar
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeCategory(category.id)}
+                      className="rounded-full border border-[#ffd5df] bg-[#fff3f7] px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#a64b6b] transition hover:bg-[#ffe8ef]"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
                 </div>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <Field
@@ -401,26 +634,17 @@ export default function AdminPanelPage({
                     onChange={(event) => updateCategory(index, "image", event.target.value)}
                   />
                 </div>
-                <label className="mt-3 block">
-                  <span className="mb-1 block text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
-                    Subir imagen categoria
-                  </span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(event) => {
-                      const file = event.target.files?.[0];
+                <div className="mt-3">
+                  <ImageDropField
+                    label="Subir o arrastrar imagen categoria"
+                    isUploading={uploadingKey === `category-${category.id}`}
+                    onFileSelected={(file) =>
                       runUpload(file, `category-${category.id}`, "landing/categories", (url) =>
                         updateCategory(index, "image", url)
-                      );
-                      event.target.value = "";
-                    }}
-                    className="w-full rounded-xl border border-[#d8e6ff] bg-white px-3 py-2 text-sm font-semibold text-ink file:mr-3 file:rounded-full file:border-0 file:bg-[#eef5ff] file:px-3 file:py-1 file:text-xs file:font-extrabold file:text-[#5b7698]"
+                      )
+                    }
                   />
-                  {uploadingKey === `category-${category.id}` ? (
-                    <p className="mt-1 text-xs font-bold text-[#5f7a9c]">Subiendo imagen...</p>
-                  ) : null}
-                </label>
+                </div>
               </div>
             ))}
           </div>
@@ -481,16 +705,30 @@ export default function AdminPanelPage({
 
           <div className="space-y-3">
             {draftProducts.map((product, index) => (
-              <div key={product.id} className="rounded-2xl border border-[#dce8ff] bg-white/90 p-4">
+              <div
+                key={product.id}
+                draggable
+                onDragStart={() => setDragMeta({ type: "product", index })}
+                onDragOver={(event) => event.preventDefault()}
+                onDrop={() => handleDropReorder("product", index)}
+                className="rounded-2xl border border-[#dce8ff] bg-white/90 p-4"
+              >
                 <div className="mb-3 flex items-center justify-between gap-2">
-                  <p className="text-sm font-extrabold text-ink">ID: {product.id}</p>
-                  <button
-                    type="button"
-                    onClick={() => removeProduct(product.id)}
-                    className="rounded-full border border-[#ffd5df] bg-[#fff3f7] px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#a64b6b] transition hover:bg-[#ffe8ef]"
-                  >
-                    Eliminar
-                  </button>
+                  <p className="text-sm font-extrabold text-ink">
+                    ID: {product.id} | Orden: {index + 1}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-full border border-[#dce8ff] bg-[#f6f9ff] px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#5f799b]">
+                      Arrastrar
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeProduct(product.id)}
+                      className="rounded-full border border-[#ffd5df] bg-[#fff3f7] px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#a64b6b] transition hover:bg-[#ffe8ef]"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
                 </div>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <Field
@@ -528,26 +766,15 @@ export default function AdminPanelPage({
                     value={product.image}
                     onChange={(event) => updateProduct(index, "image", event.target.value)}
                   />
-                  <label className="block">
-                    <span className="mb-1 block text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
-                      Subir imagen
-                    </span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(event) => {
-                        const file = event.target.files?.[0];
-                        runUpload(file, `product-${product.id}`, "landing/products", (url) =>
-                          updateProduct(index, "image", url)
-                        );
-                        event.target.value = "";
-                      }}
-                      className="w-full rounded-xl border border-[#d8e6ff] bg-white px-3 py-2 text-sm font-semibold text-ink file:mr-3 file:rounded-full file:border-0 file:bg-[#eef5ff] file:px-3 file:py-1 file:text-xs file:font-extrabold file:text-[#5b7698]"
-                    />
-                    {uploadingKey === `product-${product.id}` ? (
-                      <p className="mt-1 text-xs font-bold text-[#5f7a9c]">Subiendo imagen...</p>
-                    ) : null}
-                  </label>
+                  <ImageDropField
+                    label="Subir o arrastrar imagen"
+                    isUploading={uploadingKey === `product-${product.id}`}
+                    onFileSelected={(file) =>
+                      runUpload(file, `product-${product.id}`, "landing/products", (url) =>
+                        updateProduct(index, "image", url)
+                      )
+                    }
+                  />
                 </div>
               </div>
             ))}

@@ -21,6 +21,7 @@ export default function App() {
     config,
     products,
     clickCount,
+    clickAnalytics,
     isLoading,
     isSaving,
     error,
@@ -28,7 +29,8 @@ export default function App() {
     incrementWhatsAppClicks,
     resetClickCount,
     saveContent,
-    restoreDefaultContent
+    restoreDefaultContent,
+    importLandingSnapshot
   } = useLandingConfig();
 
   const { isAdminAuthenticated, isAuthLoading, loginWithPassword, logout } =
@@ -44,9 +46,9 @@ export default function App() {
 
   const whatsappHref = buildWhatsappHref();
 
-  const handleWhatsappClick = () => {
+  const handleWhatsappClick = (zone) => {
     setError("");
-    incrementWhatsAppClicks();
+    incrementWhatsAppClicks(zone);
   };
 
   if (isLoading) {
@@ -130,10 +132,12 @@ export default function App() {
                 config={config}
                 products={products}
                 clickCount={clickCount}
+                clickAnalytics={clickAnalytics}
                 isSaving={isSaving}
                 onSaveContent={saveContent}
                 onRestoreDefaultContent={restoreDefaultContent}
                 onResetClickCount={resetClickCount}
+                onImportSnapshot={importLandingSnapshot}
                 onLogout={logout}
               />
             ) : (

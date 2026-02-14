@@ -138,5 +138,6 @@ export const STORAGE_KEYS = {
   config: "baby_duvaby_config_v1",
   products: "baby_duvaby_products_v1",
   clicks: "baby_duvaby_whatsapp_clicks_v1",
+  clickAnalytics: "baby_duvaby_whatsapp_click_analytics_v1",
   adminFallbackSession: "baby_duvaby_admin_fallback_session_v1"
 };

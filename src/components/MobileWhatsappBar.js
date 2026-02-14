@@ -8,7 +8,7 @@ export default function MobileWhatsappBar({ whatsappHref, onWhatsappClick, butto
         href={whatsappHref}
         target="_blank"
         rel="noreferrer"
-        onClick={onWhatsappClick}
+        onClick={() => onWhatsappClick("mobile_bar")}
         className="inline-flex min-h-14 w-full items-center justify-center rounded-full bg-gradient-to-r from-[#46d6aa] to-[#20af90] px-5 text-xl font-extrabold text-white transition duration-300 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#89f0ce]"
       >
         {buttonText} 💬

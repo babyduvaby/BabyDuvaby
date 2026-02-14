@@ -12,6 +12,16 @@ const toJsonClone = (value) => JSON.parse(JSON.stringify(value));
 
 const defaultConfigClone = () => toJsonClone(defaultLandingConfig);
 const defaultProductsClone = () => toJsonClone(productCatalog);
+const defaultAnalytics = () => ({
+  total: 0,
+  byZone: {
+    hero_cta: 0,
+    mobile_bar: 0,
+    product_card: 0,
+    unknown: 0
+  },
+  byDay: {}
+});
 
 const isRecord = (value) => Boolean(value) && typeof value === "object" && !Array.isArray(value);
 
@@ -81,24 +91,63 @@ function sanitizeProducts(rawProducts, categories) {
   });
 }
 
+function sanitizeAnalytics(rawAnalytics) {
+  const defaults = defaultAnalytics();
+
+  if (!isRecord(rawAnalytics)) {
+    return defaults;
+  }
+
+  const byZone = isRecord(rawAnalytics.byZone) ? rawAnalytics.byZone : {};
+  const byDay = isRecord(rawAnalytics.byDay) ? rawAnalytics.byDay : {};
+
+  return {
+    total: Number(rawAnalytics.total) || 0,
+    byZone: {
+      hero_cta: Number(byZone.hero_cta) || 0,
+      mobile_bar: Number(byZone.mobile_bar) || 0,
+      product_card: Number(byZone.product_card) || 0,
+      unknown: Number(byZone.unknown) || 0
+    },
+    byDay: Object.keys(byDay).reduce((accumulator, key) => {
+      const safeKey = String(key);
+      const safeValue = Number(byDay[key]) || 0;
+      accumulator[safeKey] = safeValue;
+      return accumulator;
+    }, {})
+  };
+}
+
 function readLocalConfig() {
   try {
     const rawConfig = localStorage.getItem(STORAGE_KEYS.config);
     const rawProducts = localStorage.getItem(STORAGE_KEYS.products);
+    const rawAnalytics = localStorage.getItem(STORAGE_KEYS.clickAnalytics);
+    const rawClicks = localStorage.getItem(STORAGE_KEYS.clicks);
     const parsedConfig = rawConfig ? JSON.parse(rawConfig) : null;
     const parsedProducts = rawProducts ? JSON.parse(rawProducts) : null;
+    const parsedAnalytics = rawAnalytics ? JSON.parse(rawAnalytics) : null;
     const config = sanitizeConfig(parsedConfig);
     const products = sanitizeProducts(parsedProducts, config.categories);
+    const analytics = sanitizeAnalytics(parsedAnalytics);
+    const legacyClicks = Number(rawClicks) || 0;
+    analytics.total = Math.max(analytics.total, legacyClicks);
 
-    return { config, products };
+    return { config, products, analytics };
   } catch {
-    return { config: defaultConfigClone(), products: defaultProductsClone() };
+    return {
+      config: defaultConfigClone(),
+      products: defaultProductsClone(),
+      analytics: defaultAnalytics()
+    };
   }
 }
 
-function writeLocalConfig(config, products) {
+function writeLocalConfig(config, products, analytics) {
   localStorage.setItem(STORAGE_KEYS.config, JSON.stringify(config));
   localStorage.setItem(STORAGE_KEYS.products, JSON.stringify(products));
+  localStorage.setItem(STORAGE_KEYS.clickAnalytics, JSON.stringify(analytics));
+  localStorage.setItem(STORAGE_KEYS.clicks, String(Number(analytics.total) || 0));
 }
 
 export async function loadLandingState() {
@@ -114,18 +163,20 @@ export async function loadLandingState() {
     const remoteData = snapshot.data();
     const config = sanitizeConfig(remoteData?.config);
     const products = sanitizeProducts(remoteData?.products, config.categories);
-    writeLocalConfig(config, products);
+    const analytics = sanitizeAnalytics(remoteData?.analytics);
+    writeLocalConfig(config, products, analytics);
 
-    return { config, products, source: "firebase" };
+    return { config, products, analytics, source: "firebase" };
   } catch {
     return { ...localState, source: "local" };
   }
 }
 
-export async function saveLandingState(nextConfig, nextProducts) {
+export async function saveLandingState(nextConfig, nextProducts, nextAnalytics) {
   const config = sanitizeConfig(nextConfig);
   const products = sanitizeProducts(nextProducts, config.categories);
-  writeLocalConfig(config, products);
+  const analytics = sanitizeAnalytics(nextAnalytics);
+  writeLocalConfig(config, products, analytics);
 
   try {
     await setDoc(
@@ -133,20 +184,44 @@ export async function saveLandingState(nextConfig, nextProducts) {
       {
         config,
         products,
+        analytics,
         updatedAt: serverTimestamp()
       },
       { merge: true }
     );
 
-    return { config, products, persistedInFirebase: true };
+    return { config, products, analytics, persistedInFirebase: true };
   } catch (error) {
-    return { config, products, persistedInFirebase: false, error };
+    return { config, products, analytics, persistedInFirebase: false, error };
   }
 }
 
 export function getDefaultLandingState() {
   const config = defaultConfigClone();
   const products = defaultProductsClone();
-  return { config, products };
+  const analytics = defaultAnalytics();
+  return { config, products, analytics };
 }
 
+export function buildNextAnalytics(previousAnalytics, zone) {
+  const safeZone = zone || "unknown";
+  const previous = sanitizeAnalytics(previousAnalytics);
+  const dayKey = new Date().toISOString().slice(0, 10);
+
+  return {
+    ...previous,
+    total: previous.total + 1,
+    byZone: {
+      ...previous.byZone,
+      [safeZone]: (Number(previous.byZone[safeZone]) || 0) + 1
+    },
+    byDay: {
+      ...previous.byDay,
+      [dayKey]: (Number(previous.byDay[dayKey]) || 0) + 1
+    }
+  };
+}
+
+export function clearAnalytics() {
+  return defaultAnalytics();
+}

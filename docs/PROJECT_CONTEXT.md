@@ -10,6 +10,7 @@ Landing page mobile-first para Baby Duvaby en React + Tailwind CSS con enfoque e
 - Abrir ruta de catalogo por categoria y modelos al hacer clic en cada card.
 - Registrar contador de clics del CTA de WhatsApp.
 - Persistir contador de clics en `localStorage`.
+- Medir clics de WhatsApp por zona de conversion (hero, barra movil, tarjeta de producto).
 
 ## Arquitectura Frontend
 - Runtime: React 18 con `react-scripts`.
@@ -30,10 +31,14 @@ Landing page mobile-first para Baby Duvaby en React + Tailwind CSS con enfoque e
 - Ruta protegida: `/admin`.
 - Acceso admin oculto de la landing publica (sin botones en TopBar/Footer).
 - Edicion completa desde panel: marca, WhatsApp, categorias, FAQ, modelos e imagenes.
+- Carga de imagenes por drag and drop en hero, categorias y productos.
+- Ordenamiento por drag and drop para categorias y modelos.
+- Grafico de clics WhatsApp por zona y resumen de ultimos 7 dias.
+- Herramientas admin: exportar backup JSON e importar backup JSON.
 
 ## Persistencia y fallback
 - Lectura/escritura principal en Firestore.
-- Fallback local en `localStorage` para `config` y `products` si Firestore no responde.
+- Fallback local en `localStorage` para `config`, `products` y analitica si Firestore no responde.
 - Login estable sin bucles de redireccion ni recargas continuas.
 
 ## Variables de entorno recomendadas

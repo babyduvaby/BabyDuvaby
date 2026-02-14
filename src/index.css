@@ -208,6 +208,31 @@
     background: transparent;
     box-shadow: none;
   }
+
+  .faq-accordion-trigger:hover,
+  .faq-accordion-trigger:focus-visible {
+    border: 0;
+    box-shadow: none;
+    transform: none;
+    filter: none;
+  }
+
+  .faq-accordion-content {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 320ms ease;
+  }
+
+  .faq-accordion-content.is-open {
+    grid-template-rows: 1fr;
+  }
+
+  .faq-accordion-content-inner {
+    overflow: hidden;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    transition: opacity 260ms ease, padding-bottom 320ms ease;
+  }
 }
 
 @keyframes float-soft {

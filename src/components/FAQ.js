@@ -51,23 +51,35 @@ export default function FAQ({ faqItems }) {
                 }
               >
                 <span className="text-lg font-extrabold">{item.question}</span>
-                <span
+                <svg
                   aria-hidden="true"
-                  className="text-xl font-black leading-none text-[#5a7bab]"
+                  viewBox="0 0 24 24"
+                  className={`h-5 w-5 shrink-0 text-[#5a7bab] transition-transform duration-300 ${
+                    openId === item.id ? "rotate-180" : "rotate-0"
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 >
-                  {openId === item.id ? "-" : "+"}
-                </span>
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
               </button>
 
               <div
                 id={`faq-panel-${item.id}`}
                 role="region"
                 aria-hidden={openId !== item.id}
-                className={`overflow-hidden px-4 transition-all duration-300 ${
-                  openId === item.id ? "max-h-48 pb-4 opacity-100" : "max-h-0 pb-0 opacity-0"
-                }`}
+                className={`faq-accordion-content ${openId === item.id ? "is-open" : ""}`}
               >
-                <p className="text-lg font-bold text-ink/85">{item.answer}</p>
+                <div
+                  className={`faq-accordion-content-inner ${
+                    openId === item.id ? "pb-4 opacity-100" : "pb-0 opacity-0"
+                  }`}
+                >
+                  <p className="text-lg font-bold text-ink/85">{item.answer}</p>
+                </div>
               </div>
             </article>
           ))}

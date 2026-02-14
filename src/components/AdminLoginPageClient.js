@@ -36,7 +36,10 @@ export default function AdminLoginPageClient() {
         <div className="ambient ambient-bottom" />
       </div>
 
-      <TopBar brand={defaultLandingConfig.brand} />
+      <TopBar
+        brand={defaultLandingConfig.brand}
+        categories={defaultLandingConfig.categories}
+      />
 
       {isAuthLoading || isAdminAuthenticated ? (
         <AdminAuthLoading />
@@ -49,4 +52,3 @@ export default function AdminLoginPageClient() {
     </main>
   );
 }
-

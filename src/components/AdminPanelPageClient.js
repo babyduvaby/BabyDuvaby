@@ -51,7 +51,7 @@ export default function AdminPanelPageClient() {
           <div className="ambient ambient-top" />
           <div className="ambient ambient-bottom" />
         </div>
-        <TopBar brand={config.brand} />
+        <TopBar brand={config.brand} categories={config.categories} />
         <AdminAuthLoading />
       </main>
     );
@@ -64,7 +64,7 @@ export default function AdminPanelPageClient() {
         <div className="ambient ambient-bottom" />
       </div>
 
-      <TopBar brand={config.brand} />
+      <TopBar brand={config.brand} categories={config.categories} />
 
       {error ? (
         <div className="mx-auto mb-4 mt-3 max-w-3xl rounded-2xl border border-[#ffc6d9] bg-[#fff0f6] px-4 py-3 text-sm font-semibold text-[#b53d69]">
@@ -89,4 +89,3 @@ export default function AdminPanelPageClient() {
     </main>
   );
 }
-

@@ -2,21 +2,124 @@ import React from "react";
 import Link from "next/link";
 
 // Barra superior fija con identidad visual de la marca.
-export default function TopBar({ brand }) {
+export default function TopBar({ brand, categories = [] }) {
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!isMenuOpen) {
+      return undefined;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setIsMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [isMenuOpen]);
+
+  const closeMenu = () => setIsMenuOpen(false);
+
   return (
-    <header className="sticky top-0 z-30 px-3 pt-3 sm:px-6">
-      <div className="baby-section-glow mx-auto flex w-full max-w-6xl items-center justify-center rounded-2xl px-3 py-2 sm:px-5 sm:py-3">
-        <Link href="/" className="flex min-w-0 flex-col items-center gap-1 text-center">
-          <img
-            src="/logo-baby-duvaby.svg"
-            alt="Logo Baby Duvaby"
-            className="h-12 w-auto sm:h-14"
-          />
-          <p className="text-[11px] font-semibold tracking-[0.08em] text-[#66739a] sm:text-[13px]">
-            {brand?.subtitle || "Ropita y accesorios tiernos para tu bebe"}
-          </p>
-        </Link>
+    <>
+      <header className="sticky top-0 z-40 px-3 pt-3 sm:px-6">
+        <div className="baby-section-glow mx-auto grid w-full max-w-6xl grid-cols-[3rem,1fr,3rem] items-center rounded-2xl px-2 py-2 sm:grid-cols-[3.25rem,1fr,3.25rem] sm:px-4 sm:py-3">
+          <button
+            type="button"
+            aria-label="Abrir menu de categorias"
+            aria-expanded={isMenuOpen}
+            aria-controls="baby-menu-categorias"
+            onClick={() => setIsMenuOpen(true)}
+            className="baby-menu-trigger inline-flex h-11 w-11 items-center justify-center rounded-xl text-[#ff5ea7]"
+          >
+            <span className="sr-only">Menu</span>
+            <span className="flex w-5 flex-col gap-1.5">
+              <span className="h-[2.5px] w-full rounded-full bg-current" />
+              <span className="h-[2.5px] w-full rounded-full bg-current" />
+              <span className="h-[2.5px] w-full rounded-full bg-current" />
+            </span>
+          </button>
+
+          <Link href="/" className="flex min-w-0 flex-col items-center gap-1 text-center">
+            <img
+              src="/logo-baby-duvaby.svg"
+              alt="Logo Baby Duvaby"
+              className="h-12 w-auto sm:h-14"
+            />
+            <p className="text-[11px] font-semibold tracking-[0.08em] text-[#66739a] sm:text-[13px]">
+              {brand?.subtitle || "Ropita y accesorios tiernos para tu bebe"}
+            </p>
+          </Link>
+
+          <span className="h-11 w-11" aria-hidden="true" />
+        </div>
+      </header>
+
+      <div
+        className={`fixed inset-0 z-50 transition-opacity duration-300 ${
+          isMenuOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+        }`}
+        aria-hidden={!isMenuOpen}
+      >
+        <button
+          type="button"
+          onClick={closeMenu}
+          className="absolute inset-0 h-full w-full bg-[#1f2442]/35"
+          aria-label="Cerrar menu"
+        />
+        <aside
+          id="baby-menu-categorias"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Menu de categorias"
+          className={`baby-side-menu relative h-full w-[84vw] max-w-sm px-4 py-5 transition-transform duration-300 sm:w-80 ${
+            isMenuOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+        >
+          <div className="mb-4 flex items-center justify-between">
+            <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#944576]">
+              Menu
+            </p>
+            <button
+              type="button"
+              onClick={closeMenu}
+              aria-label="Cerrar"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-white/55 text-xl font-black text-[#8f4675]"
+            >
+              x
+            </button>
+          </div>
+
+          <nav aria-label="Categorias principales" className="space-y-2">
+            <Link
+              href="/"
+              onClick={closeMenu}
+              className="baby-side-link block rounded-xl px-3 py-3 text-base font-extrabold text-[#7d3f67]"
+            >
+              Inicio
+            </Link>
+            {categories.map((category) => (
+              <Link
+                key={category.id}
+                href={`/categoria/${category.id}`}
+                onClick={closeMenu}
+                className="baby-side-link block rounded-xl px-3 py-3 text-base font-extrabold text-[#7d3f67]"
+              >
+                {category.title}
+              </Link>
+            ))}
+          </nav>
+        </aside>
       </div>
-    </header>
+    </>
   );
 }

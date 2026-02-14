@@ -46,7 +46,7 @@ export default function Hero({
               width: 1080
             })}
             alt="Bebe con ropa tierna de Baby Duvaby"
-            className="hero-image hero-image-blend mx-auto aspect-square w-full max-w-[20rem] object-cover sm:max-w-[23rem]"
+            className="hero-image hero-image-blend h-[18rem] w-full object-cover sm:h-[24rem]"
             loading="eager"
             decoding="async"
           />

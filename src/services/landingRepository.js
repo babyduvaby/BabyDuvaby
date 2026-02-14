@@ -12,6 +12,10 @@ const toJsonClone = (value) => JSON.parse(JSON.stringify(value));
 
 const defaultConfigClone = () => toJsonClone(defaultLandingConfig);
 const defaultProductsClone = () => toJsonClone(productCatalog);
+const defaultSyncMeta = () => ({
+  pendingSync: false,
+  lastSavedAt: null
+});
 const defaultAnalytics = () => ({
   total: 0,
   byZone: {
@@ -123,35 +127,48 @@ function readLocalConfig() {
     const rawConfig = localStorage.getItem(STORAGE_KEYS.config);
     const rawProducts = localStorage.getItem(STORAGE_KEYS.products);
     const rawAnalytics = localStorage.getItem(STORAGE_KEYS.clickAnalytics);
+    const rawSyncMeta = localStorage.getItem(STORAGE_KEYS.syncMeta);
     const rawClicks = localStorage.getItem(STORAGE_KEYS.clicks);
     const parsedConfig = rawConfig ? JSON.parse(rawConfig) : null;
     const parsedProducts = rawProducts ? JSON.parse(rawProducts) : null;
     const parsedAnalytics = rawAnalytics ? JSON.parse(rawAnalytics) : null;
+    const parsedSyncMeta = rawSyncMeta ? JSON.parse(rawSyncMeta) : null;
     const config = sanitizeConfig(parsedConfig);
     const products = sanitizeProducts(parsedProducts, config.categories);
     const analytics = sanitizeAnalytics(parsedAnalytics);
     const legacyClicks = Number(rawClicks) || 0;
     analytics.total = Math.max(analytics.total, legacyClicks);
 
-    return { config, products, analytics };
+    const syncMeta = {
+      pendingSync: Boolean(parsedSyncMeta?.pendingSync),
+      lastSavedAt: parsedSyncMeta?.lastSavedAt || null
+    };
+
+    return { config, products, analytics, syncMeta };
   } catch {
     return {
       config: defaultConfigClone(),
       products: defaultProductsClone(),
-      analytics: defaultAnalytics()
+      analytics: defaultAnalytics(),
+      syncMeta: defaultSyncMeta()
     };
   }
 }
 
-function writeLocalConfig(config, products, analytics) {
+function writeLocalConfig(config, products, analytics, syncMeta = defaultSyncMeta()) {
   localStorage.setItem(STORAGE_KEYS.config, JSON.stringify(config));
   localStorage.setItem(STORAGE_KEYS.products, JSON.stringify(products));
   localStorage.setItem(STORAGE_KEYS.clickAnalytics, JSON.stringify(analytics));
   localStorage.setItem(STORAGE_KEYS.clicks, String(Number(analytics.total) || 0));
+  localStorage.setItem(STORAGE_KEYS.syncMeta, JSON.stringify(syncMeta));
 }
 
 export async function loadLandingState() {
   const localState = readLocalConfig();
+
+  if (localState.syncMeta.pendingSync) {
+    return { ...localState, source: "local-pending-sync" };
+  }
 
   try {
     const snapshot = await getDoc(LANDING_DOC_REF);
@@ -164,9 +181,9 @@ export async function loadLandingState() {
     const config = sanitizeConfig(remoteData?.config);
     const products = sanitizeProducts(remoteData?.products, config.categories);
     const analytics = sanitizeAnalytics(remoteData?.analytics);
-    writeLocalConfig(config, products, analytics);
+    writeLocalConfig(config, products, analytics, defaultSyncMeta());
 
-    return { config, products, analytics, source: "firebase" };
+    return { config, products, analytics, syncMeta: defaultSyncMeta(), source: "firebase" };
   } catch {
     return { ...localState, source: "local" };
   }
@@ -176,7 +193,11 @@ export async function saveLandingState(nextConfig, nextProducts, nextAnalytics) 
   const config = sanitizeConfig(nextConfig);
   const products = sanitizeProducts(nextProducts, config.categories);
   const analytics = sanitizeAnalytics(nextAnalytics);
-  writeLocalConfig(config, products, analytics);
+  const optimisticMeta = {
+    pendingSync: true,
+    lastSavedAt: new Date().toISOString()
+  };
+  writeLocalConfig(config, products, analytics, optimisticMeta);
 
   try {
     await setDoc(
@@ -190,7 +211,21 @@ export async function saveLandingState(nextConfig, nextProducts, nextAnalytics) 
       { merge: true }
     );
 
-    return { config, products, analytics, persistedInFirebase: true };
+    writeLocalConfig(config, products, analytics, {
+      pendingSync: false,
+      lastSavedAt: new Date().toISOString()
+    });
+
+    return {
+      config,
+      products,
+      analytics,
+      syncMeta: {
+        pendingSync: false,
+        lastSavedAt: new Date().toISOString()
+      },
+      persistedInFirebase: true
+    };
   } catch (error) {
     const reason =
       error?.code === "permission-denied"
@@ -199,7 +234,15 @@ export async function saveLandingState(nextConfig, nextProducts, nextAnalytics) 
           ? "network-unavailable"
           : "firebase-write-failed";
 
-    return { config, products, analytics, persistedInFirebase: false, error, reason };
+    return {
+      config,
+      products,
+      analytics,
+      syncMeta: optimisticMeta,
+      persistedInFirebase: false,
+      error,
+      reason
+    };
   }
 }
 

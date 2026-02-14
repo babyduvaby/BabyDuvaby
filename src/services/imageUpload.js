@@ -57,13 +57,16 @@ export async function uploadLandingImage(file, folderName) {
     payload.append("public_id", `${Date.now()}-${sanitizePublicId(file.name)}`);
   }
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000);
   const response = await fetch(
     `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
     {
       method: "POST",
-      body: payload
+      body: payload,
+      signal: controller.signal
     }
-  );
+  ).finally(() => clearTimeout(timeoutId));
 
   const result = await response.json();
 
@@ -79,6 +82,16 @@ export async function uploadLandingImage(file, folderName) {
     throw new Error("Cloudinary no devolvio una URL valida.");
   }
 
+  // Preferir URL oficial devuelta por Cloudinary.
+  const secureUrl = String(result.secure_url || "");
+  if (secureUrl) {
+    return secureUrl;
+  }
+
   const canonicalUrl = buildCanonicalCloudinaryUrl(CLOUDINARY_CLOUD_NAME, result);
-  return canonicalUrl || result.secure_url;
+  if (canonicalUrl) {
+    return canonicalUrl;
+  }
+
+  throw new Error("Cloudinary no devolvio una URL utilizable.");
 }

@@ -107,6 +107,41 @@ function ImageDropField({ label, onFileSelected, isUploading }) {
   );
 }
 
+function ImagePreview({ src, alt }) {
+  const [hasError, setHasError] = React.useState(false);
+  const safeSrc = String(src || "");
+
+  React.useEffect(() => {
+    setHasError(false);
+  }, [safeSrc]);
+
+  if (!safeSrc) {
+    return (
+      <div className="rounded-xl border border-dashed border-[#d8e6ff] bg-white p-3 text-xs font-semibold text-[#7188a7]">
+        Sin imagen para previsualizar.
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-xl border border-[#d8e6ff] bg-white p-2">
+      {!hasError ? (
+        <img
+          src={safeSrc}
+          alt={alt}
+          onError={() => setHasError(true)}
+          className="h-36 w-full rounded-lg object-cover"
+          loading="lazy"
+        />
+      ) : (
+        <div className="rounded-lg bg-[#fff1f6] px-3 py-4 text-xs font-bold text-[#b03e66]">
+          No se pudo cargar la previsualizacion. Revisa la URL de la imagen.
+        </div>
+      )}
+    </div>
+  );
+}
+
 function WhatsAppAnalyticsChart({ analytics }) {
   const byZone = analytics?.byZone || {};
   const zoneRows = Object.entries(byZone).map(([zone, count]) => ({
@@ -178,6 +213,7 @@ export default function AdminPanelPage({
   products,
   clickCount,
   clickAnalytics,
+  syncMeta,
   isSaving,
   onSaveContent,
   onRestoreDefaultContent,
@@ -477,6 +513,12 @@ export default function AdminPanelPage({
         </button>
       </div>
 
+      {syncMeta?.pendingSync ? (
+        <p className="mb-3 rounded-xl border border-[#ffe0b8] bg-[#fff7eb] px-4 py-3 text-sm font-bold text-[#9a6b2f]">
+          Cambios guardados localmente y pendientes de sincronizar con Firebase.
+        </p>
+      ) : null}
+
       {status ? (
         <p className="mb-3 rounded-xl border border-[#c9efd8] bg-[#effdf5] px-4 py-3 text-sm font-bold text-[#1f7e53]">
           {status}
@@ -565,6 +607,9 @@ export default function AdminPanelPage({
               }
             />
           </div>
+          <div className="mt-3">
+            <ImagePreview src={draftConfig.brand.heroImage} alt="Previsualizacion Hero" />
+          </div>
         </article>
 
         <article className="glass-panel rounded-3xl p-5 shadow-candy sm:p-6">
@@ -643,6 +688,12 @@ export default function AdminPanelPage({
                         updateCategory(index, "image", url)
                       )
                     }
+                  />
+                </div>
+                <div className="mt-3">
+                  <ImagePreview
+                    src={category.image}
+                    alt={`Previsualizacion categoria ${category.title}`}
                   />
                 </div>
               </div>
@@ -774,6 +825,12 @@ export default function AdminPanelPage({
                         updateProduct(index, "image", url)
                       )
                     }
+                  />
+                </div>
+                <div className="mt-3">
+                  <ImagePreview
+                    src={product.image}
+                    alt={`Previsualizacion producto ${product.model}`}
                   />
                 </div>
               </div>

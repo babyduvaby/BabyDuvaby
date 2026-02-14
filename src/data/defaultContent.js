@@ -139,5 +139,6 @@ export const STORAGE_KEYS = {
   products: "baby_duvaby_products_v1",
   clicks: "baby_duvaby_whatsapp_clicks_v1",
   clickAnalytics: "baby_duvaby_whatsapp_click_analytics_v1",
+  syncMeta: "baby_duvaby_sync_meta_v1",
   adminFallbackSession: "baby_duvaby_admin_fallback_session_v1"
 };

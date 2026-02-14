@@ -22,6 +22,7 @@ export default function App() {
     products,
     clickCount,
     clickAnalytics,
+    syncMeta,
     isLoading,
     isSaving,
     error,
@@ -133,6 +134,7 @@ export default function App() {
                 products={products}
                 clickCount={clickCount}
                 clickAnalytics={clickAnalytics}
+                syncMeta={syncMeta}
                 isSaving={isSaving}
                 onSaveContent={saveContent}
                 onRestoreDefaultContent={restoreDefaultContent}

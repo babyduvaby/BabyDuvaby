@@ -8,12 +8,15 @@ import {
   saveLandingState
 } from "../services/landingRepository";
 
+const EMPTY_SYNC_META = { pendingSync: false, lastSavedAt: null };
+
 export function useLandingConfig() {
   const defaults = getDefaultLandingState();
   const [config, setConfig] = useState(defaults.config);
   const [products, setProducts] = useState(defaults.products);
   const [clickAnalytics, setClickAnalytics] = useState(defaults.analytics);
   const [clickCount, setClickCount] = useState(defaults.analytics.total);
+  const [syncMeta, setSyncMeta] = useState(defaults.syncMeta);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
@@ -33,6 +36,7 @@ export function useLandingConfig() {
         setProducts(loadedState.products);
         setClickAnalytics(loadedState.analytics);
         setClickCount(loadedState.analytics.total);
+        setSyncMeta(loadedState.syncMeta || EMPTY_SYNC_META);
       } catch {
         if (isMounted) {
           setError("No se pudo cargar el contenido. Se usaron valores por defecto.");
@@ -82,6 +86,7 @@ export function useLandingConfig() {
     setProducts(saveResult.products);
     setClickAnalytics(saveResult.analytics);
     setClickCount(saveResult.analytics.total);
+    setSyncMeta(saveResult.syncMeta || EMPTY_SYNC_META);
 
     if (!saveResult.persistedInFirebase) {
       if (saveResult.reason === "permission-denied") {
@@ -116,6 +121,7 @@ export function useLandingConfig() {
     products,
     clickCount,
     clickAnalytics,
+    syncMeta,
     isLoading,
     isSaving,
     error,

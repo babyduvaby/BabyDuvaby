@@ -99,7 +99,7 @@ export default function CategoryList({ categories, products }) {
           >
             <Link
               href={`/categoria/${category.id}`}
-              className="baby-section-glow group block overflow-hidden rounded-2xl border border-white/80 bg-white/85 p-2 shadow-candy transition duration-300 hover:-translate-y-1"
+              className="baby-section-glow group block overflow-hidden rounded-2xl border border-white/80 bg-white/85 p-2 shadow-candy transition duration-300 hover:-translate-y-1 lg:bg-transparent lg:p-0 lg:shadow-none"
               aria-label={`Ver modelos de ${category.title}`}
             >
               <CategoryImage
@@ -108,7 +108,7 @@ export default function CategoryList({ categories, products }) {
                   category.secondaryImage || firstProductImageByCategory[category.id] || ""
                 }
                 alt={category.title}
-                heightClass="mx-auto aspect-square w-full max-w-[10.75rem] sm:max-w-[12rem] lg:max-w-[13rem]"
+                heightClass="mx-auto aspect-square w-full max-w-[10.75rem] sm:max-w-[12rem] lg:max-w-full"
                 focusX={clampPercent(category.imageFocusX)}
                 focusY={clampPercent(category.imageFocusY)}
                 optimizeOptions={{
@@ -128,7 +128,7 @@ export default function CategoryList({ categories, products }) {
                 }
                 fallbackSrc={category.image}
                 alt={`${category.title} - referencia inferior`}
-                heightClass="mx-auto aspect-square w-full max-w-[10.75rem] sm:max-w-[12rem] lg:max-w-[13rem]"
+                heightClass="mx-auto aspect-square w-full max-w-[10.75rem] sm:max-w-[12rem] lg:max-w-full"
                 focusX={clampPercent(category.secondaryImageFocusX)}
                 focusY={clampPercent(category.secondaryImageFocusY)}
                 optimizeOptions={{

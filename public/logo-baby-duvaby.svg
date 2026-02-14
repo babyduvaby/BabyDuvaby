@@ -1,32 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="logoTitle logoDesc">
-  <title id="logoTitle">Logo Baby Duvaby</title>
-  <desc id="logoDesc">Luna pastel con texto Baby Duvaby y mameluco</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 160" role="img" aria-labelledby="title desc">
+  <title id="title">Baby Duvaby</title>
+  <desc id="desc">Wordmark Baby Duvaby en tonos rosado y azul</desc>
   <defs>
-    <linearGradient id="moonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#f8edb8" />
-      <stop offset="100%" stop-color="#f3dc8e" />
+    <linearGradient id="pink" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8a7c8"/>
+      <stop offset="1" stop-color="#ef7ea9"/>
     </linearGradient>
-    <linearGradient id="textPink" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#f8acc4" />
-      <stop offset="100%" stop-color="#f27ea6" />
-    </linearGradient>
-    <linearGradient id="textBlue" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#9ad7f8" />
-      <stop offset="100%" stop-color="#6bb2ec" />
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8ad1fb"/>
+      <stop offset="1" stop-color="#63b2eb"/>
     </linearGradient>
   </defs>
-
-  <rect width="128" height="128" rx="28" fill="#fff9fc" />
-  <path d="M44 18c-17 0-30 13-30 30 0 17 13 30 30 30 5 0 10-1 14-3-12-1-22-11-22-24 0-13 10-23 22-24-4-2-9-3-14-3z" fill="url(#moonGrad)" />
-  <circle cx="94" cy="26" r="3" fill="#ffe7a8" />
-  <circle cx="101" cy="34" r="2.5" fill="#ffe7a8" />
-  <circle cx="87" cy="36" r="2.2" fill="#ffe7a8" />
-
-  <text x="64" y="56" text-anchor="middle" font-size="24" font-family="'Baloo 2', 'Comic Sans MS', cursive" font-weight="700" fill="url(#textBlue)">Baby</text>
-  <text x="64" y="80" text-anchor="middle" font-size="24" font-family="'Baloo 2', 'Comic Sans MS', cursive" font-weight="700" fill="url(#textPink)">Duvaby</text>
-
-  <path d="M85 93h16l6 9-7 8H84l-7-8z" fill="#9edff2" />
-  <circle cx="90" cy="99" r="1.6" fill="#6bb2ec" />
-  <circle cx="95" cy="99" r="1.6" fill="#6bb2ec" />
+  <rect x="0" y="0" width="640" height="160" fill="none" />
+  <text x="22" y="106" font-family="'Lobster Two', cursive" font-size="98" fill="url(#pink)">Baby</text>
+  <text x="286" y="106" font-family="'Lobster Two', cursive" font-size="98" fill="url(#blue)">Duvaby</text>
+  <circle cx="570" cy="44" r="10" fill="#f09ec0"/>
+  <circle cx="598" cy="58" r="14" fill="#f7b7d2"/>
+  <path d="M548 86c0-14 10-24 24-24h7v11h-7c-8 0-13 6-13 13v17h-11V86z" fill="#f1c087"/>
+  <rect x="577" y="62" width="14" height="42" rx="7" fill="#f4d4a3"/>
+  <rect x="580" y="66" width="8" height="15" rx="4" fill="#e6f2ff"/>
 </svg>
-

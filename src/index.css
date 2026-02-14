@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@500;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Lobster+Two:wght@400;700&family=Quicksand:wght@500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -11,12 +11,9 @@
 
   body {
     margin: 0;
-    font-family: "Nunito", sans-serif;
-    color: #56637f;
-    background:
-      radial-gradient(circle at 18% 8%, rgba(255, 208, 232, 0.5) 0, transparent 35%),
-      radial-gradient(circle at 82% 20%, rgba(194, 226, 255, 0.45) 0, transparent 37%),
-      linear-gradient(180deg, #fef4f9 0%, #eef5ff 55%, #e4efff 100%);
+    font-family: "Quicksand", sans-serif;
+    color: #5a6783;
+    background: linear-gradient(180deg, #f8e8f0 0%, #f2e6f3 42%, #dce7fb 100%);
   }
 }
 
@@ -28,7 +25,8 @@
   }
 
   .font-title {
-    font-family: "Baloo 2", cursive;
+    font-family: "Lobster Two", cursive;
+    font-weight: 700;
   }
 
   .app-shell {
@@ -74,21 +72,10 @@
   }
 
   .section-heading {
-    font-family: "Baloo 2", cursive;
+    font-family: "Lobster Two", cursive;
     font-size: clamp(1.9rem, 4.8vw, 2.6rem);
     line-height: 1;
-    background: linear-gradient(
-      92deg,
-      #f27ea6 0%,
-      var(--baby-pink) 20%,
-      var(--baby-blue) 52%,
-      var(--baby-lilac) 78%,
-      #86b9ff 100%
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.75));
+    color: #5b6f96;
     letter-spacing: 0.01em;
   }
 
@@ -98,22 +85,17 @@
   }
 
   .glass-panel {
-    border: 1px solid rgba(255, 255, 255, 0.78);
-    background: linear-gradient(
-      160deg,
-      rgba(255, 255, 255, 0.78) 0%,
-      rgba(255, 255, 255, 0.64) 100%
-    );
-    backdrop-filter: blur(8px);
+    border: 0;
+    background: transparent;
+    backdrop-filter: none;
+    box-shadow: none;
   }
 
   .glass-panel-baby {
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    background:
-      radial-gradient(circle at 15% 15%, rgba(255, 202, 230, 0.22) 0, transparent 38%),
-      radial-gradient(circle at 88% 22%, rgba(194, 225, 255, 0.2) 0, transparent 40%),
-      linear-gradient(145deg, rgba(255, 255, 255, 0.86) 0%, rgba(255, 252, 255, 0.7) 100%);
-    backdrop-filter: blur(10px);
+    border: 0;
+    background: transparent;
+    backdrop-filter: none;
+    box-shadow: none;
   }
 
   .faq-card-soft-a {

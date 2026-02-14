@@ -38,3 +38,5 @@ Landing page mobile-first para Baby Duvaby en React + Tailwind CSS con enfoque e
 
 ## Variables de entorno recomendadas
 - `REACT_APP_ADMIN_EMAIL`: email admin de Firebase Auth.
+- `REACT_APP_ADMIN_EMAILS`: lista separada por coma de emails admin para login por solo contrasena.
+- `REACT_APP_ADMIN_PASSWORD_FALLBACK`: contrasena local opcional de emergencia cuando Firebase Auth no este disponible.

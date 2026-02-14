@@ -5,18 +5,21 @@ export default function AdminLoginPage({ onLogin }) {
   const navigate = useNavigate();
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState("");
+  const [errorCode, setErrorCode] = React.useState("");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
+    setErrorCode("");
     setIsSubmitting(true);
 
     const result = await onLogin(password);
 
     if (!result.success) {
       setError(result.message || "No se pudo iniciar sesion.");
+      setErrorCode(result.code || "");
       setIsSubmitting(false);
       return;
     }
@@ -89,9 +92,25 @@ export default function AdminLoginPage({ onLogin }) {
           </div>
 
           {error ? (
-            <p className="rounded-xl border border-[#ffd3dd] bg-[#fff1f6] px-3 py-2 text-sm font-bold text-[#b03e66]">
-              {error}
-            </p>
+            <div className="rounded-xl border border-[#ffd3dd] bg-[#fff1f6] px-3 py-2 text-sm font-bold text-[#b03e66]">
+              <p>{error}</p>
+              {errorCode ? (
+                <p className="mt-1 text-xs font-semibold text-[#9f4562]">
+                  Codigo: <span className="font-extrabold">{errorCode}</span>
+                </p>
+              ) : null}
+            </div>
+          ) : null}
+
+          {errorCode === "auth/unauthorized-domain" ||
+          errorCode === "auth/operation-not-allowed" ||
+          errorCode === "auth/configuration-not-found" ||
+          errorCode === "auth/invalid-api-key" ||
+          errorCode === "auth/app-not-authorized" ? (
+            <div className="rounded-xl border border-[#d6e6ff] bg-[#f2f7ff] px-3 py-2 text-xs font-semibold text-[#4f6e97]">
+              Revisa Firebase Console: habilita Email/Password y autoriza este dominio en
+              Authentication.
+            </div>
           ) : null}
 
           <button

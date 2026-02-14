@@ -86,13 +86,10 @@ export default function CategoryProductsPage({
                 >
                   <img
                     src={getOptimizedCloudinaryUrl(product.image, {
-                      width: 1200,
-                      height: 900,
-                      crop: "fill",
-                      gravity: "auto"
+                      width: 1080
                     })}
                     alt={product.model}
-                    className="h-52 w-full object-cover"
+                    className="aspect-square w-full object-cover"
                     loading="lazy"
                     decoding="async"
                   />

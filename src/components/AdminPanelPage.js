@@ -134,11 +134,19 @@ function ImageDropField({ label, onFileSelected, isUploading }) {
         />
         {isUploading ? "Subiendo imagen..." : "Arrastra imagen aqui o haz clic para subir"}
       </label>
+      <p className="mt-1 text-[11px] font-semibold text-[#7a90ad]">
+        Recomendado: 1080 x 1080 px (cuadrada).
+      </p>
     </div>
   );
 }
 
-function ImagePreview({ src, alt, objectPosition = "50% 50%", imageClassName = "h-36" }) {
+function ImagePreview({
+  src,
+  alt,
+  objectPosition = "50% 50%",
+  imageClassName = "aspect-square"
+}) {
   const [hasError, setHasError] = React.useState(false);
   const safeSrc = String(src || "");
 
@@ -148,8 +156,10 @@ function ImagePreview({ src, alt, objectPosition = "50% 50%", imageClassName = "
 
   if (!safeSrc) {
     return (
-      <div className="rounded-xl border border-dashed border-[#d8e6ff] bg-white p-3 text-xs font-semibold text-[#7188a7]">
-        Sin imagen para previsualizar.
+      <div className="aspect-square rounded-xl border border-dashed border-[#d8e6ff] bg-white p-3 text-xs font-semibold text-[#7188a7]">
+        <div className="flex h-full items-center justify-center text-center">
+          Sin imagen para previsualizar.
+        </div>
       </div>
     );
   }
@@ -820,7 +830,7 @@ export default function AdminPanelPage({
                       src={category.image}
                       alt={`Previsualizacion superior categoria ${category.title}`}
                       objectPosition={`${clampPercentage(category.imageFocusX)}% ${clampPercentage(category.imageFocusY)}%`}
-                      imageClassName="h-28 sm:h-36 lg:h-40"
+                      imageClassName="aspect-square"
                     />
                   </div>
                   <div>
@@ -831,7 +841,7 @@ export default function AdminPanelPage({
                       src={category.secondaryImage || category.image}
                       alt={`Previsualizacion inferior categoria ${category.title}`}
                       objectPosition={`${clampPercentage(category.secondaryImageFocusX)}% ${clampPercentage(category.secondaryImageFocusY)}%`}
-                      imageClassName="h-20 sm:h-28 lg:h-32"
+                      imageClassName="aspect-square"
                     />
                   </div>
                 </div>

@@ -32,7 +32,7 @@ function CategoryImage({
   if (!safeSrc) {
     return (
       <div
-        className={`${heightClass} flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-[#fdeaf3] via-[#f4f6ff] to-[#e7f0ff] text-xs font-bold text-[#7d8fab]`}
+        className={`${heightClass} flex items-center justify-center rounded-xl bg-gradient-to-r from-[#fdeaf3] via-[#f4f6ff] to-[#e7f0ff] text-xs font-bold text-[#7d8fab]`}
       >
         Imagen no disponible
       </div>
@@ -43,7 +43,7 @@ function CategoryImage({
     <img
       src={getOptimizedCloudinaryUrl(safeSrc, optimizeOptions)}
       alt={alt}
-      className={`${heightClass} w-full rounded-xl object-cover`}
+      className={`${heightClass} rounded-xl object-cover`}
       style={{ objectPosition: `${focusX}% ${focusY}%` }}
       loading="lazy"
       decoding="async"
@@ -108,11 +108,11 @@ export default function CategoryList({ categories, products }) {
                   category.secondaryImage || firstProductImageByCategory[category.id] || ""
                 }
                 alt={category.title}
-                heightClass="h-24 sm:h-28 lg:h-36"
+                heightClass="mx-auto aspect-square w-full max-w-[10.75rem] sm:max-w-[12rem] lg:max-w-[13rem]"
                 focusX={clampPercent(category.imageFocusX)}
                 focusY={clampPercent(category.imageFocusY)}
                 optimizeOptions={{
-                  width: 1200
+                  width: 1080
                 }}
               />
 
@@ -128,11 +128,11 @@ export default function CategoryList({ categories, products }) {
                 }
                 fallbackSrc={category.image}
                 alt={`${category.title} - referencia inferior`}
-                heightClass="h-16 sm:h-20 lg:h-24"
+                heightClass="mx-auto aspect-square w-full max-w-[10.75rem] sm:max-w-[12rem] lg:max-w-[13rem]"
                 focusX={clampPercent(category.secondaryImageFocusX)}
                 focusY={clampPercent(category.secondaryImageFocusY)}
                 optimizeOptions={{
-                  width: 1200
+                  width: 1080
                 }}
               />
             </Link>

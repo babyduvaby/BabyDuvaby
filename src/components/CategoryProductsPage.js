@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useParams } from "react-router-dom";
+import Link from "next/link";
 import { getOptimizedCloudinaryUrl } from "../utils/cloudinary";
 
 function formatPrice(value, currency) {
@@ -19,6 +19,7 @@ function formatPrice(value, currency) {
 
 // Vista por categoria con productos agrupados por modelo.
 export default function CategoryProductsPage({
+  categoryId,
   categories,
   products,
   clickCount,
@@ -26,7 +27,6 @@ export default function CategoryProductsPage({
   buildWhatsappHref,
   onProductContextChange
 }) {
-  const { categoryId } = useParams();
   const category = categories.find((item) => item.id === categoryId);
   const categoryProducts = products.filter((item) => item.categoryId === categoryId);
 
@@ -42,7 +42,7 @@ export default function CategoryProductsPage({
         <div className="glass-panel rounded-3xl p-6 text-center shadow-candy">
           <h1 className="font-title text-4xl text-ink">Categoria no encontrada</h1>
           <Link
-            to="/"
+            href="/"
             className="mt-4 inline-flex rounded-full bg-[#5b8cc4] px-5 py-3 text-sm font-bold text-white transition hover:brightness-105"
           >
             Volver al inicio
@@ -65,7 +65,7 @@ export default function CategoryProductsPage({
             </h1>
           </div>
           <Link
-            to="/"
+            href="/"
             className="rounded-full bg-[#eef4ff] px-4 py-2 text-sm font-bold text-[#526988] transition hover:bg-[#e1ecff]"
           >
             Volver

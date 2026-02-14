@@ -11,10 +11,15 @@ import { firebaseAuth } from "../firebase";
 
 const DEFAULT_ADMIN_EMAIL = "admin@babyduvaby.com";
 const RAW_ADMIN_EMAILS =
+  process.env.NEXT_PUBLIC_ADMIN_EMAILS ||
+  process.env.NEXT_PUBLIC_ADMIN_EMAIL ||
   process.env.REACT_APP_ADMIN_EMAILS ||
   process.env.REACT_APP_ADMIN_EMAIL ||
   DEFAULT_ADMIN_EMAIL;
-const FALLBACK_PASSWORD = process.env.REACT_APP_ADMIN_PASSWORD_FALLBACK || "";
+const FALLBACK_PASSWORD =
+  process.env.NEXT_PUBLIC_ADMIN_PASSWORD_FALLBACK ||
+  process.env.REACT_APP_ADMIN_PASSWORD_FALLBACK ||
+  "";
 const FALLBACK_ACTIVE_VALUE = "active";
 
 function parseAdminEmails(rawEmails) {
@@ -190,4 +195,3 @@ export function useAdminSession() {
     adminEmails
   };
 }
-

@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { getOptimizedCloudinaryUrl } from "../utils/cloudinary";
 
 function CategoryImage({
@@ -85,7 +85,7 @@ export default function CategoryList({ categories, products }) {
             style={{ animationDelay: `${index * 90}ms` }}
           >
             <Link
-              to={`/categoria/${category.id}`}
+              href={`/categoria/${category.id}`}
               className="baby-section-glow group block overflow-hidden rounded-2xl border border-white/80 bg-white/85 p-2 shadow-candy transition duration-300 hover:-translate-y-1"
               aria-label={`Ver modelos de ${category.title}`}
             >

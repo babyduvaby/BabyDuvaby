@@ -1,8 +1,7 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import Link from "next/link";
 
-export default function AdminLoginPage({ onLogin }) {
-  const navigate = useNavigate();
+export default function AdminLoginPage({ onLogin, onLoginSuccess }) {
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState("");
   const [errorCode, setErrorCode] = React.useState("");
@@ -24,7 +23,7 @@ export default function AdminLoginPage({ onLogin }) {
       return;
     }
 
-    navigate("/admin", { replace: true });
+    onLoginSuccess?.();
   };
 
   return (
@@ -123,7 +122,7 @@ export default function AdminLoginPage({ onLogin }) {
         </form>
 
         <Link
-          to="/"
+          href="/"
           className="mt-4 inline-flex text-sm font-bold text-[#607b9d] transition hover:text-[#4e6380]"
         >
           Volver al inicio

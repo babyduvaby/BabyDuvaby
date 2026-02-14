@@ -1,7 +1,16 @@
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
-const CLOUDINARY_CLOUD_NAME = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME || "";
-const CLOUDINARY_UPLOAD_PRESET = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET || "";
-const CLOUDINARY_DYNAMIC_FOLDER = process.env.REACT_APP_CLOUDINARY_DYNAMIC_FOLDER || "";
+const CLOUDINARY_CLOUD_NAME =
+  process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ||
+  process.env.REACT_APP_CLOUDINARY_CLOUD_NAME ||
+  "";
+const CLOUDINARY_UPLOAD_PRESET =
+  process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET ||
+  process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET ||
+  "";
+const CLOUDINARY_DYNAMIC_FOLDER =
+  process.env.NEXT_PUBLIC_CLOUDINARY_DYNAMIC_FOLDER ||
+  process.env.REACT_APP_CLOUDINARY_DYNAMIC_FOLDER ||
+  "";
 
 function sanitizePublicId(fileName) {
   const baseName = String(fileName || "image")
@@ -42,7 +51,7 @@ export async function uploadLandingImage(file, folderName) {
 
   if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
     throw new Error(
-      "Faltan variables de Cloudinary. Configura REACT_APP_CLOUDINARY_CLOUD_NAME y REACT_APP_CLOUDINARY_UPLOAD_PRESET."
+      "Faltan variables de Cloudinary. Configura NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME y NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET."
     );
   }
 

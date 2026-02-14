@@ -1,5 +1,4 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { uploadLandingImage } from "../services/imageUpload";
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
@@ -220,9 +219,9 @@ export default function AdminPanelPage({
   onRestoreDefaultContent,
   onResetClickCount,
   onImportSnapshot,
-  onLogout
+  onLogout,
+  onLoggedOut
 }) {
-  const navigate = useNavigate();
   const [draftConfig, setDraftConfig] = React.useState(() => clone(config));
   const [draftProducts, setDraftProducts] = React.useState(() => clone(products));
   const [status, setStatus] = React.useState("");
@@ -454,7 +453,7 @@ export default function AdminPanelPage({
 
   const handleLogout = async () => {
     await onLogout();
-    navigate("/admin/login", { replace: true });
+    onLoggedOut?.();
   };
 
   const handleDropReorder = (type, toIndex) => {

@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 // Pie de pagina publico sin accesos de administracion.
 export default function Footer({ categories, brand, whatsappPhone }) {
@@ -30,7 +30,7 @@ export default function Footer({ categories, brand, whatsappPhone }) {
               {categories.map((category) => (
                 <Link
                   key={category.id}
-                  to={`/categoria/${category.id}`}
+                  href={`/categoria/${category.id}`}
                   className="text-sm font-bold text-ink/90 transition hover:text-[#f27ea6]"
                 >
                   {category.title}

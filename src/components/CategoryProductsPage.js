@@ -1,7 +1,8 @@
 import React from "react";
 import { Link, useParams } from "react-router-dom";
+import { getOptimizedCloudinaryUrl } from "../utils/cloudinary";
 
-// Vista por categoría con productos agrupados por modelo.
+// Vista por categoria con productos agrupados por modelo.
 export default function CategoryProductsPage({
   categories,
   products,
@@ -17,7 +18,7 @@ export default function CategoryProductsPage({
     return (
       <section className="mx-auto max-w-5xl px-4 pb-12 pt-6 sm:px-6">
         <div className="glass-panel rounded-3xl p-6 text-center shadow-candy">
-          <h1 className="font-title text-4xl text-ink">Categoría no encontrada</h1>
+          <h1 className="font-title text-4xl text-ink">Categoria no encontrada</h1>
           <Link
             to="/"
             className="mt-4 inline-flex rounded-full bg-[#5b8cc4] px-5 py-3 text-sm font-bold text-white transition hover:brightness-105"
@@ -35,7 +36,7 @@ export default function CategoryProductsPage({
         <div className="mb-6 flex items-center justify-between gap-3">
           <div>
             <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#6f84a2]">
-              Catálogo por modelo
+              Catalogo por modelo
             </p>
             <h1 className="font-title text-4xl leading-tight text-ink sm:text-5xl">
               {category.title}
@@ -45,7 +46,7 @@ export default function CategoryProductsPage({
             to="/"
             className="rounded-full bg-[#eef4ff] px-4 py-2 text-sm font-bold text-[#526988] transition hover:bg-[#e1ecff]"
           >
-            ← Volver
+            ? Volver
           </Link>
         </div>
 
@@ -61,10 +62,16 @@ export default function CategoryProductsPage({
                   className="overflow-hidden rounded-3xl border border-white/80 bg-white/95 shadow-candy transition duration-300 hover:-translate-y-1"
                 >
                   <img
-                    src={product.image}
+                    src={getOptimizedCloudinaryUrl(product.image, {
+                      width: 1200,
+                      height: 900,
+                      crop: "fill",
+                      gravity: "auto"
+                    })}
                     alt={product.model}
                     className="h-52 w-full object-cover"
                     loading="lazy"
+                    decoding="async"
                   />
                   <div className="p-4">
                     <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-[#7f93b0]">
@@ -92,7 +99,7 @@ export default function CategoryProductsPage({
           </div>
         ) : (
           <div className="rounded-2xl bg-[#f4f8ff] p-4 text-center text-sm font-bold text-[#617896]">
-            Aún no hay modelos cargados para esta categoría.
+            Aun no hay modelos cargados para esta categoria.
           </div>
         )}
 

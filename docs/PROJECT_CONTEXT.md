@@ -25,6 +25,7 @@ Landing page mobile-first para Baby Duvaby en React + Tailwind CSS con enfoque e
 - Firestore para contenido editable: documento `landing/main`.
 - Firebase Auth para acceso admin real con email/password.
 - Cloudinary para subida de imagenes desde el panel admin (carpetas `landing/hero`, `landing/categories`, `landing/products`).
+- Transformaciones de entrega de Cloudinary en frontend (`f_auto,q_auto`) para optimizar peso y formato automaticamente.
 
 ## Admin y gestion de contenido
 - Ruta de login admin: `/admin/login` (formulario solo contrasena).

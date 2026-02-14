@@ -1,6 +1,7 @@
 import React from "react";
+import { getOptimizedCloudinaryUrl } from "../utils/cloudinary";
 
-// Sección principal con CTA prioritario a WhatsApp.
+// Seccion principal con CTA prioritario a WhatsApp.
 export default function Hero({
   brand,
   whatsappHref,
@@ -17,7 +18,7 @@ export default function Hero({
         <div className="pointer-events-none absolute -bottom-10 -left-10 h-24 w-24 rounded-full bg-[#cbe7ff]/70 blur-2xl" />
 
         <div className="mx-auto mb-4 inline-flex rounded-full bg-white/80 px-4 py-2 text-[11px] font-extrabold uppercase tracking-[0.22em] text-[#60789b] shadow-sm">
-          Tienda de ropita para bebé
+          Tienda de ropita para bebe
         </div>
 
         <h1 className="font-title text-5xl leading-none sm:text-7xl">
@@ -25,16 +26,23 @@ export default function Hero({
           <span className="text-[#6bb2ec]">{secondWord || ""}</span>{" "}
           <span className="text-[#f27ea6]">{restLabel}</span>
         </h1>
-        <p className="mt-1 text-2xl">💗 ✨ 💗</p>
+        <p className="mt-1 text-2xl">?? ? ??</p>
         <p className="mx-auto mt-4 max-w-xl text-lg font-semibold text-ink/90 sm:text-xl">
           {brand.subtitle}
         </p>
 
         <div className="relative mt-6 overflow-hidden rounded-[2rem] bg-white p-2 shadow-candy">
           <img
-            src={brand.heroImage}
-            alt="Bebé sonriente con ropa tierna"
+            src={getOptimizedCloudinaryUrl(brand.heroImage, {
+              width: 1600,
+              height: 1000,
+              crop: "fill",
+              gravity: "auto"
+            })}
+            alt="Bebe sonriente con ropa tierna"
             className="hero-image h-[18rem] w-full rounded-[1.5rem] object-cover sm:h-[24rem]"
+            loading="eager"
+            decoding="async"
           />
         </div>
 

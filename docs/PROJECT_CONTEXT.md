@@ -6,11 +6,14 @@ Landing page mobile-first para Baby Duvaby en React + Tailwind CSS con enfoque e
 ## Objetivo funcional
 - Mostrar hero principal, categorias y preguntas frecuentes.
 - Facilitar contacto por WhatsApp con un CTA principal.
-- Mantener CTA de WhatsApp fijo en la parte inferior en movil.
+- Mantener CTA flotante de WhatsApp visible en mobile y desktop.
 - Abrir ruta de catalogo por categoria y modelos al hacer clic en cada card.
 - Registrar contador de clics del CTA de WhatsApp.
 - Persistir contador de clics en `localStorage`.
 - Medir clics de WhatsApp por zona de conversion (hero, barra movil, tarjeta de producto).
+- Mostrar precios por producto y mensaje de WhatsApp contextual por modelo.
+- Incluir testimonios y badges de confianza para reforzar conversion.
+- Aplicar SEO base (meta description + Open Graph) en `public/index.html`.
 
 ## Arquitectura Frontend
 - Runtime: React 18 con `react-scripts`.
@@ -19,6 +22,7 @@ Landing page mobile-first para Baby Duvaby en React + Tailwind CSS con enfoque e
 - Estado:
   - Hook central `useLandingConfig` para contenido editable y contador.
   - Catalogo por categoria/modelo definido en `src/data/defaultContent.js`.
+  - Boton flotante global de WhatsApp con mensaje prellenado dinamico.
 
 ## Integraciones
 - Firebase Web SDK inicializado en `src/firebase.js`.
@@ -26,6 +30,7 @@ Landing page mobile-first para Baby Duvaby en React + Tailwind CSS con enfoque e
 - Firebase Auth para acceso admin real con email/password.
 - Cloudinary para subida de imagenes desde el panel admin (carpetas `landing/hero`, `landing/categories`, `landing/products`).
 - Transformaciones de entrega de Cloudinary en frontend (`f_auto,q_auto`) para optimizar peso y formato automaticamente.
+- URLs de producto/hero/categoria optimizadas en runtime via util `src/utils/cloudinary.js`.
 
 ## Admin y gestion de contenido
 - Ruta de login admin: `/admin/login` (formulario solo contrasena).

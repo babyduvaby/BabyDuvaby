@@ -21,6 +21,12 @@
 }
 
 @layer components {
+  :root {
+    --baby-pink: #f9a8cf;
+    --baby-blue: #7ec8ff;
+    --baby-lilac: #d7b7ff;
+  }
+
   .font-title {
     font-family: "Baloo 2", cursive;
   }
@@ -71,8 +77,24 @@
     font-family: "Baloo 2", cursive;
     font-size: clamp(1.9rem, 4.8vw, 2.6rem);
     line-height: 1;
-    color: #4d6284;
+    background: linear-gradient(
+      92deg,
+      #f27ea6 0%,
+      var(--baby-pink) 20%,
+      var(--baby-blue) 52%,
+      var(--baby-lilac) 78%,
+      #86b9ff 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.75));
     letter-spacing: 0.01em;
+  }
+
+  .baby-kicker {
+    color: #8d96bf;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.78);
   }
 
   .glass-panel {
@@ -83,6 +105,23 @@
       rgba(255, 255, 255, 0.64) 100%
     );
     backdrop-filter: blur(8px);
+  }
+
+  .glass-panel-baby {
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    background:
+      radial-gradient(circle at 15% 15%, rgba(255, 202, 230, 0.22) 0, transparent 38%),
+      radial-gradient(circle at 88% 22%, rgba(194, 225, 255, 0.2) 0, transparent 40%),
+      linear-gradient(145deg, rgba(255, 255, 255, 0.86) 0%, rgba(255, 252, 255, 0.7) 100%);
+    backdrop-filter: blur(10px);
+  }
+
+  .faq-card-soft-a {
+    background: linear-gradient(140deg, #fff8fc 0%, #f3f8ff 100%);
+  }
+
+  .faq-card-soft-b {
+    background: linear-gradient(140deg, #f6fbff 0%, #fff4fb 100%);
   }
 }
 

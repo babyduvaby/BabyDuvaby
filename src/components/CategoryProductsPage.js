@@ -2,21 +2,43 @@ import React from "react";
 import { Link, useParams } from "react-router-dom";
 import { getOptimizedCloudinaryUrl } from "../utils/cloudinary";
 
+function formatPrice(value, currency) {
+  const amount = Number(value) || 0;
+  const safeCurrency = currency || "PEN";
+
+  try {
+    return new Intl.NumberFormat("es-PE", {
+      style: "currency",
+      currency: safeCurrency,
+      minimumFractionDigits: 2
+    }).format(amount);
+  } catch {
+    return `${safeCurrency} ${amount.toFixed(2)}`;
+  }
+}
+
 // Vista por categoria con productos agrupados por modelo.
 export default function CategoryProductsPage({
   categories,
   products,
   clickCount,
   onWhatsappClick,
-  buildWhatsappHref
+  buildWhatsappHref,
+  onProductContextChange
 }) {
   const { categoryId } = useParams();
   const category = categories.find((item) => item.id === categoryId);
   const categoryProducts = products.filter((item) => item.categoryId === categoryId);
 
+  React.useEffect(() => {
+    if (categoryProducts.length && onProductContextChange) {
+      onProductContextChange(categoryProducts[0], category);
+    }
+  }, [categoryProducts, category, onProductContextChange]);
+
   if (!category) {
     return (
-      <section className="mx-auto max-w-5xl px-4 pb-12 pt-6 sm:px-6">
+      <section className="mx-auto max-w-5xl px-4 pb-12 pt-6 sm:px-6" aria-label="Categoria no encontrada">
         <div className="glass-panel rounded-3xl p-6 text-center shadow-candy">
           <h1 className="font-title text-4xl text-ink">Categoria no encontrada</h1>
           <Link
@@ -31,7 +53,7 @@ export default function CategoryProductsPage({
   }
 
   return (
-    <section className="mx-auto max-w-6xl px-4 pb-12 pt-6 sm:px-6">
+    <section className="mx-auto max-w-6xl px-4 pb-20 pt-6 sm:px-6" aria-label="Catalogo por categoria">
       <div className="glass-panel rounded-3xl p-5 shadow-candy sm:p-7">
         <div className="mb-6 flex items-center justify-between gap-3">
           <div>
@@ -46,20 +68,21 @@ export default function CategoryProductsPage({
             to="/"
             className="rounded-full bg-[#eef4ff] px-4 py-2 text-sm font-bold text-[#526988] transition hover:bg-[#e1ecff]"
           >
-            ? Volver
+            Volver
           </Link>
         </div>
 
         {categoryProducts.length ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {categoryProducts.map((product) => {
-              const message = `Hola Baby Duvaby, me interesa el modelo ${product.model} de ${category.title}.`;
+              const message = `Hola Baby Duvaby, me interesa el modelo ${product.model} de ${category.title}. Precio: ${formatPrice(product.price, product.currency)}.`;
               const whatsappHref = buildWhatsappHref(message);
 
               return (
                 <article
                   key={product.id}
                   className="overflow-hidden rounded-3xl border border-white/80 bg-white/95 shadow-candy transition duration-300 hover:-translate-y-1"
+                  onMouseEnter={() => onProductContextChange?.(product, category)}
                 >
                   <img
                     src={getOptimizedCloudinaryUrl(product.image, {
@@ -80,6 +103,9 @@ export default function CategoryProductsPage({
                     <h2 className="mt-1 font-title text-[2rem] leading-tight text-ink">
                       {product.model}
                     </h2>
+                    <p className="mt-1 text-base font-extrabold text-[#2f936f]">
+                      {formatPrice(product.price, product.currency)}
+                    </p>
                     <p className="mt-2 text-sm font-semibold text-ink/85">
                       {product.description}
                     </p>
@@ -87,7 +113,10 @@ export default function CategoryProductsPage({
                       href={whatsappHref}
                       target="_blank"
                       rel="noreferrer"
-                      onClick={() => onWhatsappClick("product_card")}
+                      onClick={() => {
+                        onProductContextChange?.(product, category);
+                        onWhatsappClick("product_card");
+                      }}
                       className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-full bg-gradient-to-r from-[#45d4a6] to-[#24b191] px-4 text-base font-extrabold text-white transition duration-300 hover:brightness-105 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#9af2d7]"
                     >
                       Consultar por WhatsApp

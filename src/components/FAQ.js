@@ -14,16 +14,16 @@ export default function FAQ({ faqItems }) {
 
   return (
     <section className="mx-auto max-w-4xl px-4 pb-14 sm:px-6">
-      <div className="glass-panel rounded-[2rem] p-5 shadow-candy sm:p-8">
-        <h2 className="mb-5 text-center font-title text-5xl text-ink sm:text-6xl">
+      <div className="glass-panel-baby rounded-[2rem] p-5 shadow-candy sm:p-8">
+        <h2 className="section-heading mb-5 text-center text-5xl sm:text-6xl">
           Preguntas Frecuentes
         </h2>
         <div className="space-y-3">
           {faqItems.map((item, index) => (
             <div
               key={item.id}
-              className={`rounded-2xl border border-white p-4 text-ink ${
-                index % 2 === 0 ? "bg-[#f6f9ff]" : "bg-[#fff5fb]"
+              className={`rounded-2xl border border-white/90 p-4 text-ink shadow-[0_7px_20px_rgba(112,133,171,0.07)] ${
+                index % 2 === 0 ? "faq-card-soft-a" : "faq-card-soft-b"
               }`}
             >
               <p className="text-lg font-extrabold">{item.question}</p>

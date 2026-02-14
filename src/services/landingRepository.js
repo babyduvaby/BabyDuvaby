@@ -22,6 +22,7 @@ const defaultAnalytics = () => ({
     hero_cta: 0,
     mobile_bar: 0,
     product_card: 0,
+    floating_button: 0,
     unknown: 0
   },
   byDay: {}
@@ -56,17 +57,35 @@ function sanitizeConfig(rawConfig) {
         }))
     : defaults.faq;
 
+  const testimonials = Array.isArray(rawConfig.testimonials)
+    ? rawConfig.testimonials
+        .filter((item) => isRecord(item))
+        .map((item, index) => ({
+          id: String(item.id || `t-${index + 1}`),
+          name: String(item.name || `Cliente ${index + 1}`),
+          quote: String(item.quote || ""),
+          location: String(item.location || "")
+        }))
+    : defaults.testimonials;
+
+  const brandRaw = isRecord(rawConfig.brand) ? rawConfig.brand : {};
+  const trustBadges = Array.isArray(brandRaw.trustBadges)
+    ? brandRaw.trustBadges.map((item) => String(item || "")).filter(Boolean)
+    : defaults.brand.trustBadges;
+
   return {
     brand: {
       ...defaults.brand,
-      ...(isRecord(rawConfig.brand) ? rawConfig.brand : {})
+      ...brandRaw,
+      trustBadges
     },
     whatsapp: {
       ...defaults.whatsapp,
       ...(isRecord(rawConfig.whatsapp) ? rawConfig.whatsapp : {})
     },
     categories,
-    faq
+    faq,
+    testimonials
   };
 }
 
@@ -90,7 +109,9 @@ function sanitizeProducts(rawProducts, categories) {
       categoryId: safeCategoryId,
       model: String(item.model || `Modelo ${index + 1}`),
       description: String(item.description || ""),
-      image: String(item.image || "")
+      image: String(item.image || ""),
+      price: Number(item.price) || 0,
+      currency: String(item.currency || "PEN")
     };
   });
 }
@@ -111,6 +132,7 @@ function sanitizeAnalytics(rawAnalytics) {
       hero_cta: Number(byZone.hero_cta) || 0,
       mobile_bar: Number(byZone.mobile_bar) || 0,
       product_card: Number(byZone.product_card) || 0,
+      floating_button: Number(byZone.floating_button) || 0,
       unknown: Number(byZone.unknown) || 0
     },
     byDay: Object.keys(byDay).reduce((accumulator, key) => {

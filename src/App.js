@@ -3,10 +3,11 @@ import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Hero from "./components/Hero";
 import CategoryList from "./components/CategoryList";
 import FAQ from "./components/FAQ";
-import MobileWhatsappBar from "./components/MobileWhatsappBar";
 import CategoryProductsPage from "./components/CategoryProductsPage";
 import TopBar from "./components/TopBar";
 import Footer from "./components/Footer";
+import Testimonials from "./components/Testimonials";
+import FloatingWhatsappButton from "./components/FloatingWhatsappButton";
 import AdminLoginPage from "./components/AdminLoginPage";
 import AdminPanelPage from "./components/AdminPanelPage";
 import { FIXED_WHATSAPP_PHONE } from "./data/defaultContent";
@@ -16,6 +17,7 @@ import { useAdminSession } from "./hooks/useAdminSession";
 export default function App() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith("/admin");
+  const [floatingMessage, setFloatingMessage] = React.useState("");
 
   const {
     config,
@@ -45,12 +47,35 @@ export default function App() {
       customMessage || config.whatsapp.message
     )}`;
 
-  const whatsappHref = buildWhatsappHref();
+  const whatsappHref = buildWhatsappHref(floatingMessage);
 
   const handleWhatsappClick = (zone) => {
     setError("");
     incrementWhatsAppClicks(zone);
   };
+
+  const handleProductContextChange = React.useCallback((product, category) => {
+    if (!product) {
+      return;
+    }
+
+    const productPrice = Number(product.price) || 0;
+    const currency = product.currency || "PEN";
+    const formattedPrice = new Intl.NumberFormat("es-PE", {
+      style: "currency",
+      currency
+    }).format(productPrice);
+
+    setFloatingMessage(
+      `Hola Baby Duvaby, me interesa el modelo ${product.model} de ${category?.title || "catalogo"}. Precio: ${formattedPrice}.`
+    );
+  }, []);
+
+  React.useEffect(() => {
+    if (!location.pathname.startsWith("/categoria/")) {
+      setFloatingMessage(config.whatsapp.message);
+    }
+  }, [location.pathname, config.whatsapp.message]);
 
   if (isLoading) {
     return (
@@ -96,6 +121,7 @@ export default function App() {
               />
               <CategoryList categories={config.categories} />
               <FAQ faqItems={config.faq} />
+              <Testimonials items={config.testimonials} />
             </>
           }
         />
@@ -108,6 +134,7 @@ export default function App() {
               clickCount={clickCount}
               onWhatsappClick={handleWhatsappClick}
               buildWhatsappHref={buildWhatsappHref}
+              onProductContextChange={handleProductContextChange}
             />
           }
         />
@@ -159,10 +186,10 @@ export default function App() {
       ) : null}
 
       {!isAdminRoute ? (
-        <MobileWhatsappBar
+        <FloatingWhatsappButton
           whatsappHref={whatsappHref}
           onWhatsappClick={handleWhatsappClick}
-          buttonText="Contactar por WhatsApp"
+          label="WhatsApp"
         />
       ) : null}
     </main>

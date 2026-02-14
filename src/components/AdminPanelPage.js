@@ -8,6 +8,7 @@ const ZONE_LABELS = {
   hero_cta: "Hero CTA",
   mobile_bar: "Barra movil",
   product_card: "Tarjeta producto",
+  floating_button: "Boton flotante",
   unknown: "Sin zona"
 };
 
@@ -376,7 +377,9 @@ export default function AdminPanelPage({
         categoryId: firstCategoryId,
         model: "Nuevo modelo",
         description: "",
-        image: ""
+        image: "",
+        price: 0,
+        currency: "PEN"
       }
     ]);
   };
@@ -802,6 +805,34 @@ export default function AdminPanelPage({
                         </option>
                       ))}
                     </select>
+                  </label>
+                </div>
+                <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <label className="block">
+                    <span className="mb-1 block text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
+                      Precio
+                    </span>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={Number(product.price) || 0}
+                      onChange={(event) =>
+                        updateProduct(index, "price", Number(event.target.value || 0))
+                      }
+                      className="h-11 w-full rounded-xl border border-[#d8e6ff] bg-white px-3 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff]"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="mb-1 block text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
+                      Moneda
+                    </span>
+                    <input
+                      type="text"
+                      value={product.currency || "PEN"}
+                      onChange={(event) => updateProduct(index, "currency", event.target.value)}
+                      className="h-11 w-full rounded-xl border border-[#d8e6ff] bg-white px-3 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff]"
+                    />
                   </label>
                 </div>
                 <div className="mt-3">

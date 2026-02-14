@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ADMIN_PASSWORD } from "../data/defaultContent";
+import { ADMIN_PASSWORD, FIXED_WHATSAPP_PHONE } from "../data/defaultContent";
 
 // Panel local para administrar textos, imágenes y WhatsApp.
 export default function AdminPanel({
@@ -184,13 +184,16 @@ export default function AdminPanel({
             <h4 className="font-title text-2xl text-ink">WhatsApp</h4>
             <div className="mt-3 grid gap-3">
               <label className="text-sm font-semibold text-ink">
-                Número de WhatsApp (incluye código país)
+                Número de WhatsApp fijo
                 <input
                   className={inputClassName}
-                  value={draft.whatsapp.phone}
-                  onChange={(event) => updateWhatsapp("phone", event.target.value)}
+                  value="960 476 670"
+                  readOnly
                 />
               </label>
+              <p className="text-xs font-semibold text-ink/70">
+                Se usa automáticamente +{FIXED_WHATSAPP_PHONE} en todos los botones.
+              </p>
               <label className="text-sm font-semibold text-ink">
                 Mensaje predefinido
                 <textarea
@@ -289,4 +292,3 @@ export default function AdminPanel({
     </section>
   );
 }
-

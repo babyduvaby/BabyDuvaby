@@ -3,7 +3,9 @@ import Hero from "./components/Hero";
 import CategoryList from "./components/CategoryList";
 import FAQ from "./components/FAQ";
 import AdminPanel from "./components/AdminPanel";
+import MobileWhatsappBar from "./components/MobileWhatsappBar";
 import { useLandingConfig } from "./hooks/useLandingConfig";
+import { FIXED_WHATSAPP_PHONE } from "./data/defaultContent";
 
 export default function App() {
   const {
@@ -18,19 +20,24 @@ export default function App() {
   } = useLandingConfig();
 
   // Normaliza el número para construir un enlace wa.me válido.
-  const sanitizedPhone = config.whatsapp.phone.replace(/[^\d]/g, "");
+  const sanitizedPhone = FIXED_WHATSAPP_PHONE;
   const whatsappHref = `https://wa.me/${sanitizedPhone}?text=${encodeURIComponent(
     config.whatsapp.message
   )}`;
 
   const handleWhatsappClick = (event) => {
-    if (!sanitizedPhone) {
-      event.preventDefault();
-      setError("Configura un número de WhatsApp válido desde el panel administrador.");
-      return;
-    }
     setError("");
     incrementWhatsAppClicks();
+  };
+
+  const handleSaveConfig = (nextConfig) => {
+    saveConfig({
+      ...nextConfig,
+      whatsapp: {
+        ...nextConfig.whatsapp,
+        phone: FIXED_WHATSAPP_PHONE
+      }
+    });
   };
 
   if (isLoading) {
@@ -46,7 +53,7 @@ export default function App() {
   }
 
   return (
-    <main className="app-shell min-h-screen overflow-x-hidden bg-gradient-to-b from-[#fce9f2] via-[#f8f4fb] to-[#deebff] text-ink">
+    <main className="app-shell min-h-screen overflow-x-hidden bg-gradient-to-b from-[#fce9f2] via-[#f8f4fb] to-[#deebff] pb-24 text-ink sm:pb-0">
       <div className="pointer-events-none fixed inset-0 -z-10">
         <div className="ambient ambient-top" />
         <div className="ambient ambient-bottom" />
@@ -71,8 +78,14 @@ export default function App() {
       <AdminPanel
         config={config}
         clickCount={clickCount}
-        onSaveConfig={saveConfig}
+        onSaveConfig={handleSaveConfig}
         onResetClicks={resetClickCount}
+      />
+
+      <MobileWhatsappBar
+        whatsappHref={whatsappHref}
+        onWhatsappClick={handleWhatsappClick}
+        buttonText={config.brand.whatsappButtonText}
       />
     </main>
   );

@@ -6,8 +6,9 @@ Landing page mobile-first para **Baby Duvaby** en React + Tailwind CSS con enfoq
 ## Objetivo funcional
 - Mostrar hero principal, categorías y preguntas frecuentes.
 - Facilitar contacto por WhatsApp con un CTA principal.
+- Mantener CTA de WhatsApp fijo en la parte inferior en móvil.
 - Registrar contador de clics del CTA de WhatsApp.
-- Ofrecer panel administrador protegido por contraseña para editar contenido visual/textual y número de WhatsApp.
+- Ofrecer panel administrador protegido por contraseña para editar contenido visual/textual y mensaje de WhatsApp.
 - Persistir configuración y contador en `localStorage`.
 
 ## Arquitectura Frontend
@@ -20,6 +21,9 @@ Landing page mobile-first para **Baby Duvaby** en React + Tailwind CSS con enfoq
 ## Persistencia Local
 - Clave de configuración: `baby_duvaby_config_v1`
 - Clave de contador: `baby_duvaby_whatsapp_clicks_v1`
+
+## Regla comercial actual
+- Número de WhatsApp fijo para todos los botones: `+51 960 476 670`
 
 ## Seguridad y alcance
 - Panel admin con contraseña local en cliente (protección básica de interfaz).

@@ -9,7 +9,7 @@ export const defaultLandingConfig = {
     shippingMessage: "✨ Envíos a todo el Perú 🇵🇪"
   },
   whatsapp: {
-    phone: "51999999999",
+    phone: "51960476670",
     message: "Hola Baby Duvaby, quiero información sobre sus productos."
   },
   categories: [
@@ -64,8 +64,8 @@ export const defaultLandingConfig = {
 };
 
 export const ADMIN_PASSWORD = "duvaby2026";
+export const FIXED_WHATSAPP_PHONE = "51960476670";
 export const STORAGE_KEYS = {
   config: "baby_duvaby_config_v1",
   clicks: "baby_duvaby_whatsapp_clicks_v1"
 };
-

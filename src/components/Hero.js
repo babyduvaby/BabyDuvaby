@@ -38,7 +38,7 @@ export default function Hero({
         target="_blank"
         rel="noreferrer"
         onClick={onWhatsappClick}
-        className="cta-pulse mt-7 inline-flex min-h-14 w-full items-center justify-center rounded-full bg-gradient-to-r from-[#48d7a8] to-[#24b191] px-6 text-xl font-extrabold text-white shadow-candy transition duration-300 hover:scale-[1.01] hover:brightness-105 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#89f0ce] sm:w-auto"
+        className="cta-pulse mt-7 hidden min-h-14 w-full items-center justify-center rounded-full bg-gradient-to-r from-[#48d7a8] to-[#24b191] px-6 text-xl font-extrabold text-white shadow-candy transition duration-300 hover:scale-[1.01] hover:brightness-105 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#89f0ce] sm:inline-flex sm:w-auto"
       >
         {brand.whatsappButtonText}
       </a>

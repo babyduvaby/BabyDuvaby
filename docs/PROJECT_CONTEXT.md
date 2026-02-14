@@ -1,13 +1,13 @@
 # PROJECT_CONTEXT
 
 ## Resumen
-Landing page mobile-first para **Baby Duvaby** en React + Tailwind CSS con enfoque en conversión a WhatsApp.
+Landing page mobile-first para Baby Duvaby en React + Tailwind CSS con enfoque en conversion a WhatsApp.
 
 ## Objetivo funcional
-- Mostrar hero principal, categorías y preguntas frecuentes.
+- Mostrar hero principal, categorias y preguntas frecuentes.
 - Facilitar contacto por WhatsApp con un CTA principal.
-- Mantener CTA de WhatsApp fijo en la parte inferior en móvil.
-- Abrir ruta de catálogo por categoría y modelos al hacer clic en cada card.
+- Mantener CTA de WhatsApp fijo en la parte inferior en movil.
+- Abrir ruta de catalogo por categoria y modelos al hacer clic en cada card.
 - Registrar contador de clics del CTA de WhatsApp.
 - Persistir contador de clics en `localStorage`.
 
@@ -16,16 +16,25 @@ Landing page mobile-first para **Baby Duvaby** en React + Tailwind CSS con enfoq
 - Enrutamiento: `react-router-dom`.
 - Estilos: Tailwind CSS + utilidades personalizadas en `src/index.css`.
 - Estado:
-  - Hook central `useLandingConfig` para estado de landing y contador.
-  - Catálogo por categoría/modelo definido en `src/data/defaultContent.js`.
+  - Hook central `useLandingConfig` para contenido editable y contador.
+  - Catalogo por categoria/modelo definido en `src/data/defaultContent.js`.
 
-## Persistencia Local
-- Clave de contador: `baby_duvaby_whatsapp_clicks_v1`
+## Integraciones Firebase
+- Firebase Web SDK inicializado en `src/firebase.js`.
+- Firestore para contenido editable: documento `landing/main`.
+- Firebase Storage para imagenes: `landing/hero`, `landing/categories`, `landing/products`.
+- Firebase Auth para acceso admin real con email/password.
 
-## Regla comercial actual
-- Número de WhatsApp fijo para todos los botones: `+51 960 476 670`
-- Acceso admin externo: `https://baby-duvaby.vercel.app/admin/login`
+## Admin y gestion de contenido
+- Ruta de login admin: `/admin/login` (formulario solo contrasena).
+- Ruta protegida: `/admin`.
+- Acceso admin oculto de la landing publica (sin botones en TopBar/Footer).
+- Edicion completa desde panel: marca, WhatsApp, categorias, FAQ, modelos e imagenes.
 
-## Seguridad y alcance
-- Panel admin local eliminado de la landing.
-- No hay backend en esta versión.
+## Persistencia y fallback
+- Lectura/escritura principal en Firestore.
+- Fallback local en `localStorage` para `config` y `products` si Firestore no responde.
+- Login estable sin bucles de redireccion ni recargas continuas.
+
+## Variables de entorno recomendadas
+- `REACT_APP_ADMIN_EMAIL`: email admin de Firebase Auth.

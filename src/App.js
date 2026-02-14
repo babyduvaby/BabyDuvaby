@@ -1,5 +1,5 @@
 import React from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Hero from "./components/Hero";
 import CategoryList from "./components/CategoryList";
 import FAQ from "./components/FAQ";
@@ -7,25 +7,36 @@ import MobileWhatsappBar from "./components/MobileWhatsappBar";
 import CategoryProductsPage from "./components/CategoryProductsPage";
 import TopBar from "./components/TopBar";
 import Footer from "./components/Footer";
+import AdminLoginPage from "./components/AdminLoginPage";
+import AdminPanelPage from "./components/AdminPanelPage";
+import { FIXED_WHATSAPP_PHONE } from "./data/defaultContent";
 import { useLandingConfig } from "./hooks/useLandingConfig";
-import {
-  ADMIN_PANEL_URL,
-  FIXED_WHATSAPP_PHONE,
-  productCatalog
-} from "./data/defaultContent";
+import { useAdminSession } from "./hooks/useAdminSession";
 
 export default function App() {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith("/admin");
+
   const {
     config,
+    products,
     clickCount,
     isLoading,
+    isSaving,
     error,
     setError,
-    incrementWhatsAppClicks
+    incrementWhatsAppClicks,
+    resetClickCount,
+    saveContent,
+    restoreDefaultContent
   } = useLandingConfig();
 
-  // Se usa siempre el número comercial fijo solicitado por el cliente.
-  const sanitizedPhone = FIXED_WHATSAPP_PHONE;
+  const { isAdminAuthenticated, isAuthLoading, loginWithPassword, logout } =
+    useAdminSession();
+
+  const rawPhone = config?.whatsapp?.phone || FIXED_WHATSAPP_PHONE;
+  const sanitizedPhone = String(rawPhone).replace(/\D/g, "") || FIXED_WHATSAPP_PHONE;
+
   const buildWhatsappHref = (customMessage) =>
     `https://wa.me/${sanitizedPhone}?text=${encodeURIComponent(
       customMessage || config.whatsapp.message
@@ -51,13 +62,17 @@ export default function App() {
   }
 
   return (
-    <main className="app-shell min-h-screen overflow-x-hidden bg-gradient-to-b from-[#fce9f2] via-[#f8f4fb] to-[#deebff] pb-28 text-ink sm:pb-0">
+    <main
+      className={`app-shell min-h-screen overflow-x-hidden bg-gradient-to-b from-[#fce9f2] via-[#f8f4fb] to-[#deebff] text-ink ${
+        isAdminRoute ? "pb-8" : "pb-28 sm:pb-0"
+      }`}
+    >
       <div className="pointer-events-none fixed inset-0 -z-10">
         <div className="ambient ambient-top" />
         <div className="ambient ambient-bottom" />
       </div>
 
-      <TopBar />
+      <TopBar brand={config.brand} />
 
       {error ? (
         <div className="mx-auto mb-4 mt-3 max-w-3xl rounded-2xl border border-[#ffc6d9] bg-[#fff0f6] px-4 py-3 text-sm font-semibold text-[#b53d69]">
@@ -86,7 +101,7 @@ export default function App() {
           element={
             <CategoryProductsPage
               categories={config.categories}
-              products={productCatalog}
+              products={products}
               clickCount={clickCount}
               onWhatsappClick={handleWhatsappClick}
               buildWhatsappHref={buildWhatsappHref}
@@ -95,30 +110,67 @@ export default function App() {
         />
         <Route
           path="/admin/login"
-          element={<ExternalAdminRedirect url={ADMIN_PANEL_URL} />}
+          element={
+            isAuthLoading ? (
+              <AdminAuthLoading />
+            ) : isAdminAuthenticated ? (
+              <Navigate replace to="/admin" />
+            ) : (
+              <AdminLoginPage onLogin={loginWithPassword} />
+            )
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            isAuthLoading ? (
+              <AdminAuthLoading />
+            ) : isAdminAuthenticated ? (
+              <AdminPanelPage
+                config={config}
+                products={products}
+                clickCount={clickCount}
+                isSaving={isSaving}
+                onSaveContent={saveContent}
+                onRestoreDefaultContent={restoreDefaultContent}
+                onResetClickCount={resetClickCount}
+                onLogout={logout}
+              />
+            ) : (
+              <Navigate replace to="/admin/login" />
+            )
+          }
         />
         <Route path="*" element={<Navigate replace to="/" />} />
       </Routes>
 
-      <Footer categories={config.categories} />
+      {!isAdminRoute ? (
+        <Footer
+          categories={config.categories}
+          brand={config.brand}
+          whatsappPhone={sanitizedPhone}
+        />
+      ) : null}
 
-      <MobileWhatsappBar
-        whatsappHref={whatsappHref}
-        onWhatsappClick={handleWhatsappClick}
-        buttonText="Contactar por WhatsApp"
-      />
+      {!isAdminRoute ? (
+        <MobileWhatsappBar
+          whatsappHref={whatsappHref}
+          onWhatsappClick={handleWhatsappClick}
+          buttonText="Contactar por WhatsApp"
+        />
+      ) : null}
     </main>
   );
 }
 
-function ExternalAdminRedirect({ url }) {
-  React.useEffect(() => {
-    window.location.replace(url);
-  }, [url]);
-
+function AdminAuthLoading() {
   return (
-    <section className="mx-auto max-w-4xl px-4 py-8 text-center">
-      <p className="text-sm font-bold text-ink/80">Redirigiendo al panel administrador...</p>
+    <section className="mx-auto flex min-h-[60vh] w-full max-w-xl items-center px-4 py-8 sm:px-6">
+      <div className="glass-panel w-full animate-pulse rounded-3xl p-6 shadow-candy sm:p-8">
+        <div className="h-4 w-32 rounded bg-[#e1ecff]" />
+        <div className="mt-3 h-8 w-56 rounded bg-[#e1ecff]" />
+        <div className="mt-6 h-12 w-full rounded-xl bg-[#e1ecff]" />
+      </div>
     </section>
   );
 }

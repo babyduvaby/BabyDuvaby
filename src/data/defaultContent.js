@@ -134,9 +134,8 @@ export const productCatalog = [
 ];
 
 export const FIXED_WHATSAPP_PHONE = "51960476670";
-export const ADMIN_PANEL_URL = "https://baby-duvaby.vercel.app/admin/login";
 export const STORAGE_KEYS = {
   config: "baby_duvaby_config_v1",
+  products: "baby_duvaby_products_v1",
   clicks: "baby_duvaby_whatsapp_clicks_v1"
 };
-

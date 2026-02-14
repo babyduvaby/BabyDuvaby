@@ -9,8 +9,7 @@ export default function ServiceWorkerRegistrar() {
     }
 
     const CACHE_PREFIX = "baby-duvaby-";
-    const CURRENT_SW_CACHE_VERSION = "v3";
-    let didRefresh = false;
+    const CURRENT_SW_CACHE_VERSION = "v4";
 
     const register = async () => {
       try {
@@ -53,19 +52,9 @@ export default function ServiceWorkerRegistrar() {
       }
     };
 
-    const handleControllerChange = () => {
-      if (didRefresh) {
-        return;
-      }
-      didRefresh = true;
-      window.location.reload();
-    };
-
-    navigator.serviceWorker.addEventListener("controllerchange", handleControllerChange);
     window.addEventListener("load", register);
     return () => {
       window.removeEventListener("load", register);
-      navigator.serviceWorker.removeEventListener("controllerchange", handleControllerChange);
     };
   }, []);
 

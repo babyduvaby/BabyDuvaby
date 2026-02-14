@@ -26,10 +26,26 @@
   <body>
     <div class="box">
       <p><strong>Actualizando Baby Duvaby...</strong></p>
-      <p>Si no redirige en 2 segundos, recarga la pagina.</p>
+      <p id="status">Si no redirige en 2 segundos, recarga la pagina.</p>
+      <p style="margin-top: 10px">
+        <a id="manual-link" href="/home" style="color: #3f5f8a; font-weight: 700">Ir a la tienda</a>
+      </p>
     </div>
     <script>
       (async function recover() {
+        var status = document.getElementById("status");
+        var manualLink = document.getElementById("manual-link");
+
+        function buildTarget() {
+          var target = new URL("/home", location.origin);
+          target.searchParams.set("fresh", String(Date.now()));
+          return target.toString();
+        }
+
+        if (manualLink) {
+          manualLink.href = buildTarget();
+        }
+
         try {
           if ("serviceWorker" in navigator) {
             const regs = await navigator.serviceWorker.getRegistrations();
@@ -40,7 +56,11 @@
             await Promise.all(keys.map((k) => caches.delete(k)));
           }
         } catch (e) {}
-        location.replace("/");
+
+        if (status) {
+          status.textContent = "Aplicando correccion de cache...";
+        }
+        location.replace(buildTarget());
       })();
     </script>
   </body>

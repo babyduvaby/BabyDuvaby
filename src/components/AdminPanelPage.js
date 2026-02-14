@@ -26,6 +26,16 @@ function moveItem(items, fromIndex, toIndex) {
   return nextItems;
 }
 
+function clampPercentage(value, fallback = 50) {
+  const parsed = Number(value);
+
+  if (!Number.isFinite(parsed)) {
+    return fallback;
+  }
+
+  return Math.min(100, Math.max(0, parsed));
+}
+
 function Field({ label, value, onChange, placeholder }) {
   return (
     <label className="block">
@@ -54,6 +64,27 @@ function TextArea({ label, value, onChange, placeholder }) {
         onChange={onChange}
         placeholder={placeholder}
         className="min-h-24 w-full rounded-xl border border-[#d8e6ff] bg-white px-3 py-2 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff]"
+      />
+    </label>
+  );
+}
+
+function RangeField({ label, value, onChange }) {
+  const safeValue = clampPercentage(value, 50);
+
+  return (
+    <label className="block">
+      <span className="mb-1 block text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
+        {label} ({Math.round(safeValue)}%)
+      </span>
+      <input
+        type="range"
+        min="0"
+        max="100"
+        step="1"
+        value={safeValue}
+        onChange={(event) => onChange(clampPercentage(event.target.value, safeValue))}
+        className="h-11 w-full cursor-pointer accent-[#6f9ad0]"
       />
     </label>
   );
@@ -107,7 +138,7 @@ function ImageDropField({ label, onFileSelected, isUploading }) {
   );
 }
 
-function ImagePreview({ src, alt }) {
+function ImagePreview({ src, alt, objectPosition = "50% 50%", imageClassName = "h-36" }) {
   const [hasError, setHasError] = React.useState(false);
   const safeSrc = String(src || "");
 
@@ -130,7 +161,8 @@ function ImagePreview({ src, alt }) {
           src={safeSrc}
           alt={alt}
           onError={() => setHasError(true)}
-          className="h-36 w-full rounded-lg object-cover"
+          className={`${imageClassName} w-full rounded-lg object-cover`}
+          style={{ objectPosition }}
           loading="lazy"
         />
       ) : (
@@ -304,7 +336,11 @@ export default function AdminPanelPage({
           id: createId("cat"),
           title: "Nueva categoria",
           image: "",
-          secondaryImage: ""
+          secondaryImage: "",
+          imageFocusX: 50,
+          imageFocusY: 50,
+          secondaryImageFocusX: 50,
+          secondaryImageFocusY: 50
         }
       ]
     }));
@@ -718,6 +754,40 @@ export default function AdminPanelPage({
                     }
                   />
                 </div>
+                <div className="mt-3 rounded-2xl border border-[#e2ecff] bg-[#f7faff] p-3">
+                  <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
+                    Ajuste encuadre imagen superior
+                  </p>
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    <RangeField
+                      label="Horizontal"
+                      value={category.imageFocusX ?? 50}
+                      onChange={(value) => updateCategory(index, "imageFocusX", value)}
+                    />
+                    <RangeField
+                      label="Vertical"
+                      value={category.imageFocusY ?? 50}
+                      onChange={(value) => updateCategory(index, "imageFocusY", value)}
+                    />
+                  </div>
+                </div>
+                <div className="mt-3 rounded-2xl border border-[#e2ecff] bg-[#f7faff] p-3">
+                  <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
+                    Ajuste encuadre imagen inferior
+                  </p>
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    <RangeField
+                      label="Horizontal"
+                      value={category.secondaryImageFocusX ?? 50}
+                      onChange={(value) => updateCategory(index, "secondaryImageFocusX", value)}
+                    />
+                    <RangeField
+                      label="Vertical"
+                      value={category.secondaryImageFocusY ?? 50}
+                      onChange={(value) => updateCategory(index, "secondaryImageFocusY", value)}
+                    />
+                  </div>
+                </div>
                 <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <ImageDropField
                     label="Subir o arrastrar imagen superior"
@@ -749,6 +819,8 @@ export default function AdminPanelPage({
                     <ImagePreview
                       src={category.image}
                       alt={`Previsualizacion superior categoria ${category.title}`}
+                      objectPosition={`${clampPercentage(category.imageFocusX)}% ${clampPercentage(category.imageFocusY)}%`}
+                      imageClassName="h-28 sm:h-36 lg:h-40"
                     />
                   </div>
                   <div>
@@ -758,6 +830,8 @@ export default function AdminPanelPage({
                     <ImagePreview
                       src={category.secondaryImage || category.image}
                       alt={`Previsualizacion inferior categoria ${category.title}`}
+                      objectPosition={`${clampPercentage(category.secondaryImageFocusX)}% ${clampPercentage(category.secondaryImageFocusY)}%`}
+                      imageClassName="h-20 sm:h-28 lg:h-32"
                     />
                   </div>
                 </div>

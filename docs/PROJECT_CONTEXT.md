@@ -38,6 +38,7 @@ Landing page mobile-first para Baby Duvaby en Next.js (App Router) + Tailwind CS
 - Acceso admin oculto de la landing publica (sin botones en TopBar/Footer).
 - Edicion completa desde panel: marca, WhatsApp, categorias, FAQ, modelos e imagenes.
 - Carga de imagenes por drag and drop en hero, categorias y productos.
+- Ajuste de encuadre por categoria (imagen superior/inferior con control horizontal y vertical) para corregir composicion en mobile.
 - Ordenamiento por drag and drop y botones Subir/Bajar para categorias, FAQ y modelos.
 - Grafico de clics WhatsApp por zona y resumen de ultimos 7 dias.
 - Herramientas admin: exportar backup JSON e importar backup JSON.

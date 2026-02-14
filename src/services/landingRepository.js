@@ -29,6 +29,15 @@ const defaultAnalytics = () => ({
 });
 
 const isRecord = (value) => Boolean(value) && typeof value === "object" && !Array.isArray(value);
+const clampPercent = (value, fallback = 50) => {
+  const parsed = Number(value);
+
+  if (!Number.isFinite(parsed)) {
+    return fallback;
+  }
+
+  return Math.min(100, Math.max(0, parsed));
+};
 
 function sanitizeConfig(rawConfig) {
   const defaults = defaultConfigClone();
@@ -46,6 +55,16 @@ function sanitizeConfig(rawConfig) {
           image: String(item.image || defaults.categories[index]?.image || ""),
           secondaryImage: String(
             item.secondaryImage || item.image || defaults.categories[index]?.secondaryImage || ""
+          ),
+          imageFocusX: clampPercent(item.imageFocusX, defaults.categories[index]?.imageFocusX ?? 50),
+          imageFocusY: clampPercent(item.imageFocusY, defaults.categories[index]?.imageFocusY ?? 50),
+          secondaryImageFocusX: clampPercent(
+            item.secondaryImageFocusX,
+            defaults.categories[index]?.secondaryImageFocusX ?? 50
+          ),
+          secondaryImageFocusY: clampPercent(
+            item.secondaryImageFocusY,
+            defaults.categories[index]?.secondaryImageFocusY ?? 50
           )
         }))
     : defaults.categories;

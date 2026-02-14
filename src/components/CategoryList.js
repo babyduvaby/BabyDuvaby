@@ -2,12 +2,24 @@ import React from "react";
 import Link from "next/link";
 import { getOptimizedCloudinaryUrl } from "../utils/cloudinary";
 
+const clampPercent = (value, fallback = 50) => {
+  const parsed = Number(value);
+
+  if (!Number.isFinite(parsed)) {
+    return fallback;
+  }
+
+  return Math.min(100, Math.max(0, parsed));
+};
+
 function CategoryImage({
   primarySrc,
   fallbackSrc,
   alt,
   heightClass,
-  optimizeOptions
+  optimizeOptions,
+  focusX = 50,
+  focusY = 50
 }) {
   const [safeSrc, setSafeSrc] = React.useState(primarySrc || fallbackSrc || "");
   const [hasTriedFallback, setHasTriedFallback] = React.useState(false);
@@ -32,6 +44,7 @@ function CategoryImage({
       src={getOptimizedCloudinaryUrl(safeSrc, optimizeOptions)}
       alt={alt}
       className={`${heightClass} w-full rounded-xl object-cover`}
+      style={{ objectPosition: `${focusX}% ${focusY}%` }}
       loading="lazy"
       decoding="async"
       onError={() => {
@@ -96,11 +109,10 @@ export default function CategoryList({ categories, products }) {
                 }
                 alt={category.title}
                 heightClass="h-24 sm:h-28 lg:h-36"
+                focusX={clampPercent(category.imageFocusX)}
+                focusY={clampPercent(category.imageFocusY)}
                 optimizeOptions={{
-                  width: 900,
-                  height: 560,
-                  crop: "fill",
-                  gravity: "auto"
+                  width: 1200
                 }}
               />
 
@@ -117,11 +129,10 @@ export default function CategoryList({ categories, products }) {
                 fallbackSrc={category.image}
                 alt={`${category.title} - referencia inferior`}
                 heightClass="h-16 sm:h-20 lg:h-24"
+                focusX={clampPercent(category.secondaryImageFocusX)}
+                focusY={clampPercent(category.secondaryImageFocusY)}
                 optimizeOptions={{
-                  width: 900,
-                  height: 360,
-                  crop: "fill",
-                  gravity: "auto"
+                  width: 1200
                 }}
               />
             </Link>

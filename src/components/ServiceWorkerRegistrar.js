@@ -9,6 +9,7 @@ export default function ServiceWorkerRegistrar() {
     }
 
     const CACHE_PREFIX = "baby-duvaby-";
+    const CURRENT_SW_CACHE_VERSION = "v3";
     let didRefresh = false;
 
     const register = async () => {
@@ -17,7 +18,10 @@ export default function ServiceWorkerRegistrar() {
           const cacheKeys = await caches.keys();
           await Promise.all(
             cacheKeys
-              .filter((key) => key.startsWith(CACHE_PREFIX) && !key.includes("v2"))
+              .filter(
+                (key) =>
+                  key.startsWith(CACHE_PREFIX) && !key.includes(CURRENT_SW_CACHE_VERSION)
+              )
               .map((key) => caches.delete(key))
           );
         }

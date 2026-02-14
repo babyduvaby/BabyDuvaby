@@ -1,0 +1,26 @@
+{
+  "name": "Baby Duvaby",
+  "short_name": "BabyDuvaby",
+  "description": "Ropita y accesorios tiernos para tu bebe. Compra por WhatsApp.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f8e8f0",
+  "theme_color": "#f7c3df",
+  "lang": "es-PE",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo-baby-duvaby.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
+

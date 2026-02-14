@@ -8,6 +8,7 @@ import TopBar from "./components/TopBar";
 import Footer from "./components/Footer";
 import Testimonials from "./components/Testimonials";
 import FloatingWhatsappButton from "./components/FloatingWhatsappButton";
+import AppInstallPrompt from "./components/AppInstallPrompt";
 import AdminLoginPage from "./components/AdminLoginPage";
 import AdminPanelPage from "./components/AdminPanelPage";
 import { FIXED_WHATSAPP_PHONE } from "./data/defaultContent";
@@ -191,6 +192,8 @@ export default function App() {
           label="WhatsApp"
         />
       ) : null}
+
+      <AppInstallPrompt enabled={!isAdminRoute} />
     </main>
   );
 }

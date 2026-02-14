@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 // Grilla mobile-first para categorías destacadas.
 export default function CategoryList({ categories }) {
@@ -16,8 +17,9 @@ export default function CategoryList({ categories }) {
     <section className="mx-auto max-w-6xl px-4 pb-10 sm:px-6">
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {categories.map((category, index) => (
-          <article
+          <Link
             key={category.id}
+            to={`/categoria/${category.id}`}
             className="card-reveal group overflow-hidden rounded-3xl bg-white/80 shadow-candy transition duration-300 hover:-translate-y-1"
             style={{ animationDelay: `${index * 90}ms` }}
           >
@@ -31,8 +33,11 @@ export default function CategoryList({ categories }) {
               <h3 className="font-title text-2xl leading-tight text-ink">
                 {category.title}
               </h3>
+              <p className="mt-1 text-xs font-bold uppercase tracking-widest text-[#5f7696]">
+                Ver modelos
+              </p>
             </div>
-          </article>
+          </Link>
         ))}
       </div>
     </section>

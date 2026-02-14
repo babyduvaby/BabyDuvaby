@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="logoTitle logoDesc">
+  <title id="logoTitle">Logo Baby Duvaby</title>
+  <desc id="logoDesc">Luna pastel con texto Baby Duvaby y mameluco</desc>
+  <defs>
+    <linearGradient id="moonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8edb8" />
+      <stop offset="100%" stop-color="#f3dc8e" />
+    </linearGradient>
+    <linearGradient id="textPink" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8acc4" />
+      <stop offset="100%" stop-color="#f27ea6" />
+    </linearGradient>
+    <linearGradient id="textBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9ad7f8" />
+      <stop offset="100%" stop-color="#6bb2ec" />
+    </linearGradient>
+  </defs>
+
+  <rect width="128" height="128" rx="28" fill="#fff9fc" />
+  <path d="M44 18c-17 0-30 13-30 30 0 17 13 30 30 30 5 0 10-1 14-3-12-1-22-11-22-24 0-13 10-23 22-24-4-2-9-3-14-3z" fill="url(#moonGrad)" />
+  <circle cx="94" cy="26" r="3" fill="#ffe7a8" />
+  <circle cx="101" cy="34" r="2.5" fill="#ffe7a8" />
+  <circle cx="87" cy="36" r="2.2" fill="#ffe7a8" />
+
+  <text x="64" y="56" text-anchor="middle" font-size="24" font-family="'Baloo 2', 'Comic Sans MS', cursive" font-weight="700" fill="url(#textBlue)">Baby</text>
+  <text x="64" y="80" text-anchor="middle" font-size="24" font-family="'Baloo 2', 'Comic Sans MS', cursive" font-weight="700" fill="url(#textPink)">Duvaby</text>
+
+  <path d="M85 93h16l6 9-7 8H84l-7-8z" fill="#9edff2" />
+  <circle cx="90" cy="99" r="1.6" fill="#6bb2ec" />
+  <circle cx="95" cy="99" r="1.6" fill="#6bb2ec" />
+</svg>
+

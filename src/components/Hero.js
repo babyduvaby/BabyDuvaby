@@ -11,7 +11,7 @@ export default function Hero({
   const restLabel = restWords.join(" ");
 
   return (
-    <section className="relative z-10 mx-auto max-w-xl px-4 pb-10 pt-8 text-center sm:px-6">
+    <section className="relative z-10 mx-auto max-w-xl px-4 pb-10 pt-7 text-center sm:px-6">
       <div className="mx-auto mb-4 inline-flex rounded-full bg-white/70 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-ink shadow-sm">
         Tienda de ropita para bebé
       </div>
@@ -21,6 +21,7 @@ export default function Hero({
         <span className="text-[#6bb2ec]">{secondWord || ""}</span>{" "}
         <span className="text-[#f27ea6]">{restLabel}</span>
       </h1>
+      <p className="mt-1 text-2xl">💗💗</p>
       <p className="mt-4 text-lg font-semibold text-ink/90 sm:text-xl">
         {brand.subtitle}
       </p>

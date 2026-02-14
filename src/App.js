@@ -1,11 +1,18 @@
 import React from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
 import Hero from "./components/Hero";
 import CategoryList from "./components/CategoryList";
 import FAQ from "./components/FAQ";
-import AdminPanel from "./components/AdminPanel";
 import MobileWhatsappBar from "./components/MobileWhatsappBar";
+import CategoryProductsPage from "./components/CategoryProductsPage";
+import TopBar from "./components/TopBar";
+import Footer from "./components/Footer";
 import { useLandingConfig } from "./hooks/useLandingConfig";
-import { FIXED_WHATSAPP_PHONE } from "./data/defaultContent";
+import {
+  ADMIN_PANEL_URL,
+  FIXED_WHATSAPP_PHONE,
+  productCatalog
+} from "./data/defaultContent";
 
 export default function App() {
   const {
@@ -14,30 +21,21 @@ export default function App() {
     isLoading,
     error,
     setError,
-    saveConfig,
-    incrementWhatsAppClicks,
-    resetClickCount
+    incrementWhatsAppClicks
   } = useLandingConfig();
 
-  // Normaliza el número para construir un enlace wa.me válido.
+  // Se usa siempre el número comercial fijo solicitado por el cliente.
   const sanitizedPhone = FIXED_WHATSAPP_PHONE;
-  const whatsappHref = `https://wa.me/${sanitizedPhone}?text=${encodeURIComponent(
-    config.whatsapp.message
-  )}`;
+  const buildWhatsappHref = (customMessage) =>
+    `https://wa.me/${sanitizedPhone}?text=${encodeURIComponent(
+      customMessage || config.whatsapp.message
+    )}`;
 
-  const handleWhatsappClick = (event) => {
+  const whatsappHref = buildWhatsappHref();
+
+  const handleWhatsappClick = () => {
     setError("");
     incrementWhatsAppClicks();
-  };
-
-  const handleSaveConfig = (nextConfig) => {
-    saveConfig({
-      ...nextConfig,
-      whatsapp: {
-        ...nextConfig.whatsapp,
-        phone: FIXED_WHATSAPP_PHONE
-      }
-    });
   };
 
   if (isLoading) {
@@ -59,34 +57,68 @@ export default function App() {
         <div className="ambient ambient-bottom" />
       </div>
 
+      <TopBar />
+
       {error ? (
         <div className="mx-auto mb-4 mt-3 max-w-3xl rounded-2xl border border-[#ffc6d9] bg-[#fff0f6] px-4 py-3 text-sm font-semibold text-[#b53d69]">
           {error}
         </div>
       ) : null}
 
-      <Hero
-        brand={config.brand}
-        whatsappHref={whatsappHref}
-        onWhatsappClick={handleWhatsappClick}
-        clickCount={clickCount}
-      />
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <>
+              <Hero
+                brand={config.brand}
+                whatsappHref={whatsappHref}
+                onWhatsappClick={handleWhatsappClick}
+                clickCount={clickCount}
+              />
+              <CategoryList categories={config.categories} />
+              <FAQ faqItems={config.faq} />
+            </>
+          }
+        />
+        <Route
+          path="/categoria/:categoryId"
+          element={
+            <CategoryProductsPage
+              categories={config.categories}
+              products={productCatalog}
+              clickCount={clickCount}
+              onWhatsappClick={handleWhatsappClick}
+              buildWhatsappHref={buildWhatsappHref}
+            />
+          }
+        />
+        <Route
+          path="/admin/login"
+          element={<ExternalAdminRedirect url={ADMIN_PANEL_URL} />}
+        />
+        <Route path="*" element={<Navigate replace to="/" />} />
+      </Routes>
 
-      <CategoryList categories={config.categories} />
-      <FAQ faqItems={config.faq} />
-
-      <AdminPanel
-        config={config}
-        clickCount={clickCount}
-        onSaveConfig={handleSaveConfig}
-        onResetClicks={resetClickCount}
-      />
+      <Footer categories={config.categories} />
 
       <MobileWhatsappBar
         whatsappHref={whatsappHref}
         onWhatsappClick={handleWhatsappClick}
-        buttonText={config.brand.whatsappButtonText}
+        buttonText="Contactar por WhatsApp"
       />
     </main>
+  );
+}
+
+function ExternalAdminRedirect({ url }) {
+  React.useEffect(() => {
+    window.location.replace(url);
+  }, [url]);
+
+  return (
+    <section className="mx-auto max-w-4xl px-4 py-8 text-center">
+      <p className="text-sm font-bold text-ink/80">Redirigiendo al panel administrador...</p>
+    </section>
   );
 }

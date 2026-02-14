@@ -13,13 +13,7 @@ export function useLandingConfig() {
 
   useEffect(() => {
     try {
-      const savedConfigRaw = localStorage.getItem(STORAGE_KEYS.config);
       const savedClicksRaw = localStorage.getItem(STORAGE_KEYS.clicks);
-
-      if (savedConfigRaw) {
-        const savedConfig = JSON.parse(savedConfigRaw);
-        setConfig(savedConfig);
-      }
 
       if (savedClicksRaw) {
         const savedClicks = Number(savedClicksRaw);
@@ -33,11 +27,6 @@ export function useLandingConfig() {
       setIsLoading(false);
     }
   }, []);
-
-  const saveConfig = (nextConfig) => {
-    setConfig(nextConfig);
-    localStorage.setItem(STORAGE_KEYS.config, JSON.stringify(nextConfig));
-  };
 
   const incrementWhatsAppClicks = () => {
     setClickCount((prevCount) => {
@@ -58,9 +47,8 @@ export function useLandingConfig() {
     isLoading,
     error,
     setError,
-    saveConfig,
     incrementWhatsAppClicks,
-    resetClickCount
+    resetClickCount,
+    setConfig
   };
 }
-

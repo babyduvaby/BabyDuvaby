@@ -18,7 +18,5 @@ npm run build
 ```
 
 ## Panel administrador
-- Contraseña inicial: `duvaby2026`
-- Permite editar textos, imágenes y WhatsApp.
-- Los cambios y el contador de clics se guardan en `localStorage`.
-
+- URL: `https://baby-duvaby.vercel.app/admin/login`
+- El panel ya no se muestra dentro de la landing pública.

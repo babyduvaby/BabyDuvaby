@@ -353,6 +353,13 @@ export default function AdminPanelPage({
     }));
   };
 
+  const reorderFaq = (fromIndex, toIndex) => {
+    setDraftConfig((prev) => ({
+      ...prev,
+      faq: moveItem(prev.faq, fromIndex, toIndex)
+    }));
+  };
+
   const updateProduct = (index, field, value) => {
     setDraftProducts((prev) => {
       const nextProducts = [...prev];
@@ -462,6 +469,10 @@ export default function AdminPanelPage({
       reorderProducts(dragMeta.index, toIndex);
     }
 
+    if (type === "faq") {
+      reorderFaq(dragMeta.index, toIndex);
+    }
+
     setDragMeta(null);
   };
 
@@ -563,8 +574,8 @@ export default function AdminPanelPage({
             </div>
           </div>
           <p className="text-sm font-semibold text-[#5f799b]">
-            Arrastra tarjetas para cambiar el orden de categorias y modelos. Tambien puedes
-            arrastrar imagenes en cada bloque para actualizar rapido.
+            Arrastra tarjetas o usa los botones Subir/Bajar para cambiar el orden de categorias,
+            FAQ y modelos. Tambien puedes arrastrar imagenes en cada bloque para actualizar rapido.
           </p>
         </article>
 
@@ -663,6 +674,22 @@ export default function AdminPanelPage({
                     </span>
                     <button
                       type="button"
+                      onClick={() => reorderCategories(index, index - 1)}
+                      disabled={index === 0}
+                      className="rounded-full border border-[#dce8ff] bg-[#f6f9ff] px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#5f799b] transition hover:bg-[#edf4ff] disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      Subir
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => reorderCategories(index, index + 1)}
+                      disabled={index === draftConfig.categories.length - 1}
+                      className="rounded-full border border-[#dce8ff] bg-[#f6f9ff] px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#5f799b] transition hover:bg-[#edf4ff] disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      Bajar
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => removeCategory(category.id)}
                       className="rounded-full border border-[#ffd5df] bg-[#fff3f7] px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#a64b6b] transition hover:bg-[#ffe8ef]"
                     >
@@ -717,16 +744,46 @@ export default function AdminPanelPage({
           </div>
           <div className="space-y-3">
             {draftConfig.faq.map((faqItem, index) => (
-              <div key={faqItem.id} className="rounded-2xl border border-[#dce8ff] bg-white/90 p-4">
+              <div
+                key={faqItem.id}
+                draggable
+                onDragStart={() => setDragMeta({ type: "faq", index })}
+                onDragOver={(event) => event.preventDefault()}
+                onDrop={() => handleDropReorder("faq", index)}
+                className="rounded-2xl border border-[#dce8ff] bg-white/90 p-4"
+              >
                 <div className="mb-3 flex items-center justify-between gap-2">
-                  <p className="text-sm font-extrabold text-ink">ID: {faqItem.id}</p>
-                  <button
-                    type="button"
-                    onClick={() => removeFaq(faqItem.id)}
-                    className="rounded-full border border-[#ffd5df] bg-[#fff3f7] px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#a64b6b] transition hover:bg-[#ffe8ef]"
-                  >
-                    Eliminar
-                  </button>
+                  <p className="text-sm font-extrabold text-ink">
+                    ID: {faqItem.id} | Orden: {index + 1}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-full border border-[#dce8ff] bg-[#f6f9ff] px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#5f799b]">
+                      Arrastrar
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => reorderFaq(index, index - 1)}
+                      disabled={index === 0}
+                      className="rounded-full border border-[#dce8ff] bg-[#f6f9ff] px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#5f799b] transition hover:bg-[#edf4ff] disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      Subir
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => reorderFaq(index, index + 1)}
+                      disabled={index === draftConfig.faq.length - 1}
+                      className="rounded-full border border-[#dce8ff] bg-[#f6f9ff] px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#5f799b] transition hover:bg-[#edf4ff] disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      Bajar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => removeFaq(faqItem.id)}
+                      className="rounded-full border border-[#ffd5df] bg-[#fff3f7] px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#a64b6b] transition hover:bg-[#ffe8ef]"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
                 </div>
                 <Field
                   label="Pregunta"
@@ -775,6 +832,22 @@ export default function AdminPanelPage({
                     <span className="rounded-full border border-[#dce8ff] bg-[#f6f9ff] px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#5f799b]">
                       Arrastrar
                     </span>
+                    <button
+                      type="button"
+                      onClick={() => reorderProducts(index, index - 1)}
+                      disabled={index === 0}
+                      className="rounded-full border border-[#dce8ff] bg-[#f6f9ff] px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#5f799b] transition hover:bg-[#edf4ff] disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      Subir
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => reorderProducts(index, index + 1)}
+                      disabled={index === draftProducts.length - 1}
+                      className="rounded-full border border-[#dce8ff] bg-[#f6f9ff] px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#5f799b] transition hover:bg-[#edf4ff] disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      Bajar
+                    </button>
                     <button
                       type="button"
                       onClick={() => removeProduct(product.id)}

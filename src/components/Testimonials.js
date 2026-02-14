@@ -38,11 +38,42 @@ function normalizeTestimonials(items) {
 }
 
 function Stars({ rating }) {
+  const stars = Array.from({ length: 5 });
+
   return (
-    <p className="mt-1 text-base leading-none text-[#f4a11a]" aria-label={`${rating} estrellas`}>
-      {"?".repeat(rating)}
-      <span className="text-[#ced8ea]">{"?".repeat(Math.max(0, 5 - rating))}</span>
+    <p className="mt-1 inline-flex items-center gap-0.5" aria-label={`${rating} estrellas`}>
+      {stars.map((_, index) => {
+        const active = index < rating;
+        return (
+          <svg
+            key={`star-${index}`}
+            viewBox="0 0 24 24"
+            className={`h-4 w-4 ${active ? "text-[#f4a11a]" : "text-[#ced8ea]"}`}
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.6 6.1 20.5l1.2-6.5-4.8-4.6 6.6-.9L12 2.5Z" />
+          </svg>
+        );
+      })}
     </p>
+  );
+}
+
+function ChevronIcon({ direction = "right" }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="h-5 w-5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {direction === "left" ? <path d="m15 18-6-6 6-6" /> : <path d="m9 18 6-6-6-6" />}
+    </svg>
   );
 }
 
@@ -166,9 +197,9 @@ export default function Testimonials({ items }) {
                 setActiveIndex(nextIndex);
                 scrollToIndex(nextIndex);
               }}
-              className="baby-button-glow absolute left-1 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-xl font-black text-[#5a7cab] sm:inline-flex"
+              className="baby-button-glow absolute left-1 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 font-black text-[#5a7cab] sm:inline-flex"
             >
-              ‹
+              <ChevronIcon direction="left" />
             </button>
             <button
               type="button"
@@ -178,9 +209,9 @@ export default function Testimonials({ items }) {
                 setActiveIndex(nextIndex);
                 scrollToIndex(nextIndex);
               }}
-              className="baby-button-glow absolute right-1 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-xl font-black text-[#5a7cab] sm:inline-flex"
+              className="baby-button-glow absolute right-1 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 font-black text-[#5a7cab] sm:inline-flex"
             >
-              ›
+              <ChevronIcon direction="right" />
             </button>
           </>
         ) : null}

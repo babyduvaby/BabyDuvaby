@@ -37,20 +37,20 @@ export default function TopBar({ brand, categories = [], pinToViewport = false }
           pinToViewport ? "fixed inset-x-0 top-0" : "sticky top-0"
         }`}
       >
-        <div className="baby-section-glow mx-auto grid w-full max-w-6xl grid-cols-[3rem,1fr,3rem] items-center rounded-2xl px-2 py-2 sm:grid-cols-[3.25rem,1fr,3.25rem] sm:px-4 sm:py-3">
+        <div className="baby-section-glow mx-auto grid w-full max-w-6xl grid-cols-[2.5rem,1fr,2.5rem] items-center rounded-2xl px-2 py-2 sm:grid-cols-[3.25rem,1fr,3.25rem] sm:px-4 sm:py-3">
           <button
             type="button"
             aria-label="Abrir menu de categorias"
             aria-expanded={isMenuOpen}
             aria-controls="baby-menu-categorias"
             onClick={() => setIsMenuOpen(true)}
-            className="baby-menu-trigger inline-flex h-11 w-11 items-center justify-center rounded-xl text-[#ff5ea7]"
+            className="baby-menu-trigger inline-flex h-9 w-9 items-center justify-center rounded-xl text-[#ff5ea7] sm:h-11 sm:w-11"
           >
             <span className="sr-only">Menu</span>
-            <span className="flex w-5 flex-col gap-1.5">
-              <span className="h-[2.5px] w-full rounded-full bg-current" />
-              <span className="h-[2.5px] w-full rounded-full bg-current" />
-              <span className="h-[2.5px] w-full rounded-full bg-current" />
+            <span className="flex w-4 flex-col gap-1 sm:w-5 sm:gap-1.5">
+              <span className="h-[2px] w-full rounded-full bg-current sm:h-[2.5px]" />
+              <span className="h-[2px] w-full rounded-full bg-current sm:h-[2.5px]" />
+              <span className="h-[2px] w-full rounded-full bg-current sm:h-[2.5px]" />
             </span>
           </button>
 
@@ -65,7 +65,7 @@ export default function TopBar({ brand, categories = [], pinToViewport = false }
             </p>
           </Link>
 
-          <span className="h-11 w-11" aria-hidden="true" />
+          <span className="h-9 w-9 sm:h-11 sm:w-11" aria-hidden="true" />
         </div>
       </header>
 

@@ -83,7 +83,7 @@ export function useLandingConfig() {
     setClickAnalytics(saveResult.analytics);
     setClickCount(saveResult.analytics.total);
 
-    if (!saveResult.persistedInFirebase) {
+    if (!saveResult.persistedInFirebase && saveResult.reason !== "auth-missing") {
       setError("Guardado local completado. No se pudo sincronizar con Firebase.");
     }
 

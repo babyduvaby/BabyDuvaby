@@ -35,3 +35,4 @@ Configura estas variables en Vercel para que el panel admin pueda subir imagenes
 - `REACT_APP_CLOUDINARY_UPLOAD_PRESET`
 
 El `upload preset` debe ser de tipo unsigned.
+- `REACT_APP_CLOUDINARY_DYNAMIC_FOLDER` (opcional, usar `1` solo si tu preset unsigned permite folder/public_id dinamico)

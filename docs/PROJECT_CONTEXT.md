@@ -48,3 +48,4 @@ Landing page mobile-first para Baby Duvaby en React + Tailwind CSS con enfoque e
 - `REACT_APP_ADMIN_PASSWORD_FALLBACK`: contrasena local opcional de emergencia cuando Firebase Auth no este disponible.
 - `REACT_APP_CLOUDINARY_CLOUD_NAME`: cloud name de Cloudinary.
 - `REACT_APP_CLOUDINARY_UPLOAD_PRESET`: upload preset unsigned para subir imagenes desde frontend.
+- `REACT_APP_CLOUDINARY_DYNAMIC_FOLDER`: `1` para permitir folder/public_id dinamico en uploads unsigned (por defecto `0`).

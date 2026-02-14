@@ -4,7 +4,7 @@ import {
   productCatalog,
   STORAGE_KEYS
 } from "../data/defaultContent";
-import { firebaseDb } from "../firebase";
+import { firebaseAuth, firebaseDb } from "../firebase";
 
 const LANDING_DOC_REF = doc(firebaseDb, "landing", "main");
 
@@ -178,6 +178,16 @@ export async function saveLandingState(nextConfig, nextProducts, nextAnalytics) 
   const analytics = sanitizeAnalytics(nextAnalytics);
   writeLocalConfig(config, products, analytics);
 
+  if (!firebaseAuth.currentUser) {
+    return {
+      config,
+      products,
+      analytics,
+      persistedInFirebase: false,
+      reason: "auth-missing"
+    };
+  }
+
   try {
     await setDoc(
       LANDING_DOC_REF,
@@ -192,7 +202,14 @@ export async function saveLandingState(nextConfig, nextProducts, nextAnalytics) 
 
     return { config, products, analytics, persistedInFirebase: true };
   } catch (error) {
-    return { config, products, analytics, persistedInFirebase: false, error };
+    const reason =
+      error?.code === "permission-denied"
+        ? "permission-denied"
+        : error?.code === "unavailable"
+          ? "network-unavailable"
+          : "firebase-write-failed";
+
+    return { config, products, analytics, persistedInFirebase: false, error, reason };
   }
 }
 

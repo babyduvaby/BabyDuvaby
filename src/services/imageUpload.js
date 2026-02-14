@@ -1,6 +1,7 @@
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 const CLOUDINARY_CLOUD_NAME = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME || "";
 const CLOUDINARY_UPLOAD_PRESET = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET || "";
+const CLOUDINARY_DYNAMIC_FOLDER = process.env.REACT_APP_CLOUDINARY_DYNAMIC_FOLDER || "";
 
 function sanitizePublicId(fileName) {
   const baseName = String(fileName || "image")
@@ -35,8 +36,13 @@ export async function uploadLandingImage(file, folderName) {
   const payload = new FormData();
   payload.append("file", file);
   payload.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-  payload.append("folder", folderName || "landing");
-  payload.append("public_id", `${Date.now()}-${sanitizePublicId(file.name)}`);
+
+  // Muchos presets unsigned bloquean public_id y folder dinamico.
+  // Solo enviar folder si se habilito explicitamente por variable de entorno.
+  if (CLOUDINARY_DYNAMIC_FOLDER === "1" && folderName) {
+    payload.append("folder", folderName);
+    payload.append("public_id", `${Date.now()}-${sanitizePublicId(file.name)}`);
+  }
 
   const response = await fetch(
     `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
@@ -46,15 +52,19 @@ export async function uploadLandingImage(file, folderName) {
     }
   );
 
+  const result = await response.json();
+
   if (!response.ok) {
-    throw new Error("No se pudo subir imagen a Cloudinary.");
+    const cloudinaryMessage =
+      result?.error?.message ||
+      result?.message ||
+      "No se pudo subir imagen a Cloudinary.";
+    throw new Error(cloudinaryMessage);
   }
 
-  const result = await response.json();
   if (!result?.secure_url) {
     throw new Error("Cloudinary no devolvio una URL valida.");
   }
 
   return result.secure_url;
 }
-

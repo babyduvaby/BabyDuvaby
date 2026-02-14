@@ -1,10 +1,16 @@
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { firebaseStorage } from "../firebase";
-
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
+const CLOUDINARY_CLOUD_NAME = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME || "";
+const CLOUDINARY_UPLOAD_PRESET = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET || "";
 
-function sanitizeFileName(fileName) {
-  return fileName.toLowerCase().replace(/[^a-z0-9.-]+/g, "-");
+function sanitizePublicId(fileName) {
+  const baseName = String(fileName || "image")
+    .toLowerCase()
+    .replace(/\.[a-z0-9]+$/i, "")
+    .replace(/[^a-z0-9-]+/g, "-")
+    .replace(/-{2,}/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return baseName || "image";
 }
 
 export async function uploadLandingImage(file, folderName) {
@@ -20,11 +26,35 @@ export async function uploadLandingImage(file, folderName) {
     throw new Error("La imagen supera 5MB.");
   }
 
-  const safeFolder = folderName || "landing";
-  const objectPath = `${safeFolder}/${Date.now()}-${sanitizeFileName(file.name)}`;
-  const fileRef = ref(firebaseStorage, objectPath);
+  if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
+    throw new Error(
+      "Faltan variables de Cloudinary. Configura REACT_APP_CLOUDINARY_CLOUD_NAME y REACT_APP_CLOUDINARY_UPLOAD_PRESET."
+    );
+  }
 
-  await uploadBytes(fileRef, file);
-  return getDownloadURL(fileRef);
+  const payload = new FormData();
+  payload.append("file", file);
+  payload.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+  payload.append("folder", folderName || "landing");
+  payload.append("public_id", `${Date.now()}-${sanitizePublicId(file.name)}`);
+
+  const response = await fetch(
+    `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+    {
+      method: "POST",
+      body: payload
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("No se pudo subir imagen a Cloudinary.");
+  }
+
+  const result = await response.json();
+  if (!result?.secure_url) {
+    throw new Error("Cloudinary no devolvio una URL valida.");
+  }
+
+  return result.secure_url;
 }
 

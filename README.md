@@ -28,3 +28,10 @@ Configura estos secrets en GitHub (`Settings > Secrets and variables > Actions`)
 - `VERCEL_TOKEN`
 - `VERCEL_ORG_ID`
 - `VERCEL_PROJECT_ID`
+
+## Cloudinary (subida de imagenes)
+Configura estas variables en Vercel para que el panel admin pueda subir imagenes:
+- `REACT_APP_CLOUDINARY_CLOUD_NAME`
+- `REACT_APP_CLOUDINARY_UPLOAD_PRESET`
+
+El `upload preset` debe ser de tipo unsigned.

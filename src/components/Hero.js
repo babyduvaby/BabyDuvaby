@@ -7,9 +7,9 @@ export default function Hero({
   whatsappHref,
   onWhatsappClick
 }) {
-  const [firstWord, secondWord, ...restWords] = (brand.name || "Baby Duvaby").split(" ");
-  const restLabel = restWords.join(" ");
   const trustBadges = Array.isArray(brand.trustBadges) ? brand.trustBadges : [];
+  const heroHeadlineLead = brand?.heroHeadlineLead || "Viste de ternura a tu";
+  const heroHeadlineStrong = brand?.heroHeadlineStrong || "pequeño gran amor.";
 
   return (
     <section className="relative z-10 mx-auto max-w-xl px-4 pb-10 pt-7 text-center sm:max-w-2xl sm:px-6" aria-label="Presentacion de la marca">
@@ -21,14 +21,24 @@ export default function Hero({
           Tienda de ropita para bebe
         </div>
 
-        <h1 className="font-title text-5xl leading-none sm:text-7xl">
-          <span className="text-[#f27ea6]">{firstWord || ""}</span>{" "}
-          <span className="text-[#6bb2ec]">{secondWord || ""}</span>{" "}
-          <span className="text-[#f27ea6]">{restLabel}</span>
-        </h1>
-        <p className="mt-3 mx-auto max-w-xl text-lg font-semibold text-ink/90 sm:text-xl">
-          {brand.subtitle}
-        </p>
+        <div className="hero-impact-wrap mt-1">
+          <span
+            aria-hidden="true"
+            className="hero-heart hero-heart-left"
+          >
+            💖
+          </span>
+          <h1 className="hero-impact-title">
+            <span className="hero-impact-lead">{heroHeadlineLead}</span>{" "}
+            <span className="hero-impact-strong">{heroHeadlineStrong}</span>
+          </h1>
+          <span
+            aria-hidden="true"
+            className="hero-heart hero-heart-right"
+          >
+            💖
+          </span>
+        </div>
 
         <div className="hero-image-shell mt-6">
           <img

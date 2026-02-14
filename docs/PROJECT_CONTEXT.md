@@ -40,6 +40,7 @@ Landing page mobile-first para Baby Duvaby en Next.js (App Router) + Tailwind CS
 - Carga de imagenes por drag and drop en hero, categorias y productos.
 - Ajuste de encuadre por categoria (imagen superior/inferior con control horizontal y vertical) para corregir composicion en mobile.
 - Estandar visual de imagen cuadrada para catalogo/admin con recomendacion 1080 x 1080 px y render responsive optimizado.
+- Popup PWA de instalacion con logica anti-fatiga: maximo 3 apariciones por dia, oculto cuando la app esta instalada y reactivable al desinstalar.
 - Ordenamiento por drag and drop y botones Subir/Bajar para categorias, FAQ y modelos.
 - Grafico de clics WhatsApp por zona y resumen de ultimos 7 dias.
 - Herramientas admin: exportar backup JSON e importar backup JSON.

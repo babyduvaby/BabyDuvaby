@@ -389,6 +389,54 @@
       0 20px 42px rgba(255, 56, 165, 0.42),
       0 0 28px rgba(255, 130, 214, 0.5);
   }
+
+  .baby-social-icon {
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    color: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(255, 225, 241, 0.95);
+    background:
+      radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 52%),
+      linear-gradient(155deg, #ffbadc 0%, #ffc8e6 44%, #ffd8ee 72%, #ffb7d8 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.55),
+      0 14px 28px rgba(246, 147, 195, 0.22),
+      0 0 22px rgba(183, 216, 255, 0.22);
+    transition:
+      transform 180ms ease,
+      box-shadow 180ms ease,
+      filter 180ms ease,
+      border-color 180ms ease;
+  }
+
+  .baby-social-icon:hover,
+  .baby-social-icon:focus-visible {
+    transform: translateY(-1px);
+    border-color: rgba(255, 190, 224, 0.98);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.64),
+      0 16px 32px rgba(246, 147, 195, 0.28),
+      0 0 26px rgba(183, 216, 255, 0.28);
+    filter: brightness(1.02);
+  }
+
+  .baby-social-icon-disabled {
+    opacity: 0.62;
+    cursor: not-allowed;
+    filter: saturate(0.85);
+  }
+
+  @media (max-width: 360px) {
+    .baby-social-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 15px;
+    }
+  }
 }
 
 @keyframes float-soft {

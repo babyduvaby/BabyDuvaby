@@ -9,7 +9,9 @@ import {
 import { STORAGE_KEYS } from "../data/defaultContent";
 import { firebaseAuth } from "../firebase";
 
-const DEFAULT_ADMIN_EMAIL = "admin@babyduvaby.com";
+// Fallback: si no hay env vars expuestas en el bundle (NEXT_PUBLIC_*), usar el email real del admin.
+// Nota: el email NO es secreto; la seguridad sigue dependiendo de Firebase Auth + reglas Firestore.
+const DEFAULT_ADMIN_EMAIL = "babyduvaby@gmail.com";
 const RAW_ADMIN_EMAILS =
   process.env.NEXT_PUBLIC_ADMIN_EMAILS ||
   process.env.NEXT_PUBLIC_ADMIN_EMAIL ||

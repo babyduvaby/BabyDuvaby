@@ -12,8 +12,8 @@
     </linearGradient>
   </defs>
   <rect x="0" y="0" width="640" height="160" fill="none" />
-  <text x="22" y="106" font-family="'Lobster Two', cursive" font-size="98" font-weight="700" fill="url(#pink)" stroke="rgba(255,255,255,0.35)" stroke-width="1.2" paint-order="stroke fill">Baby</text>
-  <text x="286" y="106" font-family="'Lobster Two', cursive" font-size="98" font-weight="700" fill="url(#blue)" stroke="rgba(255,255,255,0.35)" stroke-width="1.2" paint-order="stroke fill">Duvaby</text>
+  <text x="22" y="106" font-family="'Lobster Two', cursive" font-size="98" font-weight="700" fill="url(#pink)">Baby</text>
+  <text x="286" y="106" font-family="'Lobster Two', cursive" font-size="98" font-weight="700" fill="url(#blue)">Duvaby</text>
   <circle cx="570" cy="44" r="10" fill="#f09ec0"/>
   <circle cx="598" cy="58" r="14" fill="#f7b7d2"/>
   <path d="M548 86c0-14 10-24 24-24h7v11h-7c-8 0-13 6-13 13v17h-11V86z" fill="#f1c087"/>

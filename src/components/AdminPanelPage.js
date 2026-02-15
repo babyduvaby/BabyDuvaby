@@ -1,5 +1,10 @@
 import React from "react";
-import { uploadLandingImage } from "../services/imageUpload";
+import {
+  clearCloudinaryConfigLocal,
+  getCloudinaryConfig,
+  saveCloudinaryConfigLocal,
+  uploadLandingImage
+} from "../services/imageUpload";
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
 
@@ -270,11 +275,23 @@ export default function AdminPanelPage({
   const [error, setError] = React.useState("");
   const [uploadingKey, setUploadingKey] = React.useState("");
   const [dragMeta, setDragMeta] = React.useState(null);
+  const [cloudinaryConfig, setCloudinaryConfig] = React.useState(() => getCloudinaryConfig());
+  const [cloudNameDraft, setCloudNameDraft] = React.useState(() => cloudinaryConfig.cloudName || "");
+  const [uploadPresetDraft, setUploadPresetDraft] = React.useState(
+    () => cloudinaryConfig.uploadPreset || ""
+  );
 
   React.useEffect(() => {
     setDraftConfig(clone(config));
     setDraftProducts(clone(products));
   }, [config, products]);
+
+  React.useEffect(() => {
+    const nextConfig = getCloudinaryConfig();
+    setCloudinaryConfig(nextConfig);
+    setCloudNameDraft((prev) => prev || nextConfig.cloudName || "");
+    setUploadPresetDraft((prev) => prev || nextConfig.uploadPreset || "");
+  }, []);
 
   const runUpload = async (file, key, folderName, onUrlReady) => {
     if (!file) {
@@ -286,6 +303,7 @@ export default function AdminPanelPage({
     setUploadingKey(key);
 
     try {
+      setCloudinaryConfig(getCloudinaryConfig());
       const imageUrl = await uploadLandingImage(file, folderName);
       onUrlReady(imageUrl);
       setStatus("Imagen subida correctamente.");
@@ -293,6 +311,33 @@ export default function AdminPanelPage({
       setError(uploadError.message || "No se pudo subir la imagen.");
     } finally {
       setUploadingKey("");
+    }
+  };
+
+  const handleSaveCloudinaryLocal = () => {
+    try {
+      saveCloudinaryConfigLocal({
+        cloudName: cloudNameDraft,
+        uploadPreset: uploadPresetDraft
+      });
+      const nextConfig = getCloudinaryConfig();
+      setCloudinaryConfig(nextConfig);
+      setStatus("Cloudinary configurado localmente para este navegador.");
+      setError("");
+    } catch {
+      setError("No se pudo guardar configuracion local de Cloudinary.");
+    }
+  };
+
+  const handleClearCloudinaryLocal = () => {
+    try {
+      clearCloudinaryConfigLocal();
+      const nextConfig = getCloudinaryConfig();
+      setCloudinaryConfig(nextConfig);
+      setStatus("Configuracion local de Cloudinary eliminada.");
+      setError("");
+    } catch {
+      setError("No se pudo limpiar configuracion local de Cloudinary.");
     }
   };
 
@@ -623,6 +668,65 @@ export default function AdminPanelPage({
             Arrastra tarjetas o usa los botones Subir/Bajar para cambiar el orden de categorias,
             FAQ y modelos. Tambien puedes arrastrar imagenes en cada bloque para actualizar rapido.
           </p>
+
+          <div className="mt-4 rounded-2xl border border-[#dce8ff] bg-white/80 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
+                Cloudinary
+              </p>
+              <span className="rounded-full border border-[#dce8ff] bg-[#f6f9ff] px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#5f799b]">
+                {cloudinaryConfig.source === "env"
+                  ? "Configurado (Vercel env)"
+                  : cloudinaryConfig.source === "local"
+                    ? "Configurado (local)"
+                    : "No configurado"}
+              </span>
+            </div>
+
+            {cloudinaryConfig.source === "none" ? (
+              <p className="mt-2 text-sm font-semibold text-[#b03e66]">
+                No se podran subir imagenes hasta configurar Cloudinary. Si ya agregaste env vars en
+                Vercel, haz Redeploy y limpia cache abriendo <span className="font-extrabold">/index.html</span>.
+              </p>
+            ) : (
+              <p className="mt-2 text-sm font-semibold text-[#5f799b]">
+                Si estas viendo este panel con Cloudinary configurado pero la subida falla, lo mas
+                comun es cache vieja: abre <span className="font-extrabold">/index.html</span> y recarga.
+              </p>
+            )}
+
+            <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <Field
+                label="Cloud name"
+                value={cloudNameDraft}
+                onChange={(event) => setCloudNameDraft(event.target.value)}
+                placeholder="dcrh6nlvf"
+              />
+              <Field
+                label="Upload preset (Unsigned)"
+                value={uploadPresetDraft}
+                onChange={(event) => setUploadPresetDraft(event.target.value)}
+                placeholder="tu_preset_unsigned"
+              />
+            </div>
+
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={handleSaveCloudinaryLocal}
+                className="rounded-full border border-[#d6e5ff] bg-white px-4 py-2 text-xs font-extrabold uppercase tracking-wide text-[#5d7698] transition hover:bg-[#f5f9ff]"
+              >
+                Guardar local
+              </button>
+              <button
+                type="button"
+                onClick={handleClearCloudinaryLocal}
+                className="rounded-full border border-[#ffd5df] bg-[#fff3f7] px-4 py-2 text-xs font-extrabold uppercase tracking-wide text-[#a64b6b] transition hover:bg-[#ffe8ef]"
+              >
+                Limpiar local
+              </button>
+            </div>
+          </div>
         </article>
 
         <article className="glass-panel rounded-3xl p-5 shadow-candy sm:p-6">

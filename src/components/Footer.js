@@ -6,6 +6,19 @@ export default function Footer({ categories, brand, whatsappPhone }) {
   const [firstWord, secondWord, ...restWords] = (brand?.name || "Baby Duvaby").split(" ");
   const restLabel = restWords.join(" ");
 
+  // TODO: reemplazar con URLs reales cuando las tengas.
+  const socialLinks = brand?.socials || {
+    facebook: "",
+    instagram: "",
+    tiktok: ""
+  };
+
+  const socials = [
+    { key: "facebook", label: "Facebook", href: socialLinks.facebook },
+    { key: "tiktok", label: "TikTok", href: socialLinks.tiktok },
+    { key: "instagram", label: "Instagram", href: socialLinks.instagram }
+  ];
+
   return (
     <footer className="mx-auto mt-4 w-full max-w-6xl px-4 pb-28 sm:px-6 sm:pb-10">
       <div className="glass-panel baby-section-glow rounded-3xl p-6 shadow-candy">
@@ -52,6 +65,26 @@ export default function Footer({ categories, brand, whatsappPhone }) {
         <p className="mt-6 text-center text-xs font-bold text-[#7d8ca3]">
           &copy; {new Date().getFullYear()} Baby Duvaby. Todos los derechos reservados.
         </p>
+
+        <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+          {socials.map((item) => (
+            <a
+              key={item.key}
+              href={item.href || "#"}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={item.label}
+              className="baby-button-glow inline-flex items-center justify-center rounded-full bg-white/70 px-4 py-2 text-xs font-extrabold uppercase tracking-[0.14em] text-[#7c88ad] transition hover:brightness-105"
+              onClick={(event) => {
+                if (!item.href) {
+                  event.preventDefault();
+                }
+              }}
+            >
+              {item.label}
+            </a>
+          ))}
+        </div>
       </div>
     </footer>
   );

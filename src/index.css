@@ -72,20 +72,20 @@
   .hero-impact-title {
     margin: 0;
     font-family: "Lobster Two", cursive;
-    font-weight: 700;
+    font-weight: 400;
     font-size: clamp(2.1rem, 6.2vw, 4.2rem);
     line-height: 0.95;
     letter-spacing: 0.005em;
   }
 
   .hero-impact-lead {
-    color: #f27ea6;
-    text-shadow: 0 4px 14px rgba(242, 126, 166, 0.18);
+    color: #f2a4c4;
+    text-shadow: 0 3px 12px rgba(242, 164, 196, 0.14);
   }
 
   .hero-impact-strong {
-    color: #6bb2ec;
-    text-shadow: 0 4px 14px rgba(107, 178, 236, 0.2);
+    color: #90c7ee;
+    text-shadow: 0 3px 12px rgba(144, 199, 238, 0.14);
   }
 
   .hero-heart {

@@ -37,6 +37,7 @@ function getColorEmojiByName(colorName = "") {
   if (/rojo|red/.test(text)) return "❤️";
   if (/morado|lila|violeta|purple/.test(text)) return "💜";
   if (/naranja|orange/.test(text)) return "🧡";
+  if (/crema|marfil|ivory/.test(text)) return "🤍";
   if (/blanco|white/.test(text)) return "🤍";
   if (/negro|black/.test(text)) return "🖤";
   if (/gris|gray|grey/.test(text)) return "🩶";
@@ -48,15 +49,19 @@ function getColorEmojiByName(colorName = "") {
 function getColorEmojiByRgb(rgbHex = "") {
   const rgb = parseHexToRgb(rgbHex);
   if (!rgb) {
-    return "🎨";
+    return "💖";
   }
 
   const { r, g, b } = rgb;
 
+  // Tonos crema/marfil y blancos.
+  if (r > 235 && g > 225 && b > 200) return "🤍";
   if (r > 230 && g > 230 && b > 230) return "🤍";
   if (r < 55 && g < 55 && b < 55) return "🖤";
+  if (Math.abs(r - g) < 14 && Math.abs(g - b) < 14) return "🩶";
 
   if (r >= g && r >= b) {
+    if (g > 180 && b < 130) return "💛";
     if (g > 170 && b < 130) return "🧡";
     if (g > 130 && b > 130) return "💗";
     return "❤️";
@@ -65,7 +70,7 @@ function getColorEmojiByRgb(rgbHex = "") {
   if (g >= r && g >= b) return "💚";
   if (b >= r && b >= g) return "💙";
 
-  return "🎨";
+  return "💖";
 }
 
 export function getColorEmoji(color) {
@@ -107,4 +112,3 @@ export function buildProductWhatsappMessage(product, category, selection) {
 export function formatProductPrice(value, currency) {
   return formatPrice(value, currency);
 }
-

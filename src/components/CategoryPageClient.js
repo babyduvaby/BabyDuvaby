@@ -14,7 +14,6 @@ export default function CategoryPageClient({ categoryId }) {
   const {
     config,
     products,
-    clickCount,
     isLoading,
     error,
     setError,
@@ -88,7 +87,6 @@ export default function CategoryPageClient({ categoryId }) {
         categoryId={categoryId}
         categories={config.categories}
         products={products}
-        clickCount={clickCount}
         onWhatsappClick={handleWhatsappClick}
         buildWhatsappHref={buildWhatsappHref}
         onProductContextChange={handleProductContextChange}

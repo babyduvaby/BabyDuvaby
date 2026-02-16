@@ -22,7 +22,6 @@ export default function CategoryProductsPage({
   categoryId,
   categories,
   products,
-  clickCount,
   onWhatsappClick,
   buildWhatsappHref,
   onProductContextChange
@@ -129,9 +128,6 @@ export default function CategoryProductsPage({
           </div>
         )}
 
-        <p className="mt-5 text-center text-sm font-semibold text-ink/80">
-          Clics acumulados en WhatsApp: {clickCount}
-        </p>
       </div>
     </section>
   );

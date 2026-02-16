@@ -50,6 +50,7 @@ Landing page mobile-first para Baby Duvaby en Next.js (App Router) + Tailwind CS
 - CTA manual "Instalar aplicacion" en la parte inferior de la landing principal mobile.
 - Flujo de instalacion bajo demanda: en Android usa prompt nativo y en iOS muestra guia de "Agregar a pantalla de inicio".
 - Captura temprana del evento `beforeinstallprompt` en layout para mejorar compatibilidad con Chrome.
+- Deteccion de navegadores embebidos (Messenger/Instagram) con fallback para abrir en navegador compatible y copiar enlace.
 - Ordenamiento por drag and drop y botones Subir/Bajar para categorias, FAQ y modelos.
 - Grafico de clics WhatsApp por zona y resumen de ultimos 7 dias.
 - Herramientas admin: exportar backup JSON e importar backup JSON.

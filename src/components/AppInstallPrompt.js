@@ -56,6 +56,79 @@ function isAndroidChrome() {
   return isAndroid && isChrome && !isOtherChromiumBrowser;
 }
 
+function isAndroid() {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  return /android/i.test(window.navigator.userAgent);
+}
+
+function isLikelyInAppBrowser() {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  const userAgent = window.navigator.userAgent.toLowerCase();
+  const inAppPatterns =
+    /fban|fbav|fb_iab|messenger|instagram|line|micromessenger|tiktok|snapchat|wv\)|twitter|linkedinapp|telegram/;
+
+  return inAppPatterns.test(userAgent);
+}
+
+function getCurrentAbsoluteUrl() {
+  if (typeof window === "undefined") {
+    return "";
+  }
+
+  return window.location.href;
+}
+
+function buildAndroidChromeIntent(url) {
+  try {
+    const parsed = new URL(url);
+    const scheme = parsed.protocol.replace(":", "");
+    const route = `${parsed.host}${parsed.pathname}${parsed.search}${parsed.hash}`;
+    return `intent://${route}#Intent;scheme=${scheme};package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(url)};end`;
+  } catch {
+    return url;
+  }
+}
+
+function getExternalOpenAction() {
+  const currentUrl = getCurrentAbsoluteUrl();
+
+  if (!currentUrl) {
+    return {
+      label: "Abrir en navegador",
+      href: "/",
+      hint: "Abre este enlace en un navegador compatible para instalar la app."
+    };
+  }
+
+  if (isAndroid()) {
+    return {
+      label: "Abrir en Chrome",
+      href: buildAndroidChromeIntent(currentUrl),
+      hint: "Desde Chrome Android podras instalar la app con el menu de los 3 puntos."
+    };
+  }
+
+  if (isIos()) {
+    return {
+      label: "Abrir en Safari",
+      href: `x-safari-${currentUrl}`,
+      hint: "Desde Safari toca Compartir y luego Agregar a pantalla de inicio."
+    };
+  }
+
+  return {
+    label: "Abrir en navegador compatible",
+    href: currentUrl,
+    hint: "Abre este enlace en Chrome/Edge actualizado para instalar la app."
+  };
+}
+
 async function hasInstalledRelatedApps() {
   if (typeof window === "undefined") {
     return false;
@@ -79,9 +152,11 @@ export default function AppInstallPrompt({ enabled = true, onVisibilityChange })
   const [mode, setMode] = React.useState("native");
   const [deferredPrompt, setDeferredPrompt] = React.useState(null);
   const [isReady, setIsReady] = React.useState(false);
+  const [copyStatus, setCopyStatus] = React.useState("");
 
   const closePrompt = React.useCallback(() => {
     setIsOpen(false);
+    setCopyStatus("");
   }, []);
 
   const installWithDeferredPrompt = React.useCallback(async () => {
@@ -223,6 +298,12 @@ export default function AppInstallPrompt({ enabled = true, onVisibilityChange })
         return;
       }
 
+      if (isLikelyInAppBrowser()) {
+        setMode("open_external");
+        setIsOpen(true);
+        return;
+      }
+
       if (isIos()) {
         setMode("ios_non_safari");
         setIsOpen(true);
@@ -259,6 +340,27 @@ export default function AppInstallPrompt({ enabled = true, onVisibilityChange })
     return null;
   }
 
+  const externalOpenAction = getExternalOpenAction();
+
+  const openCompatibleBrowser = () => {
+    const { href } = externalOpenAction;
+
+    if (!href) {
+      return;
+    }
+
+    window.location.href = href;
+  };
+
+  const copyCurrentLink = async () => {
+    try {
+      await navigator.clipboard.writeText(getCurrentAbsoluteUrl());
+      setCopyStatus("Enlace copiado.");
+    } catch {
+      setCopyStatus("No se pudo copiar el enlace.");
+    }
+  };
+
   return (
     <div
       className="fixed inset-0 z-[120] flex items-end justify-center bg-[#20102766] p-3 sm:items-center sm:p-6"
@@ -292,6 +394,16 @@ export default function AppInstallPrompt({ enabled = true, onVisibilityChange })
           </p>
         ) : null}
 
+        {mode === "open_external" ? (
+          <div className="mt-4 rounded-2xl bg-[#ffffff1a] px-4 py-3 text-sm font-bold text-[#fff6fd]">
+            <p>
+              Este navegador embebido no permite instalar apps directamente (por ejemplo,
+              Messenger/Instagram).
+            </p>
+            <p className="mt-1">{externalOpenAction.hint}</p>
+          </div>
+        ) : null}
+
         {mode === "android_manual" ? (
           <p className="mt-4 rounded-2xl bg-[#ffffff1a] px-4 py-3 text-sm font-bold text-[#fff6fd]">
             En Chrome Android: abre el menu de los 3 puntos y toca "Instalar aplicacion" o
@@ -314,6 +426,25 @@ export default function AppInstallPrompt({ enabled = true, onVisibilityChange })
         ) : null}
 
         <div className="mt-5 flex flex-col gap-2 sm:flex-row">
+          {mode === "open_external" ? (
+            <>
+              <button
+                type="button"
+                onClick={openCompatibleBrowser}
+                className="inline-flex min-h-12 w-full items-center justify-center rounded-full border border-[#ffd4f3] bg-white px-5 text-sm font-extrabold text-[#c22f8e] transition hover:bg-[#fff0fb]"
+              >
+                {externalOpenAction.label}
+              </button>
+              <button
+                type="button"
+                onClick={copyCurrentLink}
+                className="inline-flex min-h-12 w-full items-center justify-center rounded-full border border-[#ffd4f3] bg-[#ffffff1a] px-5 text-sm font-extrabold text-white transition hover:bg-[#ffffff2b]"
+              >
+                Copiar enlace
+              </button>
+            </>
+          ) : null}
+
           <button
             type="button"
             onClick={closePrompt}
@@ -322,6 +453,11 @@ export default function AppInstallPrompt({ enabled = true, onVisibilityChange })
             Ahora no
           </button>
         </div>
+        {copyStatus ? (
+          <p className="mt-2 text-center text-xs font-extrabold uppercase tracking-[0.1em] text-[#ffe8f9]">
+            {copyStatus}
+          </p>
+        ) : null}
       </div>
     </div>
   );

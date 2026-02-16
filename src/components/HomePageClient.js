@@ -9,6 +9,7 @@ import Footer from "./Footer";
 import Testimonials from "./Testimonials";
 import FloatingWhatsappButton from "./FloatingWhatsappButton";
 import AppInstallPrompt from "./AppInstallPrompt";
+import InstallAppButton from "./InstallAppButton";
 import { FIXED_WHATSAPP_PHONE } from "../data/defaultContent";
 import { useLandingConfig } from "../hooks/useLandingConfig";
 
@@ -74,6 +75,18 @@ export default function HomePageClient() {
       <CategoryList categories={config.categories} products={products} />
       <FAQ faqItems={config.faq} />
       <Testimonials items={config.testimonials} />
+
+      <section className="mx-auto w-full max-w-6xl px-4 pb-4 sm:hidden">
+        <div className="glass-panel baby-section-glow rounded-2xl px-4 py-4 text-center">
+          <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-[#8a4f74]">
+            Instala Baby Duvaby
+          </p>
+          <p className="mt-1 text-sm font-semibold text-[#6d7390]">
+            Accede mas rapido a la tienda desde tu pantalla de inicio.
+          </p>
+          <InstallAppButton className="mt-3 w-full" label="Instalar aplicación" />
+        </div>
+      </section>
 
       <Footer categories={config.categories} brand={config.brand} whatsappPhone={sanitizedPhone} />
       <FloatingWhatsappButton

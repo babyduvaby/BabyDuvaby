@@ -1,4 +1,5 @@
 import React from "react";
+import { APP_INSTALL_REQUEST_EVENT } from "../utils/appInstall";
 
 const INSTALLED_KEY = "baby_duvaby_app_installed_v1";
 const DAILY_PROMPT_STATE_KEY = "baby_duvaby_app_install_prompt_daily_v1";
@@ -95,6 +96,7 @@ export default function AppInstallPrompt({ enabled = true, onVisibilityChange })
   const [isInstalled, setIsInstalled] = React.useState(false);
   const [mode, setMode] = React.useState("native");
   const [deferredPrompt, setDeferredPrompt] = React.useState(null);
+  const [manualUnavailable, setManualUnavailable] = React.useState(false);
   const [isReady, setIsReady] = React.useState(false);
 
   const showPromptIfAllowed = React.useCallback((nextMode) => {
@@ -163,6 +165,7 @@ export default function AppInstallPrompt({ enabled = true, onVisibilityChange })
 
       setIsInstalled(false);
       setDeferredPrompt(event);
+      setManualUnavailable(false);
       showPromptIfAllowed("native");
     };
 
@@ -197,7 +200,7 @@ export default function AppInstallPrompt({ enabled = true, onVisibilityChange })
     setIsOpen(false);
   };
 
-  const installApp = async () => {
+  const installApp = React.useCallback(async () => {
     if (!deferredPrompt) {
       return;
     }
@@ -212,7 +215,40 @@ export default function AppInstallPrompt({ enabled = true, onVisibilityChange })
       closePrompt();
     }
     setDeferredPrompt(null);
-  };
+  }, [deferredPrompt]);
+
+  React.useEffect(() => {
+    if (!enabled || typeof window === "undefined") {
+      return undefined;
+    }
+
+    const handleInstallRequest = () => {
+      if (isInstalled) {
+        return;
+      }
+
+      if (deferredPrompt) {
+        void installApp();
+        return;
+      }
+
+      if (isIosSafari()) {
+        setManualUnavailable(false);
+        setMode("ios");
+        setIsOpen(true);
+        return;
+      }
+
+      setManualUnavailable(true);
+      setMode("native");
+      setIsOpen(true);
+    };
+
+    window.addEventListener(APP_INSTALL_REQUEST_EVENT, handleInstallRequest);
+    return () => {
+      window.removeEventListener(APP_INSTALL_REQUEST_EVENT, handleInstallRequest);
+    };
+  }, [deferredPrompt, enabled, installApp, isInstalled]);
 
   if (!enabled || !isReady || !isOpen || isInstalled) {
     return null;
@@ -242,8 +278,15 @@ export default function AppInstallPrompt({ enabled = true, onVisibilityChange })
           </p>
         ) : null}
 
+        {manualUnavailable ? (
+          <p className="mt-4 rounded-2xl bg-[#ffffff1a] px-4 py-3 text-sm font-bold text-[#fff6fd]">
+            En este momento no se puede instalar automaticamente. Abre el sitio en Chrome
+            movil y vuelve a tocar "Instalar aplicación".
+          </p>
+        ) : null}
+
         <div className="mt-5 flex flex-col gap-2 sm:flex-row">
-          {mode === "native" ? (
+          {mode === "native" && deferredPrompt ? (
             <button
               type="button"
               onClick={installApp}

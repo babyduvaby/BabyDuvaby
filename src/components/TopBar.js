@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import InstallAppButton from "./InstallAppButton";
 
 // Barra superior fija con identidad visual de la marca.
 export default function TopBar({ brand, categories = [], pinToViewport = false }) {
@@ -86,7 +87,7 @@ export default function TopBar({ brand, categories = [], pinToViewport = false }
           role="dialog"
           aria-modal="true"
           aria-label="Menu de categorias"
-          className={`baby-side-menu relative h-full w-[50vw] px-3 py-5 transition-transform duration-300 sm:w-80 sm:px-4 ${
+          className={`baby-side-menu relative flex h-full w-[50vw] flex-col px-3 py-5 transition-transform duration-300 sm:w-80 sm:px-4 ${
             isMenuOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
@@ -104,7 +105,7 @@ export default function TopBar({ brand, categories = [], pinToViewport = false }
             </button>
           </div>
 
-          <nav aria-label="Categorias principales" className="space-y-2">
+          <nav aria-label="Categorias principales" className="flex-1 space-y-2 overflow-y-auto pr-1">
             <Link
               href="/"
               onClick={closeMenu}
@@ -123,6 +124,14 @@ export default function TopBar({ brand, categories = [], pinToViewport = false }
               </Link>
             ))}
           </nav>
+
+          <div className="mt-4 border-t border-white/45 pt-4">
+            <InstallAppButton
+              className="w-full"
+              label="Instalar aplicación"
+              onAfterClick={closeMenu}
+            />
+          </div>
         </aside>
       </div>
     </>

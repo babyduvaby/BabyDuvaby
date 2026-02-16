@@ -1,37 +1,11 @@
 import React from "react";
 import Link from "next/link";
 import { getOptimizedCloudinaryUrl } from "../utils/cloudinary";
-
-function formatPrice(value, currency) {
-  const amount = Number(value) || 0;
-  const safeCurrency = currency || "PEN";
-
-  try {
-    return new Intl.NumberFormat("es-PE", {
-      style: "currency",
-      currency: safeCurrency,
-      minimumFractionDigits: 2
-    }).format(amount);
-  } catch {
-    return `${safeCurrency} ${amount.toFixed(2)}`;
-  }
-}
-
-function buildProductWhatsappMessage(product, category, selection) {
-  const selectedColor = selection?.color;
-  const selectedSize = selection?.size;
-  const colorText = selectedColor
-    ? `${selectedColor.name || "Color"} (${selectedColor.rgb})`
-    : "No especificado";
-  const sizeText = selectedSize || "No especificada";
-
-  return [
-    `Hola Baby Duvaby, me interesa el modelo ${product.model} de ${category.title}.`,
-    `Color elegido: ${colorText}.`,
-    `Talla elegida: ${sizeText}.`,
-    `Precio: ${formatPrice(product.price, product.currency)}.`
-  ].join(" ");
-}
+import {
+  buildProductWhatsappMessage,
+  formatProductPrice,
+  getColorLabelForWhatsApp
+} from "../utils/productWhatsapp";
 
 function ProductCard({
   product,
@@ -96,7 +70,7 @@ function ProductCard({
         </p>
         <h2 className="mt-1 font-title text-[2rem] leading-tight text-ink">{product.model}</h2>
         <p className="mt-1 text-base font-extrabold text-[#2f936f]">
-          {formatPrice(product.price, product.currency)}
+          {formatProductPrice(product.price, product.currency)}
         </p>
         <p className="mt-2 text-sm font-semibold text-ink/85">{product.description}</p>
 
@@ -132,7 +106,7 @@ function ProductCard({
               })}
             </div>
             <p className="mt-1 text-xs font-semibold text-[#687f9f]">
-              Seleccionado: {selectedColor?.name || selectedColor?.rgb}
+              Seleccionado: {getColorLabelForWhatsApp(selectedColor)}
             </p>
           </div>
         ) : null}

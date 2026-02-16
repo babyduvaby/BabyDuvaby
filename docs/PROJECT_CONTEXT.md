@@ -15,6 +15,7 @@ Landing page mobile-first para Baby Duvaby en Next.js (App Router) + Tailwind CS
 - Permitir variantes por producto (colores RGB y tallas) administrables desde panel.
 - Mostrar selector de color/talla en tarjetas de producto por categoria.
 - Personalizar mensaje de WhatsApp con seleccion de color y talla del cliente.
+- Mensaje de WhatsApp de producto con saludo amable y emojis, ocultando el codigo RGB del color.
 - Incluir testimonios y badges de confianza para reforzar conversion.
 - Aplicar SEO base (meta description + Open Graph) desde `app/layout.js`.
 

@@ -8,6 +8,7 @@ import FloatingWhatsappButton from "./FloatingWhatsappButton";
 import AppInstallPrompt from "./AppInstallPrompt";
 import { FIXED_WHATSAPP_PHONE } from "../data/defaultContent";
 import { useLandingConfig } from "../hooks/useLandingConfig";
+import { buildProductWhatsappMessage } from "../utils/productWhatsapp";
 
 export default function CategoryPageClient({ categoryId }) {
   const [floatingMessage, setFloatingMessage] = React.useState("");
@@ -40,22 +41,7 @@ export default function CategoryPageClient({ categoryId }) {
       return;
     }
 
-    const productPrice = Number(product.price) || 0;
-    const currency = product.currency || "PEN";
-    const formattedPrice = new Intl.NumberFormat("es-PE", {
-      style: "currency",
-      currency
-    }).format(productPrice);
-    const selectedColor = selection?.color;
-    const selectedSize = selection?.size;
-    const colorSummary = selectedColor
-      ? `${selectedColor.name || "Color"} (${selectedColor.rgb})`
-      : "No especificado";
-    const sizeSummary = selectedSize || "No especificada";
-
-    setFloatingMessage(
-      `Hola Baby Duvaby, me interesa el modelo ${product.model} de ${category?.title || "catalogo"}. Color elegido: ${colorSummary}. Talla elegida: ${sizeSummary}. Precio: ${formattedPrice}.`
-    );
+    setFloatingMessage(buildProductWhatsappMessage(product, category, selection));
   }, []);
 
   React.useEffect(() => {

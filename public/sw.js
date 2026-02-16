@@ -1,4 +1,4 @@
-const CACHE_VERSION = "v5";
+const CACHE_VERSION = "v6";
 const STATIC_CACHE = `baby-duvaby-static-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `baby-duvaby-runtime-${CACHE_VERSION}`;
 const CACHE_PREFIX = "baby-duvaby-";
@@ -9,7 +9,13 @@ const STATIC_ASSET_DESTINATIONS = new Set([
   "image",
   "worker"
 ]);
-const PRECACHE_URLS = ["/manifest.webmanifest", "/favicon.svg", "/logo-baby-duvaby.svg"];
+const PRECACHE_URLS = [
+  "/manifest.webmanifest",
+  "/favicon.svg",
+  "/logo-baby-duvaby.svg",
+  "/icons/icon-192.png",
+  "/icons/icon-512.png"
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

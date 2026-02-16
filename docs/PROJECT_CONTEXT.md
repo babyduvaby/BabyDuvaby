@@ -47,6 +47,7 @@ Landing page mobile-first para Baby Duvaby en Next.js (App Router) + Tailwind CS
 - Popup PWA de instalacion con logica anti-fatiga: maximo 3 apariciones por dia, oculto cuando la app esta instalada y reactivable al desinstalar.
 - CTA manual "Instalar aplicacion" en la parte inferior del menu desplegable mobile.
 - CTA manual "Instalar aplicacion" en la parte inferior de la landing principal mobile.
+- Flujo de instalacion bajo demanda: en Android usa prompt nativo y en iOS muestra guia de "Agregar a pantalla de inicio".
 - Ordenamiento por drag and drop y botones Subir/Bajar para categorias, FAQ y modelos.
 - Grafico de clics WhatsApp por zona y resumen de ultimos 7 dias.
 - Herramientas admin: exportar backup JSON e importar backup JSON.

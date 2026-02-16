@@ -9,7 +9,7 @@ export default function ServiceWorkerRegistrar() {
     }
 
     const CACHE_PREFIX = "baby-duvaby-";
-    const CURRENT_SW_CACHE_VERSION = "v4";
+    const CURRENT_SW_CACHE_VERSION = "v6";
 
     const register = async () => {
       try {

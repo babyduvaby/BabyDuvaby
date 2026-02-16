@@ -12,6 +12,9 @@ Landing page mobile-first para Baby Duvaby en Next.js (App Router) + Tailwind CS
 - Persistir contador de clics en `localStorage`.
 - Medir clics de WhatsApp por zona de conversion (hero, barra movil, tarjeta de producto).
 - Mostrar precios por producto y mensaje de WhatsApp contextual por modelo.
+- Permitir variantes por producto (colores RGB y tallas) administrables desde panel.
+- Mostrar selector de color/talla en tarjetas de producto por categoria.
+- Personalizar mensaje de WhatsApp con seleccion de color y talla del cliente.
 - Incluir testimonios y badges de confianza para reforzar conversion.
 - Aplicar SEO base (meta description + Open Graph) desde `app/layout.js`.
 
@@ -37,6 +40,7 @@ Landing page mobile-first para Baby Duvaby en Next.js (App Router) + Tailwind CS
 - Ruta protegida: `/admin`.
 - Acceso admin oculto de la landing publica (sin botones en TopBar/Footer).
 - Edicion completa desde panel: marca, WhatsApp, categorias, FAQ, modelos e imagenes.
+- Edicion de variantes por modelo: multiples colores (RGB) y multiples tallas.
 - Carga de imagenes por drag and drop en hero, categorias y productos.
 - Ajuste de encuadre por categoria (imagen superior/inferior con control horizontal y vertical) para corregir composicion en mobile.
 - Estandar visual de imagen cuadrada para catalogo/admin con recomendacion 1080 x 1080 px y render responsive optimizado.

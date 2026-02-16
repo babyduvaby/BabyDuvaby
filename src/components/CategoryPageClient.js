@@ -35,7 +35,7 @@ export default function CategoryPageClient({ categoryId }) {
     incrementWhatsAppClicks(zone);
   };
 
-  const handleProductContextChange = React.useCallback((product, category) => {
+  const handleProductContextChange = React.useCallback((product, category, selection) => {
     if (!product) {
       return;
     }
@@ -46,9 +46,15 @@ export default function CategoryPageClient({ categoryId }) {
       style: "currency",
       currency
     }).format(productPrice);
+    const selectedColor = selection?.color;
+    const selectedSize = selection?.size;
+    const colorSummary = selectedColor
+      ? `${selectedColor.name || "Color"} (${selectedColor.rgb})`
+      : "No especificado";
+    const sizeSummary = selectedSize || "No especificada";
 
     setFloatingMessage(
-      `Hola Baby Duvaby, me interesa el modelo ${product.model} de ${category?.title || "catalogo"}. Precio: ${formattedPrice}.`
+      `Hola Baby Duvaby, me interesa el modelo ${product.model} de ${category?.title || "catalogo"}. Color elegido: ${colorSummary}. Talla elegida: ${sizeSummary}. Precio: ${formattedPrice}.`
     );
   }, []);
 

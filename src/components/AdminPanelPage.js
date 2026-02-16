@@ -41,6 +41,25 @@ function clampPercentage(value, fallback = 50) {
   return Math.min(100, Math.max(0, parsed));
 }
 
+function normalizeHexColor(value, fallback = "#f7bfd7") {
+  const raw = String(value || "").trim();
+  const candidate = raw.startsWith("#") ? raw : `#${raw}`;
+
+  if (/^#[0-9a-fA-F]{6}$/.test(candidate)) {
+    return candidate.toLowerCase();
+  }
+
+  return fallback;
+}
+
+function createProductColor(name = "Nuevo color", rgb = "#f7bfd7") {
+  return {
+    id: createId("color"),
+    name,
+    rgb: normalizeHexColor(rgb)
+  };
+}
+
 function Field({ label, value, onChange, placeholder }) {
   return (
     <label className="block">
@@ -477,13 +496,121 @@ export default function AdminPanelPage({
         description: "",
         image: "",
         price: 0,
-        currency: "PEN"
+        currency: "PEN",
+        colors: [createProductColor("Rosado pastel", "#f7bfd7")],
+        sizes: ["RN", "3M", "6M"]
       }
     ]);
   };
 
   const removeProduct = (id) => {
     setDraftProducts((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const addProductColor = (productIndex) => {
+    setDraftProducts((prev) =>
+      prev.map((item, index) => {
+        if (index !== productIndex) {
+          return item;
+        }
+
+        return {
+          ...item,
+          colors: [...(Array.isArray(item.colors) ? item.colors : []), createProductColor()]
+        };
+      })
+    );
+  };
+
+  const updateProductColor = (productIndex, colorId, field, value) => {
+    setDraftProducts((prev) =>
+      prev.map((item, index) => {
+        if (index !== productIndex) {
+          return item;
+        }
+
+        const nextColors = (Array.isArray(item.colors) ? item.colors : []).map((color) =>
+          color.id === colorId
+            ? {
+                ...color,
+                [field]: value
+              }
+            : color
+        );
+
+        return {
+          ...item,
+          colors: nextColors
+        };
+      })
+    );
+  };
+
+  const removeProductColor = (productIndex, colorId) => {
+    setDraftProducts((prev) =>
+      prev.map((item, index) => {
+        if (index !== productIndex) {
+          return item;
+        }
+
+        return {
+          ...item,
+          colors: (Array.isArray(item.colors) ? item.colors : []).filter(
+            (color) => color.id !== colorId
+          )
+        };
+      })
+    );
+  };
+
+  const addProductSize = (productIndex) => {
+    setDraftProducts((prev) =>
+      prev.map((item, index) => {
+        if (index !== productIndex) {
+          return item;
+        }
+
+        return {
+          ...item,
+          sizes: [...(Array.isArray(item.sizes) ? item.sizes : []), "Nueva talla"]
+        };
+      })
+    );
+  };
+
+  const updateProductSize = (productIndex, sizeIndex, value) => {
+    setDraftProducts((prev) =>
+      prev.map((item, index) => {
+        if (index !== productIndex) {
+          return item;
+        }
+
+        const nextSizes = [...(Array.isArray(item.sizes) ? item.sizes : [])];
+        nextSizes[sizeIndex] = value;
+
+        return {
+          ...item,
+          sizes: nextSizes
+        };
+      })
+    );
+  };
+
+  const removeProductSize = (productIndex, sizeIndex) => {
+    setDraftProducts((prev) =>
+      prev.map((item, index) => {
+        if (index !== productIndex) {
+          return item;
+        }
+
+        return {
+          ...item,
+          sizes: (Array.isArray(item.sizes) ? item.sizes : []).filter(
+            (_, currentSizeIndex) => currentSizeIndex !== sizeIndex
+          )
+        };
+      })
+    );
   };
 
   const handleSave = async () => {
@@ -1137,6 +1264,119 @@ export default function AdminPanelPage({
                     value={product.description}
                     onChange={(event) => updateProduct(index, "description", event.target.value)}
                   />
+                </div>
+                <div className="mt-3 rounded-2xl border border-[#dce8ff] bg-[#f7faff] p-3">
+                  <div className="mb-2 flex items-center justify-between gap-2">
+                    <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
+                      Colores disponibles (RGB)
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => addProductColor(index)}
+                      className="rounded-full border border-[#d6e5ff] bg-white px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-[#5d7698] transition hover:bg-[#f5f9ff]"
+                    >
+                      Agregar color
+                    </button>
+                  </div>
+                  {(Array.isArray(product.colors) ? product.colors : []).length ? (
+                    <div className="space-y-2">
+                      {(Array.isArray(product.colors) ? product.colors : []).map((color) => (
+                        <div
+                          key={color.id}
+                          className="grid grid-cols-[2.5rem_1fr_8.5rem_auto] items-center gap-2"
+                        >
+                          <input
+                            type="color"
+                            value={normalizeHexColor(color.rgb, "#f7bfd7")}
+                            onChange={(event) =>
+                              updateProductColor(index, color.id, "rgb", event.target.value)
+                            }
+                            className="h-10 w-10 cursor-pointer rounded-lg border border-[#d8e6ff] bg-white p-1"
+                            aria-label={`Selector de color ${color.name || color.id}`}
+                          />
+                          <input
+                            type="text"
+                            value={color.name || ""}
+                            onChange={(event) =>
+                              updateProductColor(index, color.id, "name", event.target.value)
+                            }
+                            placeholder="Nombre color"
+                            className="h-10 rounded-xl border border-[#d8e6ff] bg-white px-3 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff]"
+                          />
+                          <input
+                            type="text"
+                            value={color.rgb || ""}
+                            onChange={(event) =>
+                              updateProductColor(index, color.id, "rgb", event.target.value)
+                            }
+                            onBlur={(event) =>
+                              updateProductColor(
+                                index,
+                                color.id,
+                                "rgb",
+                                normalizeHexColor(event.target.value, "#f7bfd7")
+                              )
+                            }
+                            placeholder="#f7bfd7"
+                            className="h-10 rounded-xl border border-[#d8e6ff] bg-white px-3 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff]"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeProductColor(index, color.id)}
+                            className="rounded-full border border-[#ffd5df] bg-[#fff3f7] px-3 py-2 text-[11px] font-extrabold uppercase tracking-wide text-[#a64b6b] transition hover:bg-[#ffe8ef]"
+                          >
+                            Quitar
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm font-semibold text-[#6c81a0]">
+                      Sin colores configurados.
+                    </p>
+                  )}
+                </div>
+                <div className="mt-3 rounded-2xl border border-[#dce8ff] bg-[#f7faff] p-3">
+                  <div className="mb-2 flex items-center justify-between gap-2">
+                    <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
+                      Tallas disponibles
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => addProductSize(index)}
+                      className="rounded-full border border-[#d6e5ff] bg-white px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-[#5d7698] transition hover:bg-[#f5f9ff]"
+                    >
+                      Agregar talla
+                    </button>
+                  </div>
+                  {(Array.isArray(product.sizes) ? product.sizes : []).length ? (
+                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                      {(Array.isArray(product.sizes) ? product.sizes : []).map((size, sizeIndex) => (
+                        <div key={`${product.id}-size-${sizeIndex}`} className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={size}
+                            onChange={(event) =>
+                              updateProductSize(index, sizeIndex, event.target.value)
+                            }
+                            placeholder="Ej: 6M"
+                            className="h-10 w-full rounded-xl border border-[#d8e6ff] bg-white px-3 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff]"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeProductSize(index, sizeIndex)}
+                            className="rounded-full border border-[#ffd5df] bg-[#fff3f7] px-3 py-2 text-[11px] font-extrabold uppercase tracking-wide text-[#a64b6b] transition hover:bg-[#ffe8ef]"
+                          >
+                            Quitar
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm font-semibold text-[#6c81a0]">
+                      Sin tallas configuradas.
+                    </p>
+                  )}
                 </div>
                 <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <Field

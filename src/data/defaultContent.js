@@ -176,7 +176,15 @@ export const defaultLandingConfig = {
   ]
 };
 
-export const productCatalog = [
+const DEFAULT_PRODUCT_COLORS = [
+  { name: "Rosado pastel", rgb: "#f6bfd8" },
+  { name: "Celeste pastel", rgb: "#bfe4ff" },
+  { name: "Crema", rgb: "#f9f1df" }
+];
+
+const DEFAULT_PRODUCT_SIZES = ["RN", "3M", "6M"];
+
+const baseProductCatalog = [
   {
     id: "p-1",
     categoryId: "cat-1",
@@ -268,6 +276,16 @@ export const productCatalog = [
     currency: "PEN"
   }
 ];
+
+export const productCatalog = baseProductCatalog.map((product, productIndex) => ({
+  ...product,
+  colors: DEFAULT_PRODUCT_COLORS.map((color, colorIndex) => ({
+    id: `p${productIndex + 1}-color-${colorIndex + 1}`,
+    name: color.name,
+    rgb: color.rgb
+  })),
+  sizes: [...DEFAULT_PRODUCT_SIZES]
+}));
 
 export const FIXED_WHATSAPP_PHONE = "51960476670";
 export const STORAGE_KEYS = {

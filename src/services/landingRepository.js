@@ -39,6 +39,39 @@ const clampPercent = (value, fallback = 50) => {
   return Math.min(100, Math.max(0, parsed));
 };
 
+function normalizeHexColor(value, fallback = "#f7bfd7") {
+  const raw = String(value || "").trim();
+  const candidate = raw.startsWith("#") ? raw : `#${raw}`;
+
+  if (/^#[0-9a-fA-F]{6}$/.test(candidate)) {
+    return candidate.toLowerCase();
+  }
+
+  return fallback;
+}
+
+function sanitizeProductColors(rawColors, fallbackColors = []) {
+  const source = Array.isArray(rawColors) ? rawColors : fallbackColors;
+  const normalized = source
+    .filter((item) => isRecord(item))
+    .map((item, index) => ({
+      id: String(item.id || `color-${index + 1}`),
+      name: String(item.name || `Color ${index + 1}`),
+      rgb: normalizeHexColor(item.rgb, "#f7bfd7")
+    }));
+
+  return normalized;
+}
+
+function sanitizeProductSizes(rawSizes, fallbackSizes = []) {
+  const source = Array.isArray(rawSizes) ? rawSizes : fallbackSizes;
+
+  return source
+    .map((item) => String(item || "").trim())
+    .filter(Boolean)
+    .slice(0, 30);
+}
+
 function sanitizeConfig(rawConfig) {
   const defaults = defaultConfigClone();
 
@@ -133,10 +166,13 @@ function sanitizeProducts(rawProducts, categories) {
     : defaults;
 
   return sourceProducts.map((item, index) => {
+    const fallbackProduct = defaults[index] || defaults[0] || {};
     const candidateCategoryId = String(item.categoryId || "");
     const safeCategoryId = categoryIds.has(candidateCategoryId)
       ? candidateCategoryId
       : fallbackCategoryId;
+    const colors = sanitizeProductColors(item.colors, fallbackProduct.colors || []);
+    const sizes = sanitizeProductSizes(item.sizes, fallbackProduct.sizes || []);
 
     return {
       id: String(item.id || `p-${index + 1}`),
@@ -145,7 +181,9 @@ function sanitizeProducts(rawProducts, categories) {
       description: String(item.description || ""),
       image: String(item.image || ""),
       price: Number(item.price) || 0,
-      currency: String(item.currency || "PEN")
+      currency: String(item.currency || "PEN"),
+      colors,
+      sizes
     };
   });
 }

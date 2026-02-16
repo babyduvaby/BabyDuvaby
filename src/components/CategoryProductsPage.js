@@ -16,14 +16,35 @@ function ProductCard({
 }) {
   const availableColors = Array.isArray(product.colors) ? product.colors : [];
   const availableSizes = Array.isArray(product.sizes) ? product.sizes.filter(Boolean) : [];
+  const colorOptionsSignature = availableColors
+    .map((color) => `${color.id}:${color.name}:${color.rgb}`)
+    .join("|");
+  const sizeOptionsSignature = availableSizes.join("|");
 
   const [selectedColorId, setSelectedColorId] = React.useState(availableColors[0]?.id || "");
   const [selectedSize, setSelectedSize] = React.useState(availableSizes[0] || "");
 
   React.useEffect(() => {
-    setSelectedColorId(availableColors[0]?.id || "");
-    setSelectedSize(availableSizes[0] || "");
-  }, [product.id, availableColors, availableSizes]);
+    setSelectedColorId((currentSelectedColorId) => {
+      const stillExists = availableColors.some((color) => color.id === currentSelectedColorId);
+      if (stillExists) {
+        return currentSelectedColorId;
+      }
+
+      return availableColors[0]?.id || "";
+    });
+  }, [product.id, colorOptionsSignature, availableColors]);
+
+  React.useEffect(() => {
+    setSelectedSize((currentSelectedSize) => {
+      const stillExists = availableSizes.some((size) => size === currentSelectedSize);
+      if (stillExists) {
+        return currentSelectedSize;
+      }
+
+      return availableSizes[0] || "";
+    });
+  }, [product.id, sizeOptionsSignature, availableSizes]);
 
   const selectedColor =
     availableColors.find((item) => item.id === selectedColorId) || availableColors[0] || null;
@@ -136,6 +157,9 @@ function ProductCard({
                 );
               })}
             </div>
+            <p className="mt-1 text-xs font-semibold text-[#687f9f]">
+              Talla elegida: {normalizedSelectedSize ? `📏 ${normalizedSelectedSize}` : "No especificada"}
+            </p>
           </div>
         ) : null}
 

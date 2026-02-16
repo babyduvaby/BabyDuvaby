@@ -1,4 +1,5 @@
 import "../src/index.css";
+import Script from "next/script";
 import ServiceWorkerRegistrar from "../src/components/ServiceWorkerRegistrar";
 
 export const metadata = {
@@ -38,6 +39,30 @@ export default function RootLayout({ children }) {
   return (
     <html lang="es">
       <body>
+        <Script id="babyduvaby-install-capture" strategy="beforeInteractive">
+          {`
+            (function () {
+              var PROMPT_KEY = "__BABY_DUVABY_DEFERRED_PROMPT__";
+              var READY_EVENT = "babyduvaby:beforeinstallprompt-ready";
+              var INSTALLED_KEY = "baby_duvaby_app_installed_v1";
+
+              window[PROMPT_KEY] = window[PROMPT_KEY] || null;
+
+              window.addEventListener("beforeinstallprompt", function (event) {
+                event.preventDefault();
+                window[PROMPT_KEY] = event;
+                window.dispatchEvent(new CustomEvent(READY_EVENT));
+              });
+
+              window.addEventListener("appinstalled", function () {
+                window[PROMPT_KEY] = null;
+                try {
+                  localStorage.setItem(INSTALLED_KEY, "1");
+                } catch (error) {}
+              });
+            })();
+          `}
+        </Script>
         <ServiceWorkerRegistrar />
         {children}
       </body>

@@ -1,5 +1,11 @@
 import React from "react";
-import { APP_INSTALL_REQUEST_EVENT } from "../utils/appInstall";
+import {
+  APP_INSTALL_BIP_READY_EVENT,
+  APP_INSTALL_REQUEST_EVENT,
+  clearStoredDeferredInstallPrompt,
+  getStoredDeferredInstallPrompt,
+  setStoredDeferredInstallPrompt
+} from "../utils/appInstall";
 
 const INSTALLED_KEY = "baby_duvaby_app_installed_v1";
 
@@ -28,10 +34,26 @@ function isIosSafari() {
 
   const userAgent = window.navigator.userAgent.toLowerCase();
   const isIosDevice = /iphone|ipad|ipod/.test(userAgent);
-  const isWebkitSafari =
-    /safari/.test(userAgent) && !/crios|fxios|edgios|opios|android/.test(userAgent);
+  const isWebkitSafari = /safari/.test(userAgent);
+  const isKnownNonSafariIosBrowser =
+    /crios|fxios|edgios|opios|braveios|yabrowser|duckduckgo|gsa|fban|fbav|instagram|line/.test(
+      userAgent
+    );
 
-  return isIosDevice && isWebkitSafari;
+  return isIosDevice && isWebkitSafari && !isKnownNonSafariIosBrowser;
+}
+
+function isAndroidChrome() {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  const userAgent = window.navigator.userAgent.toLowerCase();
+  const isAndroid = /android/.test(userAgent);
+  const isChrome = /chrome\/\d+/.test(userAgent);
+  const isOtherChromiumBrowser = /edg|opr|samsungbrowser|duckduckgo|brave/.test(userAgent);
+
+  return isAndroid && isChrome && !isOtherChromiumBrowser;
 }
 
 async function hasInstalledRelatedApps() {
@@ -63,22 +85,26 @@ export default function AppInstallPrompt({ enabled = true, onVisibilityChange })
   }, []);
 
   const installWithDeferredPrompt = React.useCallback(async () => {
-    if (!deferredPrompt) {
+    const installEvent = deferredPrompt || getStoredDeferredInstallPrompt();
+
+    if (!installEvent) {
       return false;
     }
 
-    deferredPrompt.prompt();
-    const result = await deferredPrompt.userChoice;
+    installEvent.prompt();
+    const result = await installEvent.userChoice;
 
     if (result?.outcome === "accepted") {
       localStorage.setItem(INSTALLED_KEY, "1");
       setIsInstalled(true);
       setIsOpen(false);
       setDeferredPrompt(null);
+      clearStoredDeferredInstallPrompt();
       return true;
     }
 
     setDeferredPrompt(null);
+    clearStoredDeferredInstallPrompt();
     return false;
   }, [deferredPrompt]);
 
@@ -98,6 +124,7 @@ export default function AppInstallPrompt({ enabled = true, onVisibilityChange })
       const relatedInstalled = await hasInstalledRelatedApps();
       const storedInstalled = localStorage.getItem(INSTALLED_KEY) === "1";
       const installedNow = standalone || relatedInstalled || storedInstalled;
+      const storedPrompt = getStoredDeferredInstallPrompt();
 
       if (!isActive) {
         return;
@@ -105,6 +132,7 @@ export default function AppInstallPrompt({ enabled = true, onVisibilityChange })
 
       setIsInstalled(installedNow);
       setIsOpen(false);
+      setDeferredPrompt(storedPrompt || null);
       setIsReady(true);
     };
 
@@ -120,6 +148,7 @@ export default function AppInstallPrompt({ enabled = true, onVisibilityChange })
 
       setIsInstalled(false);
       setDeferredPrompt(event);
+      setStoredDeferredInstallPrompt(event);
     };
 
     const handleInstalled = () => {
@@ -132,6 +161,7 @@ export default function AppInstallPrompt({ enabled = true, onVisibilityChange })
       setIsInstalled(true);
       setIsOpen(false);
       setDeferredPrompt(null);
+      clearStoredDeferredInstallPrompt();
     };
 
     const handleVisibilityBack = () => {
@@ -174,7 +204,10 @@ export default function AppInstallPrompt({ enabled = true, onVisibilityChange })
         return;
       }
 
-      if (deferredPrompt) {
+      const installEvent = deferredPrompt || getStoredDeferredInstallPrompt();
+
+      if (installEvent) {
+        setDeferredPrompt(installEvent);
         const installed = await installWithDeferredPrompt();
 
         if (!installed) {
@@ -196,13 +229,29 @@ export default function AppInstallPrompt({ enabled = true, onVisibilityChange })
         return;
       }
 
+      if (isAndroidChrome()) {
+        setMode("android_manual");
+        setIsOpen(true);
+        return;
+      }
+
       setMode("unavailable");
       setIsOpen(true);
     };
 
+    const handleReadyPrompt = () => {
+      const readyPrompt = getStoredDeferredInstallPrompt();
+      if (!readyPrompt) {
+        return;
+      }
+      setDeferredPrompt(readyPrompt);
+    };
+
     window.addEventListener(APP_INSTALL_REQUEST_EVENT, handleInstallRequest);
+    window.addEventListener(APP_INSTALL_BIP_READY_EVENT, handleReadyPrompt);
     return () => {
       window.removeEventListener(APP_INSTALL_REQUEST_EVENT, handleInstallRequest);
+      window.removeEventListener(APP_INSTALL_BIP_READY_EVENT, handleReadyPrompt);
     };
   }, [deferredPrompt, enabled, installWithDeferredPrompt, isInstalled]);
 
@@ -243,6 +292,13 @@ export default function AppInstallPrompt({ enabled = true, onVisibilityChange })
           </p>
         ) : null}
 
+        {mode === "android_manual" ? (
+          <p className="mt-4 rounded-2xl bg-[#ffffff1a] px-4 py-3 text-sm font-bold text-[#fff6fd]">
+            En Chrome Android: abre el menu de los 3 puntos y toca "Instalar aplicacion" o
+            "Agregar a pantalla principal".
+          </p>
+        ) : null}
+
         {mode === "unavailable" ? (
           <p className="mt-4 rounded-2xl bg-[#ffffff1a] px-4 py-3 text-sm font-bold text-[#fff6fd]">
             Aun no esta disponible la instalacion automatica en este navegador. Intenta en
@@ -270,4 +326,3 @@ export default function AppInstallPrompt({ enabled = true, onVisibilityChange })
     </div>
   );
 }
-

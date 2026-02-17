@@ -36,7 +36,7 @@
         transform-box: fill-box;
         animation: twinkle 2.2s ease-in-out infinite;
       }
-      .pacifier {
+      .pacifier-motion {
         transform-origin: center;
         transform-box: fill-box;
         animation: sway 2.8s ease-in-out infinite;
@@ -48,8 +48,8 @@
       .s5 { animation-delay: 1s; }
       .s6 { animation-delay: 1.25s; }
       @keyframes twinkle {
-        0%, 100% { opacity: 0.45; transform: scale(0.82); }
-        50% { opacity: 1; transform: scale(1.15); }
+        0%, 100% { opacity: 0.56; transform: scale(0.9); }
+        50% { opacity: 1; transform: scale(1.2); }
       }
       @keyframes sway {
         0%, 100% { transform: translateY(0) rotate(-3deg); }
@@ -57,7 +57,7 @@
       }
     </style>
     <g id="miniStar" fill="url(#starGlow)" filter="url(#softShadow)">
-      <path d="M0-8L2.2-2.2L8 0L2.2 2.2L0 8L-2.2 2.2L-8 0L-2.2-2.2Z"/>
+      <path d="M0-10L2.8-2.8L10 0L2.8 2.8L0 10L-2.8 2.8L-10 0L-2.8-2.8Z"/>
     </g>
   </defs>
 
@@ -73,11 +73,13 @@
   <use href="#miniStar" x="545" y="44" class="twinkle s5"/>
   <use href="#miniStar" x="250" y="136" class="twinkle s6"/>
 
-  <g class="pacifier" filter="url(#softShadow)" transform="translate(676 84)">
-    <circle cx="0" cy="2" r="17" fill="none" stroke="url(#goldRing)" stroke-width="8"/>
-    <ellipse cx="0" cy="-16" rx="23" ry="15" fill="url(#pinkPacifier)" stroke="#ec9fc7" stroke-width="2"/>
-    <rect x="-5.5" y="-34" width="11" height="12" rx="5.5" fill="#f9d79b"/>
-    <circle cx="0" cy="-36" r="4.5" fill="#ffdbae"/>
-    <ellipse cx="0" cy="-13" rx="7" ry="4.2" fill="#fff4fb" opacity="0.92"/>
+  <g transform="translate(676 84)">
+    <g class="pacifier-motion" filter="url(#softShadow)">
+      <circle cx="0" cy="2" r="17" fill="none" stroke="url(#goldRing)" stroke-width="8"/>
+      <ellipse cx="0" cy="-16" rx="23" ry="15" fill="url(#pinkPacifier)" stroke="#ec9fc7" stroke-width="2"/>
+      <rect x="-5.5" y="-34" width="11" height="12" rx="5.5" fill="#f9d79b"/>
+      <circle cx="0" cy="-36" r="4.5" fill="#ffdbae"/>
+      <ellipse cx="0" cy="-13" rx="7" ry="4.2" fill="#fff4fb" opacity="0.92"/>
+    </g>
   </g>
 </svg>

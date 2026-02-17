@@ -67,12 +67,14 @@ export default function Hero({
         {trustBadges.length ? (
           <div className="mt-4 flex flex-wrap items-center justify-center gap-2" aria-label="Indicadores de confianza">
             {trustBadges.map((badge) => (
-              <span
+              <a
                 key={badge}
+                href="#preguntas-frecuentes"
+                aria-label={`Ir a preguntas frecuentes sobre ${badge}`}
                 className="baby-button-glow rounded-full border border-[#f2d8e9] bg-[#fff5fb] px-3 py-1 text-xs font-extrabold uppercase tracking-[0.12em] text-[#7a86aa]"
               >
                 {badge}
-              </span>
+              </a>
             ))}
           </div>
         ) : null}

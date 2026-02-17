@@ -1,23 +1,14 @@
 import React from "react";
 import {
   APP_INSTALL_BIP_READY_EVENT,
+  APP_INSTALL_INSTALLED_KEY,
   APP_INSTALL_REQUEST_EVENT,
   clearStoredDeferredInstallPrompt,
   getStoredDeferredInstallPrompt,
+  hasInstalledRelatedApps,
+  isStandaloneMode,
   setStoredDeferredInstallPrompt
 } from "../utils/appInstall";
-
-const INSTALLED_KEY = "baby_duvaby_app_installed_v1";
-
-function isStandaloneMode() {
-  if (typeof window === "undefined") {
-    return false;
-  }
-
-  const matchStandalone = window.matchMedia?.("(display-mode: standalone)")?.matches;
-  const navigatorStandalone = window.navigator?.standalone === true;
-  return Boolean(matchStandalone || navigatorStandalone);
-}
 
 function isIos() {
   if (typeof window === "undefined") {
@@ -129,23 +120,6 @@ function getExternalOpenAction() {
   };
 }
 
-async function hasInstalledRelatedApps() {
-  if (typeof window === "undefined") {
-    return false;
-  }
-
-  if (typeof window.navigator?.getInstalledRelatedApps !== "function") {
-    return false;
-  }
-
-  try {
-    const relatedApps = await window.navigator.getInstalledRelatedApps();
-    return Array.isArray(relatedApps) && relatedApps.length > 0;
-  } catch {
-    return false;
-  }
-}
-
 export default function AppInstallPrompt({ enabled = true, onVisibilityChange }) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [isInstalled, setIsInstalled] = React.useState(false);
@@ -170,7 +144,7 @@ export default function AppInstallPrompt({ enabled = true, onVisibilityChange })
     const result = await installEvent.userChoice;
 
     if (result?.outcome === "accepted") {
-      localStorage.setItem(INSTALLED_KEY, "1");
+      localStorage.setItem(APP_INSTALL_INSTALLED_KEY, "1");
       setIsInstalled(true);
       setIsOpen(false);
       setDeferredPrompt(null);
@@ -197,7 +171,7 @@ export default function AppInstallPrompt({ enabled = true, onVisibilityChange })
     const bootstrapInstallState = async () => {
       const standalone = isStandaloneMode();
       const relatedInstalled = await hasInstalledRelatedApps();
-      const storedInstalled = localStorage.getItem(INSTALLED_KEY) === "1";
+      const storedInstalled = localStorage.getItem(APP_INSTALL_INSTALLED_KEY) === "1";
       const installedNow = standalone || relatedInstalled || storedInstalled;
       const storedPrompt = getStoredDeferredInstallPrompt();
 
@@ -215,7 +189,7 @@ export default function AppInstallPrompt({ enabled = true, onVisibilityChange })
 
     const handleBeforeInstallPrompt = (event) => {
       event.preventDefault();
-      localStorage.removeItem(INSTALLED_KEY);
+      localStorage.removeItem(APP_INSTALL_INSTALLED_KEY);
 
       if (!isActive) {
         return;
@@ -227,7 +201,7 @@ export default function AppInstallPrompt({ enabled = true, onVisibilityChange })
     };
 
     const handleInstalled = () => {
-      localStorage.setItem(INSTALLED_KEY, "1");
+      localStorage.setItem(APP_INSTALL_INSTALLED_KEY, "1");
 
       if (!isActive) {
         return;
@@ -245,7 +219,7 @@ export default function AppInstallPrompt({ enabled = true, onVisibilityChange })
       }
 
       if (isStandaloneMode()) {
-        localStorage.setItem(INSTALLED_KEY, "1");
+        localStorage.setItem(APP_INSTALL_INSTALLED_KEY, "1");
         setIsInstalled(true);
         setIsOpen(false);
       }

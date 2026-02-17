@@ -16,7 +16,10 @@ Landing page mobile-first para Baby Duvaby en Next.js (App Router) + Tailwind CS
 - Mostrar selector de color/talla en tarjetas de producto por categoria.
 - Personalizar mensaje de WhatsApp con seleccion de color y talla del cliente.
 - Mensaje de WhatsApp de producto con saludo amable y emojis, ocultando el codigo RGB del color.
+- Mensaje de WhatsApp de producto en formato multilinea limpio con modelo, categoria, color, talla, cantidad, precio unitario y total estimado (sin texto de disponibilidad).
+- Selector de cantidad por producto (1 a 99) en catalogo por modelo con calculo de total en pantalla y envio de cantidad/total al mensaje de WhatsApp.
 - Incluir testimonios y badges de confianza para reforzar conversion.
+- Los badges de confianza de la seccion de envios redirigen al bloque de Preguntas Frecuentes.
 - Aplicar SEO base (meta description + Open Graph) desde `app/layout.js`.
 
 ## Arquitectura Frontend
@@ -48,6 +51,7 @@ Landing page mobile-first para Baby Duvaby en Next.js (App Router) + Tailwind CS
 - Popup PWA de instalacion con logica anti-fatiga: maximo 3 apariciones por dia, oculto cuando la app esta instalada y reactivable al desinstalar.
 - CTA manual "Instalar aplicacion" en la parte inferior del menu desplegable mobile.
 - CTA manual "Instalar aplicacion" en la parte inferior de la landing principal mobile.
+- Los CTA manuales de instalacion (menu mobile y bloque inferior) se ocultan cuando la app ya esta instalada.
 - Flujo de instalacion bajo demanda: en Android usa prompt nativo y en iOS muestra guia de "Agregar a pantalla de inicio".
 - Captura temprana del evento `beforeinstallprompt` en layout para mejorar compatibilidad con Chrome.
 - Deteccion de navegadores embebidos (Messenger/Instagram) con fallback para abrir en navegador compatible y copiar enlace.

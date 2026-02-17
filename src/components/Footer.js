@@ -62,9 +62,6 @@ function IconTikTok(props) {
 
 // Pie de pagina publico sin accesos de administracion.
 export default function Footer({ categories, brand, whatsappPhone }) {
-  const [firstWord, secondWord, ...restWords] = (brand?.name || "Baby Duvaby").split(" ");
-  const restLabel = restWords.join(" ");
-
   // TODO: reemplazar con URLs reales cuando las tengas.
   const socialLinks = brand?.socials || {
     facebook: "",
@@ -83,11 +80,13 @@ export default function Footer({ categories, brand, whatsappPhone }) {
       <div className="glass-panel baby-section-glow rounded-3xl p-6 shadow-candy">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
           <div>
-            <p className="font-title text-4xl leading-none">
-              <span className="text-[#f27ea6]">{firstWord || ""}</span>{" "}
-              <span className="text-[#6bb2ec]">{secondWord || ""}</span>{" "}
-              <span className="text-[#f27ea6]">{restLabel}</span>
-            </p>
+            <Link href="/" className="inline-flex">
+              <img
+                src="/logo-baby-duvaby.svg"
+                alt="Logo Baby Duvaby"
+                className="h-12 w-auto sm:h-14"
+              />
+            </Link>
             <p className="mt-2 text-sm font-semibold text-ink/85">
               {brand?.subtitle ||
                 "Disenado para mamas y papas que buscan ternura, calidad y estilo."}

@@ -7,6 +7,15 @@ import {
   getColorLabelForWhatsApp
 } from "../utils/productWhatsapp";
 
+function clampQuantity(value) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) {
+    return 1;
+  }
+
+  return Math.min(99, Math.max(1, Math.floor(parsed)));
+}
+
 function ProductCard({
   product,
   category,
@@ -23,6 +32,7 @@ function ProductCard({
 
   const [selectedColorId, setSelectedColorId] = React.useState(availableColors[0]?.id || "");
   const [selectedSize, setSelectedSize] = React.useState(availableSizes[0] || "");
+  const [selectedQuantity, setSelectedQuantity] = React.useState(1);
 
   React.useEffect(() => {
     setSelectedColorId((currentSelectedColorId) => {
@@ -46,10 +56,18 @@ function ProductCard({
     });
   }, [product.id, sizeOptionsSignature, availableSizes]);
 
+  React.useEffect(() => {
+    setSelectedQuantity(1);
+  }, [product.id]);
+
   const selectedColor =
     availableColors.find((item) => item.id === selectedColorId) || availableColors[0] || null;
   const normalizedSelectedSize =
     availableSizes.find((item) => item === selectedSize) || availableSizes[0] || "";
+  const normalizedQuantity = clampQuantity(selectedQuantity);
+  const unitPrice = Number(product.price) || 0;
+  const totalPrice = unitPrice * normalizedQuantity;
+
   const selection = React.useMemo(
     () => ({
       color: selectedColor
@@ -59,9 +77,11 @@ function ProductCard({
             rgb: selectedColor.rgb
           }
         : null,
-      size: normalizedSelectedSize || null
+      size: normalizedSelectedSize || null,
+      quantity: normalizedQuantity,
+      totalQuantity: normalizedQuantity
     }),
-    [selectedColor, normalizedSelectedSize]
+    [selectedColor, normalizedSelectedSize, normalizedQuantity]
   );
 
   React.useEffect(() => {
@@ -90,8 +110,14 @@ function ProductCard({
           Modelo
         </p>
         <h2 className="mt-1 font-title text-[2rem] leading-tight text-ink">{product.model}</h2>
-        <p className="mt-1 text-base font-extrabold text-[#2f936f]">
-          {formatProductPrice(product.price, product.currency)}
+        <p className="mt-1 text-sm font-extrabold uppercase tracking-[0.08em] text-[#6f88a8]">
+          Precio unitario
+        </p>
+        <p className="text-base font-extrabold text-[#2f936f]">
+          {formatProductPrice(unitPrice, product.currency)}
+        </p>
+        <p className="mt-1 text-xs font-bold text-[#5f7899]">
+          Total x{normalizedQuantity}: {formatProductPrice(totalPrice, product.currency)}
         </p>
         <p className="mt-2 text-sm font-semibold text-ink/85">{product.description}</p>
 
@@ -162,6 +188,45 @@ function ProductCard({
             </p>
           </div>
         ) : null}
+
+        <div className="mt-3">
+          <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
+            Cantidad
+          </p>
+          <div className="mt-2 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setSelectedQuantity((current) => clampQuantity(current - 1))}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#d8e6ff] bg-white text-lg font-extrabold text-[#5f789b] transition hover:bg-[#f5f9ff]"
+              aria-label="Reducir cantidad"
+            >
+              -
+            </button>
+            <input
+              type="number"
+              min="1"
+              max="99"
+              value={normalizedQuantity}
+              onChange={(event) => setSelectedQuantity(clampQuantity(event.target.value))}
+              className="h-9 w-20 rounded-xl border border-[#d8e6ff] bg-white px-2 text-center text-sm font-extrabold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff]"
+              aria-label="Cantidad de unidades"
+            />
+            <button
+              type="button"
+              onClick={() => setSelectedQuantity((current) => clampQuantity(current + 1))}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#d8e6ff] bg-white text-lg font-extrabold text-[#5f789b] transition hover:bg-[#f5f9ff]"
+              aria-label="Aumentar cantidad"
+            >
+              +
+            </button>
+          </div>
+          <p className="mt-1 text-xs font-semibold text-[#687f9f]">
+            Puedes elegir de 1 a 99 unidades.
+          </p>
+          <p className="mt-1 text-xs font-extrabold text-[#557398]">
+            Total final: {formatProductPrice(totalPrice, product.currency)}
+          </p>
+        </div>
 
         <a
           href={whatsappHref}

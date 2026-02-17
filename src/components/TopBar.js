@@ -1,10 +1,12 @@
 import React from "react";
 import Link from "next/link";
 import InstallAppButton from "./InstallAppButton";
+import useAppInstalledState from "../hooks/useAppInstalledState";
 
 // Barra superior fija con identidad visual de la marca.
 export default function TopBar({ brand, categories = [], pinToViewport = false }) {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const { isInstalled, isReady } = useAppInstalledState();
 
   React.useEffect(() => {
     if (!isMenuOpen) {
@@ -125,13 +127,15 @@ export default function TopBar({ brand, categories = [], pinToViewport = false }
             ))}
           </nav>
 
-          <div className="mt-4 border-t border-white/45 pt-4">
-            <InstallAppButton
-              className="w-full"
-              label="Instalar aplicación"
-              onAfterClick={closeMenu}
-            />
-          </div>
+          {isReady && !isInstalled ? (
+            <div className="mt-4 border-t border-white/45 pt-4">
+              <InstallAppButton
+                className="w-full"
+                label="Instalar aplicación"
+                onAfterClick={closeMenu}
+              />
+            </div>
+          ) : null}
         </aside>
       </div>
     </>

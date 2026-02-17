@@ -27,7 +27,7 @@ export default function FAQ({ faqItems }) {
   }
 
   return (
-    <section className="mx-auto max-w-4xl px-4 pb-14 sm:px-6">
+    <section id="preguntas-frecuentes" className="mx-auto max-w-4xl scroll-mt-28 px-4 pb-14 sm:scroll-mt-32 sm:px-6">
       <div className="glass-panel-baby baby-section-glow rounded-[2rem] p-5 shadow-candy sm:p-8">
         <h2 className="section-heading mb-5 text-center text-5xl sm:text-6xl">
           Preguntas Frecuentes

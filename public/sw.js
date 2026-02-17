@@ -1,4 +1,4 @@
-const CACHE_VERSION = "v6";
+const CACHE_VERSION = "v7";
 const STATIC_CACHE = `baby-duvaby-static-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `baby-duvaby-runtime-${CACHE_VERSION}`;
 const CACHE_PREFIX = "baby-duvaby-";

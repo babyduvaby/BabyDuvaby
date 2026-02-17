@@ -73,7 +73,7 @@
   <use href="#miniStar" x="545" y="44" class="twinkle s5"/>
   <use href="#miniStar" x="250" y="136" class="twinkle s6"/>
 
-  <g transform="translate(676 84)">
+  <g transform="translate(618 86) rotate(22) scale(0.76)">
     <g class="pacifier-motion" filter="url(#softShadow)">
       <circle cx="0" cy="2" r="17" fill="none" stroke="url(#goldRing)" stroke-width="8"/>
       <ellipse cx="0" cy="-16" rx="23" ry="15" fill="url(#pinkPacifier)" stroke="#ec9fc7" stroke-width="2"/>

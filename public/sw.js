@@ -92,6 +92,10 @@ self.addEventListener("fetch", (event) => {
   }
 
   if (event.request.mode === "navigate") {
+    /* Don't intercept /admin/ navigation — handled by admin-sw.js */
+    if (requestUrl.pathname.startsWith("/admin")) {
+      return;
+    }
     event.respondWith(networkFirst(event.request, RUNTIME_CACHE));
     return;
   }

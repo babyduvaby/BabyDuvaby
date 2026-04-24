@@ -5,6 +5,8 @@ import {
   saveCloudinaryConfigLocal,
   uploadLandingImage
 } from "../services/imageUpload";
+import { useAutoSave } from "../hooks/useAutoSave";
+import AutoSaveIndicator from "./AutoSaveIndicator";
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
 
@@ -60,24 +62,27 @@ function createProductColor(name = "Nuevo color", rgb = "#f7bfd7") {
   };
 }
 
-function Field({ label, value, onChange, placeholder }) {
+function Field({ label, value, onChange, onBlur, placeholder, required, type = "text", error }) {
   return (
     <label className="block">
       <span className="mb-1 block text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
-        {label}
+        {label}{required && <span className="ml-0.5 text-[#e74c6f]">*</span>}
       </span>
       <input
-        type="text"
+        type={type}
         value={value}
         onChange={onChange}
+        onBlur={onBlur}
         placeholder={placeholder}
-        className="h-11 w-full rounded-xl border border-[#d8e6ff] bg-white px-3 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff]"
+        required={required}
+        className="h-12 w-full rounded-xl border border-[#d8e6ff] bg-white px-4 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff] min-h-[48px]"
       />
+      {error && <p className="mt-1 text-[11px] font-bold text-[#b03e66]">{error}</p>}
     </label>
   );
 }
 
-function TextArea({ label, value, onChange, placeholder }) {
+function TextArea({ label, value, onChange, onBlur, placeholder }) {
   return (
     <label className="block">
       <span className="mb-1 block text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
@@ -86,29 +91,39 @@ function TextArea({ label, value, onChange, placeholder }) {
       <textarea
         value={value}
         onChange={onChange}
+        onBlur={onBlur}
         placeholder={placeholder}
-        className="min-h-24 w-full rounded-xl border border-[#d8e6ff] bg-white px-3 py-2 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff]"
+        rows={3}
+        className="min-h-24 w-full rounded-xl border border-[#d8e6ff] bg-white px-4 py-3 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff]"
       />
     </label>
   );
 }
 
-function RangeField({ label, value, onChange }) {
+function RangeField({ label, value, onChange, onChangeEnd }) {
   const safeValue = clampPercentage(value, 50);
 
   return (
     <label className="block">
-      <span className="mb-1 block text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
-        {label} ({Math.round(safeValue)}%)
-      </span>
+      <div className="mb-1 flex items-center justify-between">
+        <span className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
+          {label}
+        </span>
+        <span className="rounded-full bg-[#eef5ff] px-2.5 py-0.5 text-xs font-extrabold text-[#5f93d1] tabular-nums">
+          {Math.round(safeValue)}%
+        </span>
+      </div>
       <input
         type="range"
         min="0"
         max="100"
         step="1"
         value={safeValue}
-        onChange={(event) => onChange(clampPercentage(event.target.value, safeValue))}
-        className="h-11 w-full cursor-pointer accent-[#6f9ad0]"
+        onChange={(event) => {
+          onChange(clampPercentage(event.target.value, safeValue));
+          onChangeEnd?.();
+        }}
+        className="h-8 w-full cursor-pointer accent-[#6f9ad0] touch-manipulation"
       />
     </label>
   );
@@ -311,6 +326,17 @@ export default function AdminPanelPage({
   /* 2FA setup state */
   const [new2faPin, setNew2faPin] = React.useState("");
   const [show2faSection, setShow2faSection] = React.useState(false);
+
+  /* Auto-save hook: debounced save with visual feedback */
+  const autoSave = useAutoSave(
+    async (draftData) => {
+      const result = await onSaveContent(draftData.config, draftData.products, clickAnalytics);
+      if (result) return "Firebase";
+      return "localStorage";
+    },
+    { config: draftConfig, products: draftProducts },
+    { debounceMs: 800, successMs: 2000, retryMs: 3000, maxRetries: 2 }
+  );
 
   React.useEffect(() => {
     setDraftConfig(clone(config));
@@ -815,6 +841,9 @@ export default function AdminPanelPage({
         </p>
       ) : null}
 
+      {/* Auto-save indicator (floating) */}
+      <AutoSaveIndicator status={autoSave.status} errorMsg={autoSave.errorMsg} />
+
       <div className="space-y-4">
         <WhatsAppAnalyticsChart analytics={clickAnalytics} />
 
@@ -1148,166 +1177,235 @@ export default function AdminPanelPage({
           </div>
         </article>
 
-        <article className="glass-panel rounded-3xl p-5 shadow-candy sm:p-6">
-          <div className="mb-3 flex items-center justify-between gap-3">
-            <h2 className="font-title text-4xl text-ink">Categorias</h2>
+        <article className="glass-panel rounded-3xl p-4 shadow-candy sm:p-6">
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="font-title text-3xl text-ink sm:text-4xl">Categorias</h2>
             <button
               type="button"
               onClick={addCategory}
-              className="rounded-full border border-[#d6e5ff] bg-white px-4 py-2 text-xs font-extrabold uppercase tracking-wide text-[#5d7698] transition hover:bg-[#f5f9ff]"
+              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#f7bfd7] to-[#ffd6e8] px-5 text-sm font-extrabold text-[#8b4570] shadow-md transition hover:brightness-105 active:scale-[0.98] sm:w-auto sm:h-11"
             >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-5 w-5">
+                <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
               Agregar categoria
             </button>
           </div>
 
           <div className="space-y-3">
-            {draftConfig.categories.map((category, index) => (
-              <div
-                key={category.id}
-                draggable
-                onDragStart={() => setDragMeta({ type: "category", index })}
-                onDragOver={(event) => event.preventDefault()}
-                onDrop={() => handleDropReorder("category", index)}
-                className="rounded-2xl border border-[#dce8ff] bg-white/90 p-4"
-              >
-                <div className="mb-3 flex items-center justify-between gap-2">
-                  <p className="text-sm font-extrabold text-ink">
-                    ID: {category.id} | Orden: {index + 1}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <span className="rounded-full border border-[#dce8ff] bg-[#f6f9ff] px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#5f799b]">
-                      Arrastrar
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => reorderCategories(index, index - 1)}
-                      disabled={index === 0}
-                      className="rounded-full border border-[#dce8ff] bg-[#f6f9ff] px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#5f799b] transition hover:bg-[#edf4ff] disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      Subir
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => reorderCategories(index, index + 1)}
-                      disabled={index === draftConfig.categories.length - 1}
-                      className="rounded-full border border-[#dce8ff] bg-[#f6f9ff] px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#5f799b] transition hover:bg-[#edf4ff] disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      Bajar
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => removeCategory(category.id)}
-                      className="rounded-full border border-[#ffd5df] bg-[#fff3f7] px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#a64b6b] transition hover:bg-[#ffe8ef]"
-                    >
-                      Eliminar
-                    </button>
-                  </div>
+            {draftConfig.categories.map((category, index) => {
+              const [expanded, setExpanded] = React.useState(index === 0);
+              const titleMissing = !category.title?.trim();
+              const imageMissing = !category.image?.trim();
+              const hasValidation = titleMissing || imageMissing;
+
+              return (
+                <div
+                  key={category.id}
+                  draggable
+                  onDragStart={() => setDragMeta({ type: "category", index })}
+                  onDragOver={(event) => event.preventDefault()}
+                  onDrop={() => handleDropReorder("category", index)}
+                  className="rounded-2xl border border-[#dce8ff] bg-white/90 overflow-hidden transition-shadow"
+                >
+                  {/* ---- Category Header: always visible, large touch target ---- */}
+                  <button
+                    type="button"
+                    onClick={() => setExpanded((prev) => !prev)}
+                    className="flex w-full items-center justify-between gap-2 px-4 py-3 text-left active:bg-[#f4f8ff] sm:px-5"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#eef5ff] text-xs font-extrabold text-[#5f93d1]">
+                        {index + 1}
+                      </span>
+                      <div className="min-w-0">
+                        <p className={`truncate text-sm font-extrabold ${titleMissing ? "text-[#b03e66]" : "text-ink"}`}>
+                          {category.title?.trim() || "Sin titulo (obligatorio)"}
+                        </p>
+                        {hasValidation && (
+                          <p className="truncate text-[10px] font-bold text-[#b03e66]">
+                            {titleMissing ? "Falta titulo" : "Falta imagen"}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={`h-5 w-5 text-[#7a90ad] transition-transform ${expanded ? "rotate-180" : ""}`}
+                      >
+                        <polyline points="6 9 12 15 18 9" />
+                      </svg>
+                    </div>
+                  </button>
+
+                  {/* ---- Collapsible Content ---- */}
+                  {expanded && (
+                    <div className="border-t border-[#eef3ff] px-4 pb-4 pt-3 space-y-3 sm:px-5">
+                      {/* Reorder + Delete: sticky row with large buttons */}
+                      <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                        <span className="rounded-full border border-[#dce8ff] bg-[#f6f9ff] px-3 py-2 text-[10px] font-extrabold uppercase tracking-wide text-[#5f799b] whitespace-nowrap">
+                          Arrastra para reordenar
+                        </span>
+                        <div className="flex-1" />
+                        <button
+                          type="button"
+                          onClick={() => reorderCategories(index, index - 1)}
+                          disabled={index === 0}
+                          className="inline-flex h-10 min-w-[44px] items-center justify-center gap-1 rounded-full border border-[#dce8ff] bg-[#f6f9ff] px-3 text-xs font-extrabold uppercase tracking-wide text-[#5f799b] transition hover:bg-[#edf4ff] active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-4 w-4"><polyline points="18 15 12 9 6 15" /></svg>
+                          <span className="hidden sm:inline">Subir</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => reorderCategories(index, index + 1)}
+                          disabled={index === draftConfig.categories.length - 1}
+                          className="inline-flex h-10 min-w-[44px] items-center justify-center gap-1 rounded-full border border-[#dce8ff] bg-[#f6f9ff] px-3 text-xs font-extrabold uppercase tracking-wide text-[#5f799b] transition hover:bg-[#edf4ff] active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-4 w-4"><polyline points="6 9 12 15 18 9" /></svg>
+                          <span className="hidden sm:inline">Bajar</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeCategory(category.id)}
+                          className="inline-flex h-10 min-w-[44px] items-center justify-center gap-1 rounded-full border border-[#ffd5df] bg-[#fff3f7] px-3 text-xs font-extrabold uppercase tracking-wide text-[#a64b6b] transition hover:bg-[#ffe8ef] active:scale-[0.96]"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" /></svg>
+                          <span className="hidden sm:inline">Eliminar</span>
+                        </button>
+                      </div>
+
+                      {/* Title + URL: full-width on mobile, 2-col on desktop */}
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <Field
+                          label="Titulo"
+                          value={category.title}
+                          onChange={(event) => updateCategory(index, "title", event.target.value)}
+                          onBlur={handleBlur}
+                          required
+                          error={titleMissing ? "El titulo es obligatorio" : undefined}
+                          placeholder="Ej: Bodies Bebe"
+                        />
+                        <Field
+                          label="URL imagen superior"
+                          value={category.image}
+                          onChange={(event) => updateCategory(index, "image", event.target.value)}
+                          onBlur={handleBlur}
+                          required
+                          error={imageMissing ? "Necesitas una imagen" : undefined}
+                          placeholder="https://res.cloudinary.com/..."
+                        />
+                      </div>
+                      <Field
+                        label="URL imagen inferior (opcional)"
+                        value={category.secondaryImage || ""}
+                        onChange={(event) => updateCategory(index, "secondaryImage", event.target.value)}
+                        onBlur={handleBlur}
+                        placeholder="https://res.cloudinary.com/..."
+                      />
+
+                      {/* Sliders: Encuadre imagen superior */}
+                      <div className="rounded-2xl border border-[#e2ecff] bg-[#f7faff] p-3 sm:p-4">
+                        <p className="mb-3 text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
+                          Encuadre imagen superior
+                        </p>
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                          <RangeField
+                            label="Horizontal"
+                            value={category.imageFocusX ?? 50}
+                            onChange={(value) => updateCategory(index, "imageFocusX", value)}
+                            onChangeEnd={handleChange}
+                          />
+                          <RangeField
+                            label="Vertical"
+                            value={category.imageFocusY ?? 50}
+                            onChange={(value) => updateCategory(index, "imageFocusY", value)}
+                            onChangeEnd={handleChange}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Sliders: Encuadre imagen inferior */}
+                      <div className="rounded-2xl border border-[#e2ecff] bg-[#f7faff] p-3 sm:p-4">
+                        <p className="mb-3 text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
+                          Encuadre imagen inferior
+                        </p>
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                          <RangeField
+                            label="Horizontal"
+                            value={category.secondaryImageFocusX ?? 50}
+                            onChange={(value) => updateCategory(index, "secondaryImageFocusX", value)}
+                            onChangeEnd={handleChange}
+                          />
+                          <RangeField
+                            label="Vertical"
+                            value={category.secondaryImageFocusY ?? 50}
+                            onChange={(value) => updateCategory(index, "secondaryImageFocusY", value)}
+                            onChangeEnd={handleChange}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Image Upload + Preview */}
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <ImageDropField
+                          label="Subir imagen superior"
+                          isUploading={uploadingKey === `category-${category.id}`}
+                          onFileSelected={(file) =>
+                            runUpload(file, `category-${category.id}`, "landing/categories", (url) =>
+                              updateCategory(index, "image", url)
+                            )
+                          }
+                        />
+                        <ImageDropField
+                          label="Subir imagen inferior"
+                          isUploading={uploadingKey === `category-secondary-${category.id}`}
+                          onFileSelected={(file) =>
+                            runUpload(
+                              file,
+                              `category-secondary-${category.id}`,
+                              "landing/categories",
+                              (url) => updateCategory(index, "secondaryImage", url)
+                            )
+                          }
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <p className="mb-1 text-[10px] font-extrabold uppercase tracking-[0.1em] text-[#738bab]">
+                            Vista superior
+                          </p>
+                          <ImagePreview
+                            src={category.image}
+                            alt={category.title || "Previsualizacion"}
+                            objectPosition={`${clampPercentage(category.imageFocusX)}% ${clampPercentage(category.imageFocusY)}%`}
+                          />
+                        </div>
+                        <div>
+                          <p className="mb-1 text-[10px] font-extrabold uppercase tracking-[0.1em] text-[#738bab]">
+                            Vista inferior
+                          </p>
+                          <ImagePreview
+                            src={category.secondaryImage || category.image}
+                            alt={category.title || "Previsualizacion"}
+                            objectPosition={`${clampPercentage(category.secondaryImageFocusX)}% ${clampPercentage(category.secondaryImageFocusY)}%`}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <Field
-                    label="Titulo"
-                    value={category.title}
-                    onChange={(event) => updateCategory(index, "title", event.target.value)}
-                  />
-                  <Field
-                    label="URL imagen superior"
-                    value={category.image}
-                    onChange={(event) => updateCategory(index, "image", event.target.value)}
-                  />
-                </div>
-                <div className="mt-3">
-                  <Field
-                    label="URL imagen inferior"
-                    value={category.secondaryImage || ""}
-                    onChange={(event) =>
-                      updateCategory(index, "secondaryImage", event.target.value)
-                    }
-                  />
-                </div>
-                <div className="mt-3 rounded-2xl border border-[#e2ecff] bg-[#f7faff] p-3">
-                  <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
-                    Ajuste encuadre imagen superior
-                  </p>
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                    <RangeField
-                      label="Horizontal"
-                      value={category.imageFocusX ?? 50}
-                      onChange={(value) => updateCategory(index, "imageFocusX", value)}
-                    />
-                    <RangeField
-                      label="Vertical"
-                      value={category.imageFocusY ?? 50}
-                      onChange={(value) => updateCategory(index, "imageFocusY", value)}
-                    />
-                  </div>
-                </div>
-                <div className="mt-3 rounded-2xl border border-[#e2ecff] bg-[#f7faff] p-3">
-                  <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
-                    Ajuste encuadre imagen inferior
-                  </p>
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                    <RangeField
-                      label="Horizontal"
-                      value={category.secondaryImageFocusX ?? 50}
-                      onChange={(value) => updateCategory(index, "secondaryImageFocusX", value)}
-                    />
-                    <RangeField
-                      label="Vertical"
-                      value={category.secondaryImageFocusY ?? 50}
-                      onChange={(value) => updateCategory(index, "secondaryImageFocusY", value)}
-                    />
-                  </div>
-                </div>
-                <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <ImageDropField
-                    label="Subir o arrastrar imagen superior"
-                    isUploading={uploadingKey === `category-${category.id}`}
-                    onFileSelected={(file) =>
-                      runUpload(file, `category-${category.id}`, "landing/categories", (url) =>
-                        updateCategory(index, "image", url)
-                      )
-                    }
-                  />
-                  <ImageDropField
-                    label="Subir o arrastrar imagen inferior"
-                    isUploading={uploadingKey === `category-secondary-${category.id}`}
-                    onFileSelected={(file) =>
-                      runUpload(
-                        file,
-                        `category-secondary-${category.id}`,
-                        "landing/categories",
-                        (url) => updateCategory(index, "secondaryImage", url)
-                      )
-                    }
-                  />
-                </div>
-                <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <div>
-                    <p className="mb-1 text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
-                      Previsualizacion superior
-                    </p>
-                    <ImagePreview
-                      src={category.image}
-                      alt={`Previsualizacion superior categoria ${category.title}`}
-                      objectPosition={`${clampPercentage(category.imageFocusX)}% ${clampPercentage(category.imageFocusY)}%`}
-                      imageClassName="aspect-square"
-                    />
-                  </div>
-                  <div>
-                    <p className="mb-1 text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
-                      Previsualizacion inferior
-                    </p>
-                    <ImagePreview
-                      src={category.secondaryImage || category.image}
-                      alt={`Previsualizacion inferior categoria ${category.title}`}
-                      objectPosition={`${clampPercentage(category.secondaryImageFocusX)}% ${clampPercentage(category.secondaryImageFocusY)}%`}
-                      imageClassName="aspect-square"
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
+
+          {draftConfig.categories.length === 0 && (
+            <div className="rounded-2xl border-2 border-dashed border-[#dce8ff] px-4 py-8 text-center">
+              <p className="text-sm font-bold text-[#7a90ad]">
+                No hay categorias. Presiona el boton de arriba para agregar la primera.
+              </p>
+            </div>
+          )}
         </article>
 
         <article className="glass-panel rounded-3xl p-5 shadow-candy sm:p-6">

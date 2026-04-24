@@ -6,7 +6,7 @@
   "scope": "/admin/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#f8e8f0",
+  "background_color": "#0c1222",
   "theme_color": "#5f93d1",
   "lang": "es-PE",
   "categories": ["business", "shopping"],

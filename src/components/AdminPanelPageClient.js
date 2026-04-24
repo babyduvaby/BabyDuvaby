@@ -58,7 +58,7 @@ export default function AdminPanelPageClient() {
   }
 
   return (
-    <main className="app-shell min-h-screen overflow-x-hidden bg-gradient-to-b from-[#fce9f2] via-[#f8f4fb] to-[#deebff] pb-8 text-ink">
+    <main className="app-shell min-h-screen overflow-x-hidden bg-gradient-to-b from-[#fce9f2] via-[#f8f4fb] to-[#deebff] pb-12 text-ink sm:pb-8">
       <div className="pointer-events-none fixed inset-0 -z-10">
         <div className="ambient ambient-top" />
         <div className="ambient ambient-bottom" />

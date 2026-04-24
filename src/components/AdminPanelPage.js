@@ -700,34 +700,34 @@ export default function AdminPanelPage({
   }));
 
   return (
-    <section className="mx-auto w-full max-w-6xl px-4 pb-12 pt-6 sm:px-6">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+    <section className="mx-auto w-full max-w-6xl px-3 pb-12 pt-4 sm:px-6 sm:pt-6">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-[#6e88a8]">
+          <p className="text-[10px] font-extrabold uppercase tracking-[0.22em] text-[#6e88a8] sm:text-xs">
             Panel Administrador
           </p>
-          <h1 className="font-title text-5xl text-ink sm:text-6xl">Gestion de contenido</h1>
+          <h1 className="font-title text-4xl text-ink sm:text-6xl">Gestion de contenido</h1>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={handleSave}
             disabled={isSaving}
-            className="inline-flex min-h-11 items-center justify-center rounded-full bg-gradient-to-r from-[#4ed0a9] to-[#27b494] px-5 text-sm font-extrabold text-white transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-70"
+            className="inline-flex min-h-11 items-center justify-center rounded-full bg-gradient-to-r from-[#4ed0a9] to-[#27b494] px-4 text-sm font-extrabold text-white transition hover:brightness-105 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 sm:px-5"
           >
             {isSaving ? "Guardando..." : "Guardar cambios"}
           </button>
           <button
             type="button"
             onClick={handleRestore}
-            className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#d8e6ff] bg-white px-5 text-sm font-extrabold text-[#5d7698] transition hover:bg-[#f4f8ff]"
+            className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#d8e6ff] bg-white px-4 text-sm font-extrabold text-[#5d7698] transition hover:bg-[#f4f8ff] active:scale-[0.98] sm:px-5"
           >
             Restaurar defaults
           </button>
           <button
             type="button"
             onClick={handleLogout}
-            className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#ffd6df] bg-[#fff3f7] px-5 text-sm font-extrabold text-[#a54a69] transition hover:bg-[#ffe8ef]"
+            className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#ffd6df] bg-[#fff3f7] px-4 text-sm font-extrabold text-[#a54a69] transition hover:bg-[#ffe8ef] active:scale-[0.98] sm:px-5"
           >
             Cerrar sesion
           </button>

@@ -286,7 +286,15 @@ export default function AdminPanelPage({
   onResetClickCount,
   onImportSnapshot,
   onLogout,
-  onLoggedOut
+  onLoggedOut,
+  isDarkMode,
+  onToggleDarkMode,
+  visitCount,
+  visitAnalytics,
+  onResetVisitCount,
+  twoFA,
+  notificationPermission,
+  onRequestNotificationPermission
 }) {
   const [draftConfig, setDraftConfig] = React.useState(() => clone(config));
   const [draftProducts, setDraftProducts] = React.useState(() => clone(products));
@@ -299,6 +307,10 @@ export default function AdminPanelPage({
   const [uploadPresetDraft, setUploadPresetDraft] = React.useState(
     () => cloudinaryConfig.uploadPreset || ""
   );
+
+  /* 2FA setup state */
+  const [new2faPin, setNew2faPin] = React.useState("");
+  const [show2faSection, setShow2faSection] = React.useState(false);
 
   React.useEffect(() => {
     setDraftConfig(clone(config));
@@ -497,6 +509,7 @@ export default function AdminPanelPage({
         image: "",
         price: 0,
         currency: "PEN",
+        stock: -1,
         colors: [createProductColor("Rosado pastel", "#f7bfd7")],
         sizes: ["RN", "3M", "6M"]
       }
@@ -620,10 +633,22 @@ export default function AdminPanelPage({
 
     if (persistedInFirebase) {
       setStatus("Cambios guardados en Firebase.");
-      return;
+    } else {
+      setStatus("Cambios guardados localmente.");
     }
 
-    setStatus("Cambios guardados localmente.");
+    /* #9: Auto-backup - save a timestamped backup to localStorage */
+    try {
+      const backupPayload = {
+        config: draftConfig,
+        products: draftProducts,
+        analytics: clickAnalytics,
+        exportedAt: new Date().toISOString()
+      };
+      localStorage.setItem("baby_duvaby_auto_backup_v1", JSON.stringify(backupPayload));
+    } catch {
+      /* silent fail - backup is non-critical */
+    }
   };
 
   const handleRestore = async () => {
@@ -709,6 +734,34 @@ export default function AdminPanelPage({
           <h1 className="font-title text-4xl text-ink sm:text-6xl">Gestion de contenido</h1>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          {/* #5: Dark Mode Toggle */}
+          {typeof onToggleDarkMode === "function" && (
+            <button
+              type="button"
+              onClick={onToggleDarkMode}
+              className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full border border-[#d8e6ff] bg-white px-4 text-sm font-extrabold text-[#5d7698] transition hover:bg-[#f4f8ff] active:scale-[0.98] sm:px-4"
+              title={isDarkMode ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+            >
+              {isDarkMode ? (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4">
+                  <circle cx="12" cy="12" r="5" />
+                  <line x1="12" y1="1" x2="12" y2="3" />
+                  <line x1="12" y1="21" x2="12" y2="23" />
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                  <line x1="1" y1="12" x2="3" y2="12" />
+                  <line x1="21" y1="12" x2="23" y2="12" />
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+              )}
+              <span className="hidden sm:inline">{isDarkMode ? "Claro" : "Oscuro"}</span>
+            </button>
+          )}
           <button
             type="button"
             onClick={handleSave}
@@ -764,6 +817,182 @@ export default function AdminPanelPage({
 
       <div className="space-y-4">
         <WhatsAppAnalyticsChart analytics={clickAnalytics} />
+
+        {/* #3: Visit Analytics Dashboard */}
+        {visitAnalytics && (
+          <article className="glass-panel rounded-3xl p-5 shadow-candy sm:p-6">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="font-title text-4xl text-ink">Analitica de Visitas</h2>
+              <div className="flex items-center gap-2">
+                <p className="rounded-full border border-[#d8e6ff] bg-white px-4 py-2 text-sm font-extrabold text-[#5f789b]">
+                  Total: {visitAnalytics.total || 0}
+                </p>
+                <button
+                  type="button"
+                  onClick={onResetVisitCount}
+                  className="rounded-full border border-[#d8e6ff] bg-white px-3 py-2 text-xs font-extrabold uppercase tracking-wide text-[#5f799b] transition hover:bg-[#f4f8ff]"
+                >
+                  Limpiar
+                </button>
+              </div>
+            </div>
+            <div className="mt-4">
+              <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
+                Ultimos 7 dias
+              </p>
+              {visitAnalytics.byDay ? (
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
+                  {Object.keys(visitAnalytics.byDay || {})
+                    .sort((a, b) => a.localeCompare(b))
+                    .slice(-7)
+                    .map((key) => (
+                      <div key={key} className="rounded-xl border border-[#dce8ff] bg-white p-3 text-center">
+                        <p className="text-[10px] font-extrabold uppercase tracking-[0.1em] text-[#738bab]">
+                          {key.slice(5)}
+                        </p>
+                        <p className="mt-1 text-lg font-extrabold text-[#4f6f97]">{visitAnalytics.byDay[key]}</p>
+                      </div>
+                    ))}
+                </div>
+              ) : (
+                <div className="rounded-xl border border-[#dce8ff] bg-white p-3 text-sm font-semibold text-[#5f799b]">
+                  Aun no hay datos de visitas.
+                </div>
+              )}
+            </div>
+          </article>
+        )}
+
+        {/* Security & Settings Panel */}
+        <article className="glass-panel rounded-3xl p-5 shadow-candy sm:p-6">
+          <h2 className="font-title text-4xl text-ink">Seguridad y Configuracion</h2>
+
+          <div className="mt-4 space-y-4">
+            {/* #1: 2FA PIN Settings */}
+            <div className="rounded-2xl border border-[#dce8ff] bg-white/80 p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
+                    Autenticacion 2FA (PIN)
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-[#5f799b]">
+                    {twoFA?.isEnabled
+                      ? "2FA activado — Se requiere PIN despues de la contrasena."
+                      : "2FA desactivado — Solo se requiere contrasena."}
+                  </p>
+                </div>
+                <span className={`rounded-full px-3 py-1 text-xs font-extrabold uppercase ${twoFA?.isEnabled ? "bg-[#d1fae5] text-[#065f46]" : "bg-[#fee2e2] text-[#991b1b]"}`}>
+                  {twoFA?.isEnabled ? "Activo" : "Inactivo"}
+                </span>
+              </div>
+
+              {twoFA?.isEnabled ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (twoFA?.disable2FA) {
+                      twoFA.disable2FA();
+                      setStatus("2FA desactivado correctamente.");
+                    }
+                  }}
+                  className="mt-3 rounded-full border border-[#ffd5df] bg-[#fff3f7] px-4 py-2 text-xs font-extrabold uppercase tracking-wide text-[#a64b6b] transition hover:bg-[#ffe8ef]"
+                >
+                  Desactivar 2FA
+                </button>
+              ) : (
+                <div className="mt-3">
+                  <button
+                    type="button"
+                    onClick={() => setShow2faSection((prev) => !prev)}
+                    className="rounded-full border border-[#d6e5ff] bg-white px-4 py-2 text-xs font-extrabold uppercase tracking-wide text-[#5d7698] transition hover:bg-[#f5f9ff]"
+                  >
+                    Configurar 2FA
+                  </button>
+                  {show2faSection && (
+                    <div className="mt-3 flex flex-wrap items-end gap-2">
+                      <label className="block flex-1 min-w-[120px]">
+                        <span className="mb-1 block text-xs font-extrabold text-[#6d87a7]">Nuevo PIN (4-6 digitos)</span>
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          maxLength={6}
+                          value={new2faPin}
+                          onChange={(e) => setNew2faPin(e.target.value.replace(/\D/g, ""))}
+                          placeholder="1234"
+                          className="h-11 w-full rounded-xl border border-[#d8e6ff] bg-white px-3 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff]"
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (twoFA?.enable2FA && new2faPin.length >= 4) {
+                            const ok = twoFA.enable2FA(new2faPin);
+                            if (ok) {
+                              setStatus("2FA activado con PIN: " + new2faPin);
+                              setNew2faPin("");
+                              setShow2faSection(false);
+                            }
+                          }
+                        }}
+                        disabled={new2faPin.length < 4}
+                        className="inline-flex min-h-11 items-center justify-center rounded-full bg-gradient-to-r from-[#f59e0b] to-[#d97706] px-4 text-sm font-extrabold text-white transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        Activar
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* #2: Push Notification Permission */}
+            <div className="rounded-2xl border border-[#dce8ff] bg-white/80 p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
+                    Notificaciones Push
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-[#5f799b]">
+                    Estado: <span className="font-extrabold">{notificationPermission === "granted" ? "Permitidas" : notificationPermission === "denied" ? "Bloqueadas" : "No configuradas"}</span>
+                  </p>
+                </div>
+                <span className={`rounded-full px-3 py-1 text-xs font-extrabold uppercase ${notificationPermission === "granted" ? "bg-[#d1fae5] text-[#065f46]" : notificationPermission === "denied" ? "bg-[#fee2e2] text-[#991b1b]" : "bg-[#fef3c7] text-[#92400e]"}`}>
+                  {notificationPermission === "granted" ? "Activo" : notificationPermission === "denied" ? "Bloqueado" : "Pendiente"}
+                </span>
+              </div>
+              {notificationPermission !== "granted" && typeof onRequestNotificationPermission === "function" && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const result = await onRequestNotificationPermission();
+                    setStatus(result === "granted" ? "Notificaciones activadas." : result === "denied" ? "Notificaciones bloqueadas por el navegador." : "No se pudo solicitar permiso.");
+                  }}
+                  className="mt-3 rounded-full border border-[#d6e5ff] bg-white px-4 py-2 text-xs font-extrabold uppercase tracking-wide text-[#5d7698] transition hover:bg-[#f5f9ff]"
+                >
+                  Solicitar permiso de notificaciones
+                </button>
+              )}
+            </div>
+
+            {/* #9: Auto-backup info */}
+            <div className="rounded-2xl border border-[#dce8ff] bg-white/80 p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
+                    Auto-Backup
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-[#5f799b]">
+                    Se guarda un backup automatico en localStorage cada vez que haces clic en "Guardar cambios".
+                  </p>
+                </div>
+                <span className="rounded-full bg-[#d1fae5] px-3 py-1 text-xs font-extrabold uppercase text-[#065f46]">
+                  Activo
+                </span>
+              </div>
+            </div>
+          </div>
+        </article>
 
         <article className="glass-panel rounded-3xl p-5 shadow-candy sm:p-6">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
@@ -1256,6 +1485,27 @@ export default function AdminPanelPage({
                       onChange={(event) => updateProduct(index, "currency", event.target.value)}
                       className="h-11 w-full rounded-xl border border-[#d8e6ff] bg-white px-3 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff]"
                     />
+                  </label>
+                  {/* #4: Stock field */}
+                  <label className="block">
+                    <span className="mb-1 block text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
+                      Stock ({typeof product.stock === "number" && product.stock === 0 ? "AGOTADO" : typeof product.stock === "number" && product.stock === -1 ? "Ilimitado" : product.stock + " uds"})
+                    </span>
+                    <div className="flex gap-2">
+                      <input
+                        type="number"
+                        min="-1"
+                        value={typeof product.stock === "number" ? product.stock : -1}
+                        onChange={(event) => updateProduct(index, "stock", parseInt(event.target.value, 10) || -1)}
+                        placeholder="-1 = ilimitado, 0 = agotado"
+                        className="h-11 w-full rounded-xl border border-[#d8e6ff] bg-white px-3 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff]"
+                      />
+                      {typeof product.stock === "number" && product.stock === 0 && (
+                        <span className="inline-flex shrink-0 items-center rounded-full bg-[#ff4757] px-3 py-1.5 text-xs font-extrabold text-white">
+                          AGOTADO
+                        </span>
+                      )}
+                    </div>
                   </label>
                 </div>
                 <div className="mt-3">

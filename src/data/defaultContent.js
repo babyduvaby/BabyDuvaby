@@ -279,6 +279,7 @@ const baseProductCatalog = [
 
 export const productCatalog = baseProductCatalog.map((product, productIndex) => ({
   ...product,
+  stock: -1,
   colors: DEFAULT_PRODUCT_COLORS.map((color, colorIndex) => ({
     id: `p${productIndex + 1}-color-${colorIndex + 1}`,
     name: color.name,
@@ -294,5 +295,12 @@ export const STORAGE_KEYS = {
   clicks: "baby_duvaby_whatsapp_clicks_v1",
   clickAnalytics: "baby_duvaby_whatsapp_click_analytics_v1",
   syncMeta: "baby_duvaby_sync_meta_v1",
-  adminFallbackSession: "baby_duvaby_admin_fallback_session_v1"
+  adminFallbackSession: "baby_duvaby_admin_fallback_session_v1",
+  visitCount: "baby_duvaby_visit_count_v1",
+  visitAnalytics: "baby_duvaby_visit_analytics_v1",
+  adminDarkMode: "baby_duvaby_admin_dark_mode_v1",
+  admin2faPin: "baby_duvaby_admin_2fa_pin_v1",
+  admin2faEnabled: "baby_duvaby_admin_2fa_enabled_v1",
+  autoBackup: "baby_duvaby_auto_backup_v1",
+  notificationPermission: "baby_duvaby_notif_permission_v1"
 };

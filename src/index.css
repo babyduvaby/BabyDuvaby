@@ -4,6 +4,178 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================
+   DARK MODE — Admin Panel Only
+   Applied via data-admin-theme="dark" on <html>
+   ============================================ */
+[data-admin-theme="dark"] {
+  --admin-bg-gradient-from: #1a1a2e;
+  --admin-bg-gradient-via: #16213e;
+  --admin-bg-gradient-to: #0f3460;
+  --admin-panel-bg: rgba(30, 30, 60, 0.75);
+  --admin-panel-border: rgba(100, 130, 180, 0.35);
+  --admin-panel-shadow: rgba(50, 80, 140, 0.25);
+  --admin-text-primary: #e2e8f0;
+  --admin-text-secondary: #94a3b8;
+  --admin-text-muted: #64748b;
+  --admin-input-bg: rgba(20, 20, 50, 0.8);
+  --admin-input-border: rgba(100, 130, 180, 0.4);
+  --admin-input-focus-ring: rgba(99, 140, 220, 0.3);
+  --admin-card-bg: rgba(25, 25, 55, 0.7);
+  --admin-card-border: rgba(100, 130, 180, 0.25);
+  --admin-success-bg: rgba(34, 120, 80, 0.2);
+  --admin-success-border: rgba(34, 180, 110, 0.4);
+  --admin-error-bg: rgba(180, 50, 80, 0.2);
+  --admin-error-border: rgba(200, 60, 90, 0.4);
+  --admin-warning-bg: rgba(180, 140, 40, 0.2);
+  --admin-warning-border: rgba(200, 160, 50, 0.4);
+}
+
+/* Default (light) admin theme variables */
+:root {
+  --admin-bg-gradient-from: #fce9f2;
+  --admin-bg-gradient-via: #f8f4fb;
+  --admin-bg-gradient-to: #deebff;
+  --admin-panel-bg: transparent;
+  --admin-panel-border: transparent;
+  --admin-panel-shadow: transparent;
+  --admin-text-primary: transparent;
+  --admin-text-secondary: transparent;
+  --admin-text-muted: transparent;
+  --admin-input-bg: transparent;
+  --admin-input-border: transparent;
+  --admin-input-focus-ring: transparent;
+  --admin-card-bg: transparent;
+  --admin-card-border: transparent;
+  --admin-success-bg: transparent;
+  --admin-success-border: transparent;
+  --admin-error-bg: transparent;
+  --admin-error-border: transparent;
+  --admin-warning-bg: transparent;
+  --admin-warning-border: transparent;
+}
+
+/* Dark mode overrides for admin panel sections */
+[data-admin-theme="dark"] .admin-dark-wrapper {
+  background: linear-gradient(180deg, var(--admin-bg-gradient-from) 0%, var(--admin-bg-gradient-via) 42%, var(--admin-bg-gradient-to) 100%) !important;
+  color: var(--admin-text-primary);
+}
+
+[data-admin-theme="dark"] .admin-dark-wrapper .glass-panel {
+  border-color: var(--admin-panel-border) !important;
+  background: var(--admin-panel-bg) !important;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 28px var(--admin-panel-shadow), 0 0 24px rgba(100, 130, 200, 0.15) !important;
+}
+
+[data-admin-theme="dark"] .admin-dark-wrapper .text-ink,
+[data-admin-theme="dark"] .admin-dark-wrapper [class*="text-ink"],
+[data-admin-theme="dark"] .admin-dark-wrapper [class*="text-[#5"],
+[data-admin-theme="dark"] .admin-dark-wrapper [class*="text-[#6"] {
+  color: var(--admin-text-primary) !important;
+}
+
+[data-admin-theme="dark"] .admin-dark-wrapper .text-ink\/85,
+[data-admin-theme="dark"] .admin-dark-wrapper .text-ink\/70 {
+  color: var(--admin-text-secondary) !important;
+}
+
+[data-admin-theme="dark"] .admin-dark-wrapper .text-ink\/40 {
+  color: var(--admin-text-muted) !important;
+}
+
+[data-admin-theme="dark"] .admin-dark-wrapper [class*="bg-white"],
+[data-admin-theme="dark"] .admin-dark-wrapper [class*="bg-white/"] {
+  background-color: var(--admin-input-bg) !important;
+}
+
+[data-admin-theme="dark"] .admin-dark-wrapper [class*="border-[#d8e6ff"],
+[data-admin-theme="dark"] .admin-dark-wrapper [class*="border-[#dce8ff"],
+[data-admin-theme="dark"] .admin-dark-wrapper [class*="border-[#d9e7ff"] {
+  border-color: var(--admin-input-border) !important;
+}
+
+[data-admin-theme="dark"] .admin-dark-wrapper [class*="focus:ring-[#dbe9ff"],
+[data-admin-theme="dark"] .admin-dark-wrapper [class*="focus:ring-[#dce9ff"] {
+  --tw-ring-color: var(--admin-input-focus-ring) !important;
+}
+
+[data-admin-theme="dark"] .admin-dark-wrapper [class*="border-[#ffd3dd"] {
+  border-color: var(--admin-error-border) !important;
+  background: var(--admin-error-bg) !important;
+}
+
+[data-admin-theme="dark"] .admin-dark-wrapper [class*="bg-[#fff1f6"] {
+  background: var(--admin-error-bg) !important;
+}
+
+[data-admin-theme="dark"] .admin-dark-wrapper [class*="bg-[#f4f8ff"],
+[data-admin-theme="dark"] .admin-dark-wrapper [class*="bg-[#f7faff"] {
+  background: var(--admin-card-bg) !important;
+}
+
+[data-admin-theme="dark"] .admin-dark-wrapper [class*="bg-[#effdf5"] {
+  background: var(--admin-success-bg) !important;
+}
+
+[data-admin-theme="dark"] .admin-dark-wrapper [class*="border-[#c9efd8"] {
+  border-color: var(--admin-success-border) !important;
+}
+
+[data-admin-theme="dark"] .admin-dark-wrapper [class*="bg-[#fff7eb"] {
+  background: var(--admin-warning-bg) !important;
+}
+
+[data-admin-theme="dark"] .admin-dark-wrapper [class*="border-[#ffe0b8"] {
+  border-color: var(--admin-warning-border) !important;
+}
+
+[data-admin-theme="dark"] .admin-dark-wrapper [class*="bg-[#f2f7ff"] {
+  background: var(--admin-card-bg) !important;
+}
+
+[data-admin-theme="dark"] .admin-dark-wrapper [class*="border-[#d6e6ff"] {
+  border-color: var(--admin-panel-border) !important;
+}
+
+[data-admin-theme="dark"] .admin-dark-wrapper [class*="text-[#b03e66"],
+[data-admin-theme="dark"] .admin-dark-wrapper [class*="text-[#b53d69"] {
+  color: #fb7185 !important;
+}
+
+[data-admin-theme="dark"] .admin-dark-wrapper [class*="text-[#1f7e53"] {
+  color: #4ade80 !important;
+}
+
+[data-admin-theme="dark"] .admin-dark-wrapper [class*="text-[#9a6b2f"] {
+  color: #fbbf24 !important;
+}
+
+[data-admin-theme="dark"] .admin-dark-wrapper [class*="text-[#2f936f"] {
+  color: #4ade80 !important;
+}
+
+[data-admin-theme="dark"] .admin-dark-wrapper .ambient {
+  opacity: 0.15;
+}
+
+[data-admin-theme="dark"] .admin-dark-wrapper [class*="border-[#ffc6d9"] {
+  border-color: var(--admin-error-border) !important;
+}
+
+[data-admin-theme="dark"] .admin-dark-wrapper [class*="bg-[#fff0f6"] {
+  background: var(--admin-error-bg) !important;
+}
+
+/* Dark mode: Image brightness correction */
+[data-admin-theme="dark"] .admin-dark-wrapper img {
+  filter: brightness(0.92);
+}
+
+/* ============================================
+   Base Styles
+   ============================================ */
+
 @layer base {
   * {
     box-sizing: border-box;

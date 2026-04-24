@@ -4,8 +4,10 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import AdminLoginPage from "./AdminLoginPage";
 import TopBar from "./TopBar";
-import { defaultLandingConfig } from "../data/defaultContent";
+import OfflineIndicator from "./OfflineIndicator";
+import { defaultLandingConfig, STORAGE_KEYS } from "../data/defaultContent";
 import { useAdminSession } from "../hooks/useAdminSession";
+import { useAdminDarkMode, use2FA } from "../hooks/useAdminFeatures";
 
 function AdminAuthLoading() {
   return (
@@ -22,7 +24,10 @@ function AdminAuthLoading() {
 export default function AdminLoginPageClient() {
   const router = useRouter();
   const { isAdminAuthenticated, isAuthLoading, loginWithPassword } = useAdminSession();
+  const { isDark } = useAdminDarkMode();
+  const twoFA = use2FA();
 
+  /* #7: PWA Standalone redirect — if authenticated in standalone mode, skip login */
   React.useEffect(() => {
     if (!isAuthLoading && isAdminAuthenticated) {
       router.replace("/admin");
@@ -30,7 +35,8 @@ export default function AdminLoginPageClient() {
   }, [isAuthLoading, isAdminAuthenticated, router]);
 
   return (
-    <main className="app-shell min-h-screen overflow-x-hidden bg-gradient-to-b from-[#fce9f2] via-[#f8f4fb] to-[#deebff] pb-8 text-ink">
+    <main className="app-shell admin-dark-wrapper min-h-screen overflow-x-hidden bg-gradient-to-b from-[#fce9f2] via-[#f8f4fb] to-[#deebff] pb-8 text-ink">
+      <OfflineIndicator />
       <div className="pointer-events-none fixed inset-0 -z-10">
         <div className="ambient ambient-top" />
         <div className="ambient ambient-bottom" />
@@ -47,6 +53,8 @@ export default function AdminLoginPageClient() {
         <AdminLoginPage
           onLogin={loginWithPassword}
           onLoginSuccess={() => router.replace("/admin")}
+          is2FAEnabled={twoFA.isEnabled}
+          verify2FAPin={twoFA.verifyPin}
         />
       )}
     </main>

@@ -182,6 +182,7 @@ function sanitizeProducts(rawProducts, categories) {
       image: String(item.image || ""),
       price: Number(item.price) || 0,
       currency: String(item.currency || "PEN"),
+      stock: typeof item.stock === "number" ? item.stock : -1,
       colors,
       sizes
     };

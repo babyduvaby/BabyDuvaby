@@ -4,8 +4,10 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import AdminPanelPage from "./AdminPanelPage";
 import TopBar from "./TopBar";
+import OfflineIndicator from "./OfflineIndicator";
 import { useLandingConfig } from "../hooks/useLandingConfig";
 import { useAdminSession } from "../hooks/useAdminSession";
+import { useAdminDarkMode, useVisitCounter, use2FA, useNotificationPermission } from "../hooks/useAdminFeatures";
 
 function AdminAuthLoading() {
   return (
@@ -37,6 +39,10 @@ export default function AdminPanelPageClient() {
   } = useLandingConfig();
 
   const { isAdminAuthenticated, isAuthLoading, logout } = useAdminSession();
+  const { isDark, toggle: toggleDarkMode } = useAdminDarkMode();
+  const { visitCount, getVisitAnalytics, resetVisitCount } = useVisitCounter();
+  const twoFA = use2FA();
+  const notifications = useNotificationPermission();
 
   React.useEffect(() => {
     if (!isAuthLoading && !isAdminAuthenticated) {
@@ -46,7 +52,7 @@ export default function AdminPanelPageClient() {
 
   if (isAuthLoading || !isAdminAuthenticated || isLoading) {
     return (
-      <main className="app-shell min-h-screen overflow-x-hidden bg-gradient-to-b from-[#fce9f2] via-[#f8f4fb] to-[#deebff] pb-8 text-ink">
+      <main className="app-shell admin-dark-wrapper min-h-screen overflow-x-hidden bg-gradient-to-b from-[#fce9f2] via-[#f8f4fb] to-[#deebff] pb-8 text-ink">
         <div className="pointer-events-none fixed inset-0 -z-10">
           <div className="ambient ambient-top" />
           <div className="ambient ambient-bottom" />
@@ -58,7 +64,8 @@ export default function AdminPanelPageClient() {
   }
 
   return (
-    <main className="app-shell min-h-screen overflow-x-hidden bg-gradient-to-b from-[#fce9f2] via-[#f8f4fb] to-[#deebff] pb-12 text-ink sm:pb-8">
+    <main className="app-shell admin-dark-wrapper min-h-screen overflow-x-hidden bg-gradient-to-b from-[#fce9f2] via-[#f8f4fb] to-[#deebff] pb-12 text-ink sm:pb-8">
+      <OfflineIndicator />
       <div className="pointer-events-none fixed inset-0 -z-10">
         <div className="ambient ambient-top" />
         <div className="ambient ambient-bottom" />
@@ -84,7 +91,18 @@ export default function AdminPanelPageClient() {
         onResetClickCount={resetClickCount}
         onImportSnapshot={importLandingSnapshot}
         onLogout={logout}
-        onLoggedOut={() => router.replace("/admin/login")}
+        onLoggedOut={() => {
+          router.replace("/admin/login");
+        }}
+        /* New features props */
+        isDarkMode={isDark}
+        onToggleDarkMode={toggleDarkMode}
+        visitCount={visitCount}
+        visitAnalytics={getVisitAnalytics()}
+        onResetVisitCount={resetVisitCount}
+        twoFA={twoFA}
+        notificationPermission={notifications.permission}
+        onRequestNotificationPermission={notifications.requestPermission}
       />
     </main>
   );

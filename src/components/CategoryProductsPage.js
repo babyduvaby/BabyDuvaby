@@ -67,6 +67,7 @@ function ProductCard({
   const normalizedQuantity = clampQuantity(selectedQuantity);
   const unitPrice = Number(product.price) || 0;
   const totalPrice = unitPrice * normalizedQuantity;
+  const isOutOfStock = typeof product.stock === "number" && product.stock === 0;
 
   const selection = React.useMemo(
     () => ({
@@ -93,7 +94,7 @@ function ProductCard({
 
   return (
     <article
-      className="overflow-hidden rounded-3xl border border-white/80 bg-white/95 shadow-candy transition duration-300 hover:-translate-y-1"
+      className="overflow-hidden rounded-3xl border border-white/80 bg-white/95 shadow-candy transition duration-300 hover:-translate-y-1 relative"
       onMouseEnter={() => onProductContextChange?.(product, category, selection)}
     >
       <img
@@ -105,6 +106,11 @@ function ProductCard({
         loading="lazy"
         decoding="async"
       />
+      {isOutOfStock && (
+        <div className="absolute top-3 right-3 rounded-full bg-[#ff4757] px-3 py-1.5 text-xs font-extrabold uppercase tracking-wider text-white shadow-lg">
+          Agotado
+        </div>
+      )}
       <div className="p-4">
         <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-[#7f93b0]">
           Modelo
@@ -228,18 +234,24 @@ function ProductCard({
           </p>
         </div>
 
-        <a
-          href={whatsappHref}
-          target="_blank"
-          rel="noreferrer"
-          onClick={() => {
-            onProductContextChange?.(product, category, selection);
-            onWhatsappClick("product_card");
-          }}
-          className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-full bg-gradient-to-r from-[#45d4a6] to-[#24b191] px-4 text-base font-extrabold text-white transition duration-300 hover:brightness-105 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#9af2d7]"
-        >
-          Consultar por WhatsApp
-        </a>
+        {isOutOfStock ? (
+          <div className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[#d1d5db] px-4 text-base font-extrabold text-[#6b7280] cursor-not-allowed">
+            Producto agotado
+          </div>
+        ) : (
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => {
+              onProductContextChange?.(product, category, selection);
+              onWhatsappClick("product_card");
+            }}
+            className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-full bg-gradient-to-r from-[#45d4a6] to-[#24b191] px-4 text-base font-extrabold text-white transition duration-300 hover:brightness-105 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#9af2d7]"
+          >
+            Consultar por WhatsApp
+          </a>
+        )}
       </div>
     </article>
   );

@@ -10,9 +10,26 @@ import Testimonials from "./Testimonials";
 import FloatingWhatsappButton from "./FloatingWhatsappButton";
 import AppInstallPrompt from "./AppInstallPrompt";
 import InstallAppButton from "./InstallAppButton";
-import { FIXED_WHATSAPP_PHONE } from "../data/defaultContent";
+import { FIXED_WHATSAPP_PHONE, STORAGE_KEYS } from "../data/defaultContent";
 import { useLandingConfig } from "../hooks/useLandingConfig";
 import useAppInstalledState from "../hooks/useAppInstalledState";
+
+/* #3: Increment visit counter on home page load */
+if (typeof window !== "undefined") {
+  try {
+    const current = Number(localStorage.getItem(STORAGE_KEYS.visitCount)) || 0;
+    localStorage.setItem(STORAGE_KEYS.visitCount, String(current + 1));
+    const rawAnalytics = localStorage.getItem(STORAGE_KEYS.visitAnalytics);
+    const analytics = rawAnalytics ? JSON.parse(rawAnalytics) : { total: 0, byDay: {} };
+    const dayKey = new Date().toISOString().slice(0, 10);
+    analytics.total = current + 1;
+    analytics.byDay = analytics.byDay || {};
+    analytics.byDay[dayKey] = (Number(analytics.byDay[dayKey]) || 0) + 1;
+    localStorage.setItem(STORAGE_KEYS.visitAnalytics, JSON.stringify(analytics));
+  } catch {
+    /* silent fail */
+  }
+}
 
 export default function HomePageClient() {
   const [floatingMessage, setFloatingMessage] = React.useState("");

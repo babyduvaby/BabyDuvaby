@@ -1,12 +1,22 @@
 import React from "react";
 import Link from "next/link";
 
-export default function AdminLoginPage({ onLogin, onLoginSuccess }) {
+export default function AdminLoginPage({ onLogin, onLoginSuccess, is2FAEnabled, verify2FAPin }) {
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState("");
   const [errorCode, setErrorCode] = React.useState("");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
+  const [authStep, setAuthStep] = React.useState(is2FAEnabled ? "2fa" : "password");
+  const [pinCode, setPinCode] = React.useState("");
+  const [pinError, setPinError] = React.useState("");
+
+  /* If 2FA gets enabled after mount, switch to 2fa step if already past password */
+  React.useEffect(() => {
+    if (is2FAEnabled && authStep === "done") {
+      setAuthStep("2fa");
+    }
+  }, [is2FAEnabled, authStep]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -23,9 +33,111 @@ export default function AdminLoginPage({ onLogin, onLoginSuccess }) {
       return;
     }
 
+    /* If 2FA is enabled, go to PIN verification step */
+    if (is2FAEnabled) {
+      setAuthStep("2fa");
+      setIsSubmitting(false);
+      return;
+    }
+
+    setAuthStep("done");
     onLoginSuccess?.();
   };
 
+  const handlePinSubmit = (event) => {
+    event.preventDefault();
+    setPinError("");
+
+    if (!verify2FAPin || !verify2FAPin(pinCode)) {
+      setPinError("PIN incorrecto. Intenta de nuevo.");
+      setPinCode("");
+      return;
+    }
+
+    setAuthStep("done");
+    onLoginSuccess?.();
+  };
+
+  /* ========== 2FA PIN Verification Step ========== */
+  if (authStep === "2fa") {
+    return (
+      <section className="mx-auto flex min-h-[80vh] w-full max-w-md items-center px-3 py-6 sm:max-w-xl sm:px-6 sm:py-8">
+        <div className="glass-panel w-full rounded-3xl p-5 shadow-candy sm:p-8">
+          <div className="mb-2 flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#f59e0b] to-[#d97706] shadow-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-xs font-extrabold uppercase tracking-[0.24em] text-[#6c86a6]">
+                Verificacion 2FA
+              </p>
+            </div>
+          </div>
+
+          <h1 className="mt-2 font-title text-4xl leading-none text-ink sm:text-5xl">
+            Codigo PIN
+          </h1>
+          <p className="mt-3 text-sm leading-relaxed font-semibold text-ink/85 sm:text-base">
+            Ingresa tu PIN de 4-6 digitos para completar el acceso.
+          </p>
+
+          <form className="mt-6 space-y-4" onSubmit={handlePinSubmit}>
+            <label className="block text-sm font-bold text-ink/85" htmlFor="admin-pin">
+              PIN de seguridad
+            </label>
+            <input
+              id="admin-pin"
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={6}
+              value={pinCode}
+              onChange={(event) => setPinCode(event.target.value.replace(/\D/g, ""))}
+              placeholder="Ingresa tu PIN"
+              className="h-14 w-full rounded-2xl border border-[#d9e7ff] bg-white/95 px-4 text-center text-2xl font-extrabold tracking-[0.5em] text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dbe9ff] sm:h-12 sm:text-lg"
+              autoComplete="one-time-code"
+              required
+              autoFocus
+            />
+
+            {pinError ? (
+              <div className="rounded-xl border border-[#ffd3dd] bg-[#fff1f6] px-3 py-2.5 text-sm font-bold text-[#b03e66]">
+                <p>{pinError}</p>
+              </div>
+            ) : null}
+
+            <button
+              type="submit"
+              disabled={pinCode.length < 4}
+              className="mt-2 inline-flex h-14 w-full items-center justify-center rounded-full bg-gradient-to-r from-[#f59e0b] to-[#d97706] px-5 text-base font-extrabold text-white shadow-lg shadow-[#f59e0b]/25 transition hover:brightness-105 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#fde68a] disabled:cursor-not-allowed disabled:opacity-70 sm:mt-0 sm:h-12"
+            >
+              Verificar PIN
+            </button>
+          </form>
+
+          <button
+            type="button"
+            onClick={() => {
+              setAuthStep("password");
+              setPinCode("");
+              setPinError("");
+            }}
+            className="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-[#607b9d] transition hover:text-[#4e6380]"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4">
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+            Volver a contrasena
+          </button>
+        </div>
+      </section>
+    );
+  }
+
+  /* ========== Password Login Step ========== */
   return (
     <section className="mx-auto flex min-h-[80vh] w-full max-w-md items-center px-3 py-6 sm:max-w-xl sm:px-6 sm:py-8">
       <div className="glass-panel w-full rounded-3xl p-5 shadow-candy sm:p-8">
@@ -48,6 +160,11 @@ export default function AdminLoginPage({ onLogin, onLoginSuccess }) {
         </h1>
         <p className="mt-3 text-sm leading-relaxed font-semibold text-ink/85 sm:text-base">
           Ingresa la contrasena para editar el contenido de la landing.
+          {is2FAEnabled && (
+            <span className="mt-1 block text-xs font-extrabold text-[#f59e0b]">
+              2FA activado — Se pedira PIN despues de la contrasena.
+            </span>
+          )}
         </p>
 
         <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
@@ -72,28 +189,14 @@ export default function AdminLoginPage({ onLogin, onLoginSuccess }) {
               aria-label={showPassword ? "Ocultar contrasena" : "Mostrar contrasena"}
             >
               {showPassword ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  className="h-5 w-5"
-                >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
                   <path d="M3 3l18 18" />
                   <path d="M10.58 10.58A2 2 0 0 0 12 14a2 2 0 0 0 1.42-.58" />
                   <path d="M9.88 5.09A10.94 10.94 0 0 1 12 5c5 0 9.27 3.11 11 7-1 2.2-2.65 4.06-4.73 5.31" />
                   <path d="M6.61 6.61C4.62 7.86 3 9.69 2 12c1.73 3.89 6 7 10 7 1.35 0 2.66-.24 3.88-.68" />
                 </svg>
               ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  className="h-5 w-5"
-                >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
                   <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
                   <circle cx="12" cy="12" r="3" />
                 </svg>

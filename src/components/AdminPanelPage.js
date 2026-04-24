@@ -10,6 +10,25 @@ import AutoSaveIndicator from "./AutoSaveIndicator";
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
 
+/* ---- AutoSave Context: provides auto-save handlers to all form fields ---- */
+const AutoSaveContext = React.createContext(null);
+
+/* ---- URL Validation ---- */
+function isValidUrl(string) {
+  try {
+    const url = new URL(string);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+function urlValidationHint(value) {
+  if (!value || !value.trim()) return undefined;
+  if (isValidUrl(value.trim())) return undefined;
+  return "URL invalida. Debe empezar con https://";
+}
+
 const ZONE_LABELS = {
   hero_cta: "Hero CTA",
   mobile_bar: "Barra movil",
@@ -63,6 +82,11 @@ function createProductColor(name = "Nuevo color", rgb = "#f7bfd7") {
 }
 
 function Field({ label, value, onChange, onBlur, placeholder, required, type = "text", error }) {
+  const autoSave = React.useContext(AutoSaveContext);
+  const handleFieldBlur = (e) => {
+    if (typeof onBlur === "function") onBlur(e);
+    if (autoSave?.handleBlur) autoSave.handleBlur();
+  };
   return (
     <label className="block">
       <span className="mb-1 block text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
@@ -72,7 +96,7 @@ function Field({ label, value, onChange, onBlur, placeholder, required, type = "
         type={type}
         value={value}
         onChange={onChange}
-        onBlur={onBlur}
+        onBlur={handleFieldBlur}
         placeholder={placeholder}
         required={required}
         className="h-12 w-full rounded-xl border border-[#d8e6ff] bg-white px-4 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff] min-h-[48px]"
@@ -83,6 +107,11 @@ function Field({ label, value, onChange, onBlur, placeholder, required, type = "
 }
 
 function TextArea({ label, value, onChange, onBlur, placeholder }) {
+  const autoSave = React.useContext(AutoSaveContext);
+  const handleAreaBlur = (e) => {
+    if (typeof onBlur === "function") onBlur(e);
+    if (autoSave?.handleBlur) autoSave.handleBlur();
+  };
   return (
     <label className="block">
       <span className="mb-1 block text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
@@ -91,7 +120,7 @@ function TextArea({ label, value, onChange, onBlur, placeholder }) {
       <textarea
         value={value}
         onChange={onChange}
-        onBlur={onBlur}
+        onBlur={handleAreaBlur}
         placeholder={placeholder}
         rows={3}
         className="min-h-24 w-full rounded-xl border border-[#d8e6ff] bg-white px-4 py-3 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff]"
@@ -101,7 +130,14 @@ function TextArea({ label, value, onChange, onBlur, placeholder }) {
 }
 
 function RangeField({ label, value, onChange, onChangeEnd }) {
+  const autoSave = React.useContext(AutoSaveContext);
   const safeValue = clampPercentage(value, 50);
+
+  const handleRangeChange = (event) => {
+    onChange(clampPercentage(event.target.value, safeValue));
+    if (onChangeEnd) onChangeEnd();
+    if (autoSave?.handleChange) autoSave.handleChange();
+  };
 
   return (
     <label className="block">
@@ -119,11 +155,8 @@ function RangeField({ label, value, onChange, onChangeEnd }) {
         max="100"
         step="1"
         value={safeValue}
-        onChange={(event) => {
-          onChange(clampPercentage(event.target.value, safeValue));
-          onChangeEnd?.();
-        }}
-        className="h-8 w-full cursor-pointer accent-[#6f9ad0] touch-manipulation"
+        onChange={handleRangeChange}
+        className="h-10 w-full cursor-pointer touch-manipulation"
       />
     </label>
   );
@@ -176,6 +209,58 @@ function ImageDropField({ label, onFileSelected, isUploading }) {
       <p className="mt-1 text-[11px] font-semibold text-[#7a90ad]">
         Recomendado: 1080 x 1080 px (cuadrada).
       </p>
+    </div>
+  );
+}
+
+/* ---- User Guide Component (5 steps) ---- */
+function UserGuide() {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const steps = [
+    { num: "1", title: "Agregar categoria", desc: "Presiona el boton rosa \"Agregar categoria\" para crear una nueva tarjeta." },
+    { num: "2", title: "Completar titulo", desc: "Escribe el nombre de la categoria (ej: Bodies Bebe). Es obligatorio." },
+    { num: "3", title: "Subir imagen", desc: "Arrastra una imagen al campo de subida o pega una URL (debe empezar con https://)." },
+    { num: "4", title: "Ajustar encuadre", desc: "Usa los sliders horizontales y verticales para centrar la imagen como prefieras." },
+    { num: "5", title: "Guardado automatico", desc: "Los cambios se guardan solos al salir de cada campo. Verifica el indicador verde arriba a la derecha." }
+  ];
+
+  return (
+    <div className="rounded-2xl border border-[#dce8ff] bg-[#f4f8ff] overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setIsOpen((prev) => !prev)}
+        className="flex w-full items-center justify-between gap-2 px-4 py-3 text-left active:bg-[#eef3ff] transition"
+      >
+        <div className="flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5 text-[#5f93d1]">
+            <circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+          <span className="text-sm font-extrabold text-[#5f789b]">Guia rapida de categorias</span>
+        </div>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={`h-5 w-5 text-[#7a90ad] transition-transform ${isOpen ? "rotate-180" : ""}`}>
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+      {isOpen && (
+        <div className="border-t border-[#eef3ff] px-4 py-3">
+          <div className="space-y-3">
+            {steps.map((step) => (
+              <div key={step.num} className="flex items-start gap-3">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-[#5f93d1] to-[#4ed0a9] text-xs font-extrabold text-white">
+                  {step.num}
+                </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-extrabold text-ink">{step.title}</p>
+                  <p className="text-xs font-semibold text-[#6d87a7]">{step.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-[11px] font-semibold text-[#7a90ad]">
+            Consejo: Tambien puedes arrastrar las tarjetas para reordenar las categorias, o usar los botones Subir/Bajar en cada tarjeta.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
@@ -751,6 +836,7 @@ export default function AdminPanelPage({
   }));
 
   return (
+    <AutoSaveContext.Provider value={autoSave}>
     <section className="mx-auto w-full max-w-6xl px-3 pb-12 pt-4 sm:px-6 sm:pt-6">
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -790,11 +876,11 @@ export default function AdminPanelPage({
           )}
           <button
             type="button"
-            onClick={handleSave}
-            disabled={isSaving}
-            className="inline-flex min-h-11 items-center justify-center rounded-full bg-gradient-to-r from-[#4ed0a9] to-[#27b494] px-4 text-sm font-extrabold text-white transition hover:brightness-105 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 sm:px-5"
+            onClick={() => autoSave.saveNow()}
+            disabled={isSaving || autoSave.status === "saving"}
+            className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full bg-gradient-to-r from-[#4ed0a9] to-[#27b494] px-4 text-sm font-extrabold text-white transition hover:brightness-105 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 sm:px-5"
           >
-            {isSaving ? "Guardando..." : "Guardar cambios"}
+            {autoSave.status === "saving" ? "Guardando..." : isSaving ? "Guardando..." : "Guardar ahora"}
           </button>
           <button
             type="button"
@@ -829,6 +915,14 @@ export default function AdminPanelPage({
           Cambios guardados localmente y pendientes de sincronizar con Firebase.
         </p>
       ) : null}
+
+      {/* Auto-save note */}
+      <div className="mb-3 rounded-xl border border-[#dce8ff] bg-[#f4f8ff] px-4 py-2.5 text-xs font-semibold text-[#6d87a7] flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-3.5 w-3.5 shrink-0 text-[#5f93d1]">
+          <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" /><polyline points="17 21 17 13 7 13 7 21" /><polyline points="7 3 7 8 15 8" />
+        </svg>
+        <span>Auto-guardado activo: los cambios se guardan al salir de cada campo y al mover los sliders.</span>
+      </div>
 
       {status ? (
         <p className="mb-3 rounded-xl border border-[#c9efd8] bg-[#effdf5] px-4 py-3 text-sm font-bold text-[#1f7e53]">
@@ -1192,6 +1286,10 @@ export default function AdminPanelPage({
             </button>
           </div>
 
+          <div className="mb-3">
+            <UserGuide />
+          </div>
+
           <div className="space-y-3">
             {draftConfig.categories.map((category, index) => {
               const [expanded, setExpanded] = React.useState(index === 0);
@@ -1281,7 +1379,6 @@ export default function AdminPanelPage({
                           label="Titulo"
                           value={category.title}
                           onChange={(event) => updateCategory(index, "title", event.target.value)}
-                          onBlur={handleBlur}
                           required
                           error={titleMissing ? "El titulo es obligatorio" : undefined}
                           placeholder="Ej: Bodies Bebe"
@@ -1290,9 +1387,8 @@ export default function AdminPanelPage({
                           label="URL imagen superior"
                           value={category.image}
                           onChange={(event) => updateCategory(index, "image", event.target.value)}
-                          onBlur={handleBlur}
                           required
-                          error={imageMissing ? "Necesitas una imagen" : undefined}
+                          error={imageMissing ? "Necesitas una imagen" : urlValidationHint(category.image)}
                           placeholder="https://res.cloudinary.com/..."
                         />
                       </div>
@@ -1300,7 +1396,7 @@ export default function AdminPanelPage({
                         label="URL imagen inferior (opcional)"
                         value={category.secondaryImage || ""}
                         onChange={(event) => updateCategory(index, "secondaryImage", event.target.value)}
-                        onBlur={handleBlur}
+                        error={urlValidationHint(category.secondaryImage)}
                         placeholder="https://res.cloudinary.com/..."
                       />
 
@@ -1314,13 +1410,11 @@ export default function AdminPanelPage({
                             label="Horizontal"
                             value={category.imageFocusX ?? 50}
                             onChange={(value) => updateCategory(index, "imageFocusX", value)}
-                            onChangeEnd={handleChange}
                           />
                           <RangeField
                             label="Vertical"
                             value={category.imageFocusY ?? 50}
                             onChange={(value) => updateCategory(index, "imageFocusY", value)}
-                            onChangeEnd={handleChange}
                           />
                         </div>
                       </div>
@@ -1335,13 +1429,11 @@ export default function AdminPanelPage({
                             label="Horizontal"
                             value={category.secondaryImageFocusX ?? 50}
                             onChange={(value) => updateCategory(index, "secondaryImageFocusX", value)}
-                            onChangeEnd={handleChange}
                           />
                           <RangeField
                             label="Vertical"
                             value={category.secondaryImageFocusY ?? 50}
                             onChange={(value) => updateCategory(index, "secondaryImageFocusY", value)}
-                            onChangeEnd={handleChange}
                           />
                         </div>
                       </div>
@@ -1754,5 +1846,6 @@ export default function AdminPanelPage({
         </article>
       </div>
     </section>
+    </AutoSaveContext.Provider>
   );
 }

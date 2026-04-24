@@ -2,6 +2,7 @@
   "name": "Baby Duvaby Admin",
   "short_name": "Admin BD",
   "description": "Panel de administracion Baby Duvaby. Gestiona productos, configuracion y analiticas.",
+  "id": "/admin/?source=pwa-admin",
   "start_url": "/admin/login",
   "scope": "/admin/",
   "display": "standalone",
@@ -9,7 +10,7 @@
   "background_color": "#0c1222",
   "theme_color": "#5f93d1",
   "lang": "es-PE",
-  "categories": ["business", "shopping"],
+  "categories": ["business"],
   "icons": [
     {
       "src": "/icons/admin-icon-192.png",

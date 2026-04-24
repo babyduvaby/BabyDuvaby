@@ -3,20 +3,43 @@ import { STORAGE_KEYS } from "../data/defaultContent";
 
 /**
  * Hook for managing admin dark mode preference.
- * Persists to localStorage and applies data-admin-theme attribute.
+ * Supports:
+ *   - System prefers-color-scheme: dark auto-detection
+ *   - Manual toggle persisted to localStorage
+ *   - data-admin-theme attribute on <html>
+ *     "dark"  → force dark
+ *     "light" → force light (overrides system dark)
+ *     absent  → follow system preference
  */
 export function useAdminDarkMode() {
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
+    function applyTheme(preference) {
+      if (preference === "dark") {
+        document.documentElement.setAttribute("data-admin-theme", "dark");
+        setIsDark(true);
+      } else if (preference === "light") {
+        document.documentElement.setAttribute("data-admin-theme", "light");
+        setIsDark(false);
+      } else {
+        /* Follow system */
+        document.documentElement.removeAttribute("data-admin-theme");
+        const systemDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
+        setIsDark(systemDark);
+      }
+    }
+
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.adminDarkMode);
-      if (saved === "dark") {
-        setIsDark(true);
-        document.documentElement.setAttribute("data-admin-theme", "dark");
+      if (saved === "dark" || saved === "light") {
+        applyTheme(saved);
+      } else {
+        /* No saved preference — detect system */
+        applyTheme(window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light");
       }
     } catch {
-      // no-op
+      applyTheme("light");
     }
   }, []);
 
@@ -28,7 +51,7 @@ export function useAdminDarkMode() {
         if (next) {
           document.documentElement.setAttribute("data-admin-theme", "dark");
         } else {
-          document.documentElement.removeAttribute("data-admin-theme");
+          document.documentElement.setAttribute("data-admin-theme", "light");
         }
       } catch {
         // no-op

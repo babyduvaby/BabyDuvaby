@@ -1,6 +1,7 @@
 import CategoryPageClient from "../../../src/components/CategoryPageClient";
 
-export default function CategoryPage({ params }) {
-  return <CategoryPageClient categoryId={params.categoryId} />;
+// Next.js 15: params is now a Promise
+export default async function CategoryPage({ params }) {
+  const { categoryId } = await params;
+  return <CategoryPageClient categoryId={categoryId} />;
 }
-

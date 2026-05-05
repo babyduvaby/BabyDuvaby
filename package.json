@@ -3,15 +3,27 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "@payloadcms/next": "^3.84.1",
+    "@payloadcms/plugin-multi-tenant": "^3.84.1",
+    "@payloadcms/richtext-lexical": "^3.84.1",
+    "@payloadcms/storage-vercel-blob": "^3.84.1",
     "firebase": "^12.9.0",
-    "next": "^14.2.30",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "graphql": "^16.13.2",
+    "next": "^15.4.11",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
+    "dev:webpack": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "payload:admin": "next dev --turbopack",
+    "generate:types": "payload generate:types",
+    "generate:graphql": "payload generate:graphql-schema",
+    "migrate": "payload migrate",
+    "migrate:create": "payload migrate:create",
+    "migrate:fresh": "payload migrate:fresh"
   },
   "browserslist": {
     "production": [
@@ -26,8 +38,12 @@
     ]
   },
   "devDependencies": {
+    "@payloadcms/db-sqlite": "^3.84.1",
+    "@types/node": "^25.6.0",
+    "@types/react": "^19.2.14",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
-    "tailwindcss": "^3.4.17"
+    "tailwindcss": "^3.4.17",
+    "typescript": "^6.0.3"
   }
 }

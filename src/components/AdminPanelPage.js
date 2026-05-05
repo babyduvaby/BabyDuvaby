@@ -846,6 +846,20 @@ export default function AdminPanelPage({
           <h1 className="font-title text-4xl text-ink sm:text-6xl">Gestion de contenido</h1>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          {/* Boton magico: Ir a Payload CMS para edicion inline */}
+          <a
+            href="/cms"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] px-4 text-sm font-extrabold text-white shadow-lg transition hover:brightness-110 hover:shadow-xl active:scale-[0.98] sm:px-5"
+            title="Abrir Payload CMS - Edicion de contenido en tiempo real"
+          >
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+            </svg>
+            <span className="hidden sm:inline">Payload CMS</span>
+          </a>
           {/* #5: Dark Mode Toggle */}
           {typeof onToggleDarkMode === "function" && (
             <button

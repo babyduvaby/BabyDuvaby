@@ -1,8 +1,7 @@
 import { buildConfig } from 'payload'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
-import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import { multiTenantPlugin } from '@payloadcms/plugin-multi-tenant'
-import { sqliteAdapter } from '@payloadcms/db-sqlite'
+import { postgresAdapter } from '@payloadcms/db-postgres'
 
 import { Sites } from './payload/collections/Sites'
 import { Media } from './payload/collections/Media'
@@ -11,6 +10,7 @@ import { Products } from './payload/collections/Products'
 import { Categories } from './payload/collections/Categories'
 import { PayloadUsers } from './payload/collections/PayloadUsers'
 import { SiteConfig } from './payload/globals/SiteConfig'
+import { supabaseStoragePlugin } from './payload/plugins/supabaseStorage'
 
 export default buildConfig({
   admin: {
@@ -25,10 +25,18 @@ export default buildConfig({
     },
   },
   editor: lexicalEditor(),
-  db: sqliteAdapter({
-    client: {
-      url: 'file:./babyduvaby.db',
+  db: postgresAdapter({
+    pool: {
+      connectionString: process.env.DATABASE_URI || 'postgresql://postgres:postgres@localhost:5432/babyduvaby_payload',
+      ssl: process.env.NODE_ENV === 'production'
+        ? { rejectUnauthorized: false }
+        : false,
+      max: 10,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 5000,
     },
+    idType: 'uuid',
+    migrationDir: './src/payload/migrations',
   }),
   collections: [PayloadUsers, Sites, Media, Pages, Products, Categories],
   globals: [SiteConfig],
@@ -42,12 +50,16 @@ export default buildConfig({
         media: {},
       },
     }),
-    vercelBlobStorage({
-      enabled: process.env.VERCEL_BLOB_READ_WRITE_TOKEN !== undefined,
-      token: process.env.VERCEL_BLOB_READ_WRITE_TOKEN || '',
+    supabaseStoragePlugin({
       collections: {
-        media: true,
+        media: {
+          bucket: 'payload-media',
+          prefix: 'media',
+        },
       },
+      defaultBucket: 'payload-media',
+      defaultPrefix: 'media',
+      publicBucket: true,
     }),
   ],
   secret: process.env.PAYLOAD_SECRET || 'baby-duvaby-payload-secret-key-2024',

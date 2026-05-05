@@ -9,6 +9,8 @@
 # Payload CMS
 /src/payload/payload-types.ts
 /src/payload/generated-schema.graphql
+/src/payload/migrations/
+*.db
 
 # misc
 .DS_Store

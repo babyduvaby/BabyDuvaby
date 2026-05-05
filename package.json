@@ -24,7 +24,8 @@
     "generate:graphql": "payload generate:graphql-schema",
     "migrate": "payload migrate",
     "migrate:create": "payload migrate:create",
-    "migrate:fresh": "payload migrate:fresh"
+    "migrate:fresh": "payload migrate:fresh",
+    "supabase:setup": "node scripts/supabase-setup.js"
   },
   "browserslist": {
     "production": [

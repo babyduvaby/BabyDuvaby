@@ -9,7 +9,8 @@ const nextConfig = {
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "source.unsplash.com" },
       { protocol: "https", hostname: "randomuser.me" },
-      { protocol: "https", hostname: "abyvdueqjhufdlqbvthy.supabase.co" },
+      // Supabase Storage - soporta cualquier proyecto
+      { protocol: "https", hostname: "*.supabase.co" },
     ],
   },
 }

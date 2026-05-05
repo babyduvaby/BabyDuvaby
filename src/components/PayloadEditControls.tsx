@@ -36,7 +36,7 @@ export function PayloadEditControls({ collectionSlug, documentId }: {
 
   if (!isAdmin) return null
 
-  const adminUrl = `/admin/collections/${collectionSlug}${documentId ? `/${documentId}` : ''}`
+  const adminUrl = `/cms/collections/${collectionSlug}${documentId ? `/${documentId}` : ''}`
 
   return (
     <div

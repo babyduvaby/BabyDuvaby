@@ -1,8 +1,11 @@
 /**
  * Supabase Storage Plugin para Payload CMS 3.0
  *
- * Sube archivos (imágenes, documentos) a un bucket de Supabase Storage
+ * Sube archivos (imagenes, documentos) a un bucket de Supabase Storage
  * en vez de guardarlos localmente o en Vercel Blob.
+ *
+ * Si las credenciales de Supabase no estan configuradas, el plugin
+ * se desactiva gracefulmente y usa el almacenamiento local de Payload.
  *
  * Uso en payload.config.ts:
  *   import { supabaseStoragePlugin } from './plugins/supabaseStorage'
@@ -24,7 +27,7 @@ export interface SupabaseStorageOptions {
   defaultBucket?: string
   /** Prefijo de carpeta por defecto dentro del bucket */
   defaultPrefix?: string
-  /** Si es true, hace upload público (genera URL pública) */
+  /** Si es true, hace upload publico (genera URL publica) */
   publicBucket?: boolean
 }
 
@@ -38,15 +41,17 @@ export interface SupabaseFileData {
   url: string
 }
 
-function getSupabaseClient(): SupabaseClient {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+function isSupabaseConfigured(): boolean {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+  return !!(url && key && !url.includes('TU_') && !key.includes('tu-'))
+}
 
-  if (!supabaseUrl || !supabaseServiceKey) {
-    throw new Error(
-      '[Supabase Storage Plugin] Faltan variables de entorno NEXT_PUBLIC_SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY'
-    )
-  }
+function getSupabaseClient(): SupabaseClient | null {
+  if (!isSupabaseConfigured()) return null
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
   return createClient(supabaseUrl, supabaseServiceKey, {
     auth: {
@@ -98,9 +103,17 @@ export const supabaseStoragePlugin =
   (incomingConfig: Config): Config => {
     const config = { ...incomingConfig }
 
+    // Si Supabase no esta configurado, no modificar nada - usar almacenamiento local
+    if (!isSupabaseConfigured()) {
+      console.log('[Supabase Storage] Credenciales no configuradas. Usando almacenamiento local de Payload.')
+      return config
+    }
+
     const defaultBucket = options.defaultBucket || 'payload-media'
     const defaultPrefix = options.defaultPrefix || ''
     const isPublic = options.publicBucket !== false
+
+    console.log(`[Supabase Storage] Plugin activado. Bucket: ${defaultBucket}, Prefix: ${defaultPrefix}`)
 
     // Modificar las colecciones configuradas para usar Supabase Storage
     config.collections = (config.collections || []).map((collection) => {
@@ -118,107 +131,125 @@ export const supabaseStoragePlugin =
       const customGenerateURL =
         typeof collectionOption === 'object' ? collectionOption.generateURL : undefined
 
-      // Añadir hook afterRead para inyectar la URL de Supabase
+      // Anadir hook afterRead para inyectar la URL de Supabase
       const existingAfterRead = collection.hooks?.afterRead || []
 
-      const supabaseAfterReadHook: typeof existingAfterRead[0] = async ({ doc, req }) => {
-        if (doc.filename && !doc.url?.includes('supabase')) {
-          const supabase = getSupabaseClient()
-          const filePath = prefix ? `${prefix}/${doc.filename}` : doc.filename
-          const publicUrl = customGenerateURL
-            ? customGenerateURL({
-                key: filePath,
-                bucket: bucketName,
-                prefix,
-                filename: doc.filename,
-                mimeType: doc.mimeType || 'image/jpeg',
-                size: doc.filesize || 0,
-                url: buildPublicUrl(supabase, bucketName, filePath),
-              })
-            : buildPublicUrl(supabase, bucketName, filePath)
+      const supabaseAfterReadHook: typeof existingAfterRead[0] = async ({ doc }) => {
+        try {
+          if (doc.filename && !doc.url?.includes('supabase')) {
+            const supabase = getSupabaseClient()
+            if (!supabase) return doc
 
-          doc.url = publicUrl
+            const filePath = prefix ? `${prefix}/${doc.filename}` : doc.filename
+            const publicUrl = customGenerateURL
+              ? customGenerateURL({
+                  key: filePath,
+                  bucket: bucketName,
+                  prefix,
+                  filename: doc.filename,
+                  mimeType: doc.mimeType || 'image/jpeg',
+                  size: doc.filesize || 0,
+                  url: buildPublicUrl(supabase, bucketName, filePath),
+                })
+              : buildPublicUrl(supabase, bucketName, filePath)
 
-          // Añadir URLs para los tamaños de imagen
-          if (doc.sizes && typeof doc.sizes === 'object') {
-            const sizes = { ...doc.sizes }
-            for (const sizeKey of Object.keys(sizes)) {
-              const sizeData = sizes[sizeKey]
-              if (sizeData?.filename && !sizeData.url?.includes('supabase')) {
-                const sizePath = prefix ? `${prefix}/${sizeData.filename}` : sizeData.filename
-                sizeData.url = buildPublicUrl(supabase, bucketName, sizePath)
+            doc.url = publicUrl
+
+            // Anadir URLs para los tamanos de imagen
+            if (doc.sizes && typeof doc.sizes === 'object') {
+              const sizes = { ...doc.sizes }
+              for (const sizeKey of Object.keys(sizes)) {
+                const sizeData = sizes[sizeKey]
+                if (sizeData?.filename && !sizeData.url?.includes('supabase')) {
+                  const sizePath = prefix ? `${prefix}/${sizeData.filename}` : sizeData.filename
+                  sizeData.url = buildPublicUrl(supabase, bucketName, sizePath)
+                }
               }
+              doc.sizes = sizes
             }
-            doc.sizes = sizes
           }
+        } catch (err: any) {
+          console.error('[Supabase Storage] afterRead error:', err.message)
         }
 
         return doc
       }
 
-      // Añadir hook afterChange para subir archivos a Supabase Storage
+      // Anadir hook afterChange para subir archivos a Supabase Storage
       const existingAfterChange = collection.hooks?.afterChange || []
 
       const supabaseAfterChangeHook: typeof existingAfterChange[0] = async ({ doc, req, operation }) => {
-        if (operation === 'create' || operation === 'update') {
-          // Inicializar bucket si no existe
-          const supabase = getSupabaseClient()
-          await ensureBucketExists(supabase, bucketName, isPublic)
+        try {
+          if (operation === 'create' || operation === 'update') {
+            const supabase = getSupabaseClient()
+            if (!supabase) return doc
 
-          // Si hay archivo temporal, subir a Supabase
-          const file = req.file
-          if (file && file.data) {
-            const filePath = prefix ? `${prefix}/${doc.filename}` : doc.filename
+            // Inicializar bucket si no existe
+            await ensureBucketExists(supabase, bucketName, isPublic)
 
-            const { error: uploadError } = await supabase.storage
-              .from(bucketName)
-              .upload(filePath, file.data, {
-                contentType: doc.mimeType || file.mimetype || 'image/jpeg',
-                upsert: true,
-              })
+            // Si hay archivo temporal, subir a Supabase
+            const file = req.file
+            if (file && file.data) {
+              const filePath = prefix ? `${prefix}/${doc.filename}` : doc.filename
 
-            if (uploadError) {
-              console.error('[Supabase Storage] Error subiendo archivo:', uploadError.message)
-            } else {
-              doc.url = buildPublicUrl(supabase, bucketName, filePath)
+              const { error: uploadError } = await supabase.storage
+                .from(bucketName)
+                .upload(filePath, file.data, {
+                  contentType: doc.mimeType || file.mimetype || 'image/jpeg',
+                  upsert: true,
+                })
+
+              if (uploadError) {
+                console.error('[Supabase Storage] Error subiendo archivo:', uploadError.message)
+              } else {
+                doc.url = buildPublicUrl(supabase, bucketName, filePath)
+              }
             }
           }
+        } catch (err: any) {
+          console.error('[Supabase Storage] afterChange error:', err.message)
         }
 
         return doc
       }
 
-      // Añadir hook afterDelete para limpiar archivos de Supabase
+      // Anadir hook afterDelete para limpiar archivos de Supabase
       const existingAfterDelete = collection.hooks?.afterDelete || []
 
       const supabaseAfterDeleteHook: typeof existingAfterDelete[0] = async ({ doc }) => {
-        if (doc.filename) {
-          const supabase = getSupabaseClient()
-          const filePath = prefix ? `${prefix}/${doc.filename}` : doc.filename
+        try {
+          if (doc.filename) {
+            const supabase = getSupabaseClient()
+            if (!supabase) return doc
 
-          // Eliminar archivo principal
-          const { error: deleteError } = await supabase.storage
-            .from(bucketName)
-            .remove([filePath])
+            const filePath = prefix ? `${prefix}/${doc.filename}` : doc.filename
 
-          if (deleteError) {
-            console.error('[Supabase Storage] Error eliminando archivo:', deleteError.message)
-          }
+            // Eliminar archivo principal
+            const { error: deleteError } = await supabase.storage
+              .from(bucketName)
+              .remove([filePath])
 
-          // Eliminar tamaños de imagen
-          if (doc.sizes && typeof doc.sizes === 'object') {
-            const pathsToRemove: string[] = []
-            for (const sizeKey of Object.keys(doc.sizes)) {
-              const sizeData = doc.sizes[sizeKey]
-              if (sizeData?.filename) {
-                const sizePath = prefix ? `${prefix}/${sizeData.filename}` : sizeData.filename
-                pathsToRemove.push(sizePath)
+            if (deleteError) {
+              console.error('[Supabase Storage] Error eliminando archivo:', deleteError.message)
+            }
+
+            // Eliminar tamanos de imagen
+            if (doc.sizes && typeof doc.sizes === 'object') {
+              const pathsToRemove: string[] = []
+              for (const sizeKey of Object.keys(doc.sizes)) {
+                const sizeData = doc.sizes[sizeKey]
+                if (sizeData?.filename) {
+                  const sizePath = prefix ? `${prefix}/${sizeData.filename}` : sizeData.filename
+                  pathsToRemove.push(sizePath)
+                }
+              }
+              if (pathsToRemove.length > 0) {
+                await supabase.storage.from(bucketName).remove(pathsToRemove)
               }
             }
-            if (pathsToRemove.length > 0) {
-              await supabase.storage.from(bucketName).remove(pathsToRemove)
-            }
           }
+        } catch (err: any) {
+          console.error('[Supabase Storage] afterDelete error:', err.message)
         }
 
         return doc
@@ -234,10 +265,8 @@ export const supabaseStoragePlugin =
         },
         upload: {
           ...(typeof collection.upload === 'object' ? collection.upload : {}),
-          // Deshabilitar almacenamiento local de Payload
+          // Solo deshabilitar almacenamiento local si Supabase esta activo
           disableLocalStorage: true,
-          // Usar handlers custom para Supabase
-          handlers: [],
         },
       }
     })

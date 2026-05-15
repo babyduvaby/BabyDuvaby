@@ -3,7 +3,6 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import AdminPanelPage from "./AdminPanelPage";
-import TopBar from "./TopBar";
 import OfflineIndicator from "./OfflineIndicator";
 import { useLandingConfig } from "../hooks/useLandingConfig";
 import { useAdminSession } from "../hooks/useAdminSession";
@@ -11,8 +10,8 @@ import { useAdminDarkMode, useVisitCounter, use2FA, useNotificationPermission } 
 
 function AdminAuthLoading() {
   return (
-    <section className="mx-auto flex min-h-[60vh] w-full max-w-xl items-center px-4 py-8 sm:px-6">
-      <div className="glass-panel w-full animate-pulse rounded-3xl p-6 shadow-candy sm:p-8">
+    <section className="mx-auto flex min-h-[60vh] w-full max-w-full box-border items-center px-2 py-8 sm:px-6">
+      <div className="glass-panel w-full animate-pulse rounded-3xl p-4 sm:p-6 md:p-8 shadow-candy">
         <div className="h-4 w-32 rounded bg-[#e1ecff]" />
         <div className="mt-3 h-8 w-56 rounded bg-[#e1ecff]" />
         <div className="mt-6 h-12 w-full rounded-xl bg-[#e1ecff]" />
@@ -57,7 +56,6 @@ export default function AdminPanelPageClient() {
           <div className="ambient ambient-top" />
           <div className="ambient ambient-bottom" />
         </div>
-        <TopBar brand={config.brand} categories={config.categories} />
         <AdminAuthLoading />
       </main>
     );
@@ -71,11 +69,11 @@ export default function AdminPanelPageClient() {
         <div className="ambient ambient-bottom" />
       </div>
 
-      <TopBar brand={config.brand} categories={config.categories} />
-
       {error ? (
-        <div className="mx-auto mb-4 mt-3 max-w-3xl rounded-2xl border border-[#ffc6d9] bg-[#fff0f6] px-4 py-3 text-sm font-semibold text-[#b53d69]">
-          {error}
+        <div className="mx-auto mb-4 mt-3 max-w-full box-border px-2 sm:px-4">
+          <div className="rounded-2xl border border-[#ffc6d9] bg-[#fff0f6] px-3 py-2.5 text-sm font-semibold text-[#b53d69] sm:px-4 sm:py-3">
+            {error}
+          </div>
         </div>
       ) : null}
 

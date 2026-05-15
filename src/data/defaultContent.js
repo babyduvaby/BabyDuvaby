@@ -188,6 +188,7 @@ const baseProductCatalog = [
   {
     id: "p-1",
     categoryId: "cat-1",
+    sku: "BD-PA-001",
     model: "Panalera Nube Rosa",
     description: "Amplia, ligera y con bolsillos termicos para salidas diarias.",
     image: "https://source.unsplash.com/1200x900/?diaper,bag,pink,baby",
@@ -197,6 +198,7 @@ const baseProductCatalog = [
   {
     id: "p-2",
     categoryId: "cat-1",
+    sku: "BD-MO-002",
     model: "Mochila Dulce Paseo",
     description: "Diseno moderno con compartimentos para biberon y panales.",
     image: "https://source.unsplash.com/1200x900/?baby,backpack,maternity",
@@ -206,6 +208,7 @@ const baseProductCatalog = [
   {
     id: "p-3",
     categoryId: "cat-2",
+    sku: "BD-MS-003",
     model: "Muselina Dream Soft",
     description: "Tela respirable y suave para envolver al bebe con comodidad.",
     image: "https://source.unsplash.com/1200x900/?muslin,blanket,baby",
@@ -215,6 +218,7 @@ const baseProductCatalog = [
   {
     id: "p-4",
     categoryId: "cat-2",
+    sku: "BD-FR-004",
     model: "Frazada Teddy Cloud",
     description: "Frazada acolchada con textura tierna y acabados premium.",
     image: "https://source.unsplash.com/1200x900/?baby,blanket,teddy",
@@ -224,6 +228,7 @@ const baseProductCatalog = [
   {
     id: "p-5",
     categoryId: "cat-3",
+    sku: "BD-BB-005",
     model: "Babero Mini Smile",
     description: "Babero absorbente con ajuste comodo y estampado delicado.",
     image: "https://source.unsplash.com/1200x900/?baby,bib,cute",
@@ -233,6 +238,7 @@ const baseProductCatalog = [
   {
     id: "p-6",
     categoryId: "cat-3",
+    sku: "BD-MN-006",
     model: "Mandil Clean Time",
     description: "Proteccion practica para comidas con material facil de limpiar.",
     image: "https://source.unsplash.com/1200x900/?baby,feeding,cloth",
@@ -242,6 +248,7 @@ const baseProductCatalog = [
   {
     id: "p-7",
     categoryId: "cat-4",
+    sku: "BD-GR-007",
     model: "Gorrito Osito Plush",
     description: "Gorro termico con orejitas para look adorable y abrigado.",
     image: "https://source.unsplash.com/1200x900/?baby,hat,winter,cute",
@@ -251,6 +258,7 @@ const baseProductCatalog = [
   {
     id: "p-8",
     categoryId: "cat-4",
+    sku: "BD-TB-008",
     model: "Turbante Bloom Pastel",
     description: "Turbante delicado en tonos pastel para outfits especiales.",
     image: "https://source.unsplash.com/1200x900/?baby,turban,pastel",
@@ -260,6 +268,7 @@ const baseProductCatalog = [
   {
     id: "p-9",
     categoryId: "cat-5",
+    sku: "BD-AC-009",
     model: "Set Accesorios Sweet Day",
     description: "Pack de peineta, medias y guantes para recien nacidos.",
     image: "https://source.unsplash.com/1200x900/?baby,accessories,set",
@@ -269,6 +278,7 @@ const baseProductCatalog = [
   {
     id: "p-10",
     categoryId: "cat-5",
+    sku: "BD-KB-010",
     model: "Kit Bienvenida Bebe",
     description: "Accesorios esenciales de primera etapa en tonos suaves.",
     image: "https://source.unsplash.com/1200x900/?newborn,essentials,baby",
@@ -280,6 +290,7 @@ const baseProductCatalog = [
 export const productCatalog = baseProductCatalog.map((product, productIndex) => ({
   ...product,
   stock: -1,
+  stockReal: 10,
   colors: DEFAULT_PRODUCT_COLORS.map((color, colorIndex) => ({
     id: `p${productIndex + 1}-color-${colorIndex + 1}`,
     name: color.name,

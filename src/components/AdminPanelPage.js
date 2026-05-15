@@ -99,7 +99,7 @@ function Field({ label, value, onChange, onBlur, placeholder, required, type = "
         onBlur={handleFieldBlur}
         placeholder={placeholder}
         required={required}
-        className="h-12 w-full rounded-xl border border-[#d8e6ff] bg-white px-4 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff] min-h-[48px]"
+        className="h-12 w-full max-w-full box-border rounded-xl border border-[#d8e6ff] bg-white px-3 py-2 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff] md:px-4 md:py-3 md:text-base min-h-[48px]"
       />
       {error && <p className="mt-1 text-[11px] font-bold text-[#b03e66]">{error}</p>}
     </label>
@@ -123,7 +123,7 @@ function TextArea({ label, value, onChange, onBlur, placeholder }) {
         onBlur={handleAreaBlur}
         placeholder={placeholder}
         rows={3}
-        className="min-h-24 w-full rounded-xl border border-[#d8e6ff] bg-white px-4 py-3 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff]"
+        className="min-h-20 w-full max-w-full box-border rounded-xl border border-[#d8e6ff] bg-white px-3 py-2 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff] md:min-h-24 md:px-4 md:py-3"
       />
     </label>
   );
@@ -610,10 +610,12 @@ export default function AdminPanelPage({
 
   const addProduct = () => {
     const firstCategoryId = draftConfig.categories[0]?.id || "cat-1";
+    const skuCounter = draftProducts.length + 1;
     setDraftProducts((prev) => [
       ...prev,
       {
         id: createId("p"),
+        sku: `BD-NEW-${String(skuCounter).padStart(3, "0")}`,
         categoryId: firstCategoryId,
         model: "Nuevo modelo",
         description: "",
@@ -621,6 +623,7 @@ export default function AdminPanelPage({
         price: 0,
         currency: "PEN",
         stock: -1,
+        stockReal: 0,
         colors: [createProductColor("Rosado pastel", "#f7bfd7")],
         sizes: ["RN", "3M", "6M"]
       }
@@ -837,7 +840,7 @@ export default function AdminPanelPage({
 
   return (
     <AutoSaveContext.Provider value={autoSave}>
-    <section className="mx-auto w-full max-w-6xl px-3 pb-12 pt-4 sm:px-6 sm:pt-6">
+    <section className="mx-auto w-full max-w-full box-border px-2 sm:px-6 lg:px-8 pb-12 pt-4 sm:pt-6">
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-[10px] font-extrabold uppercase tracking-[0.22em] text-[#6e88a8] sm:text-xs">
@@ -845,13 +848,13 @@ export default function AdminPanelPage({
           </p>
           <h1 className="font-title text-4xl text-ink sm:text-6xl">Gestion de contenido</h1>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           {/* Boton magico: Ir a Payload CMS para edicion inline */}
           <a
             href="/cms"
             target="_blank"
             rel="noreferrer"
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] px-4 text-sm font-extrabold text-white shadow-lg transition hover:brightness-110 hover:shadow-xl active:scale-[0.98] sm:px-5"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] px-3 py-2 text-xs font-extrabold text-white shadow-lg transition hover:brightness-110 hover:shadow-xl active:scale-[0.98] sm:px-5 sm:text-sm"
             title="Abrir Payload CMS - Edicion de contenido en tiempo real"
           >
             <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1598,28 +1601,47 @@ export default function AdminPanelPage({
           </div>
 
           <div className="space-y-3">
-            {draftProducts.map((product, index) => (
+            {draftProducts.map((product, index) => {
+              const stockRealVal = typeof product.stockReal === "number" ? product.stockReal : 0;
+              const isLowStock = stockRealVal >= 0 && stockRealVal < 5;
+              const isOutOfStock = typeof product.stock === "number" && product.stock === 0;
+
+              return (
               <div
                 key={product.id}
                 draggable
                 onDragStart={() => setDragMeta({ type: "product", index })}
                 onDragOver={(event) => event.preventDefault()}
                 onDrop={() => handleDropReorder("product", index)}
-                className="rounded-2xl border border-[#dce8ff] bg-white/90 p-4"
+                className="w-full max-w-full box-border rounded-2xl border border-[#dce8ff] bg-white/90 p-3 sm:p-4"
               >
-                <div className="mb-3 flex items-center justify-between gap-2">
-                  <p className="text-sm font-extrabold text-ink">
-                    ID: {product.id} | Orden: {index + 1}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <span className="rounded-full border border-[#dce8ff] bg-[#f6f9ff] px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#5f799b]">
+                {/* Header del producto */}
+                <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-extrabold text-ink">
+                      {product.sku ? (
+                        <span className="mr-2 inline-flex items-center rounded-md bg-[#eef5ff] px-2 py-0.5 text-[11px] font-mono font-extrabold tracking-wider text-[#5f93d1]">{product.sku}</span>
+                      ) : null}
+                      {product.model}
+                    </p>
+                    <p className="mt-0.5 text-xs font-semibold text-[#8a97b0]">
+                      ID: {product.id} | Orden: {index + 1}
+                      {isLowStock && stockRealVal > 0 ? (
+                        <span className="ml-2 inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-extrabold text-amber-700">
+                          Stock bajo: {stockRealVal} uds
+                        </span>
+                      ) : null}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                    <span className="rounded-full border border-[#dce8ff] bg-[#f6f9ff] px-2 py-1 text-[11px] font-extrabold uppercase tracking-wide text-[#5f799b] sm:px-3">
                       Arrastrar
                     </span>
                     <button
                       type="button"
                       onClick={() => reorderProducts(index, index - 1)}
                       disabled={index === 0}
-                      className="rounded-full border border-[#dce8ff] bg-[#f6f9ff] px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#5f799b] transition hover:bg-[#edf4ff] disabled:cursor-not-allowed disabled:opacity-50"
+                      className="rounded-full border border-[#dce8ff] bg-[#f6f9ff] px-2 py-1 text-[11px] font-extrabold uppercase tracking-wide text-[#5f799b] transition hover:bg-[#edf4ff] disabled:cursor-not-allowed disabled:opacity-50 sm:px-3"
                     >
                       Subir
                     </button>
@@ -1627,20 +1649,22 @@ export default function AdminPanelPage({
                       type="button"
                       onClick={() => reorderProducts(index, index + 1)}
                       disabled={index === draftProducts.length - 1}
-                      className="rounded-full border border-[#dce8ff] bg-[#f6f9ff] px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#5f799b] transition hover:bg-[#edf4ff] disabled:cursor-not-allowed disabled:opacity-50"
+                      className="rounded-full border border-[#dce8ff] bg-[#f6f9ff] px-2 py-1 text-[11px] font-extrabold uppercase tracking-wide text-[#5f799b] transition hover:bg-[#edf4ff] disabled:cursor-not-allowed disabled:opacity-50 sm:px-3"
                     >
                       Bajar
                     </button>
                     <button
                       type="button"
                       onClick={() => removeProduct(product.id)}
-                      className="rounded-full border border-[#ffd5df] bg-[#fff3f7] px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#a64b6b] transition hover:bg-[#ffe8ef]"
+                      className="rounded-full border border-[#ffd5df] bg-[#fff3f7] px-2 py-1 text-[11px] font-extrabold uppercase tracking-wide text-[#a64b6b] transition hover:bg-[#ffe8ef] sm:px-3"
                     >
                       Eliminar
                     </button>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+
+                {/* Campos principales: Nombre + Categoria */}
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3">
                   <Field
                     label="Nombre del modelo"
                     value={product.model}
@@ -1653,7 +1677,7 @@ export default function AdminPanelPage({
                     <select
                       value={product.categoryId}
                       onChange={(event) => updateProduct(index, "categoryId", event.target.value)}
-                      className="h-11 w-full rounded-xl border border-[#d8e6ff] bg-white px-3 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff]"
+                      className="h-11 w-full max-w-full box-border rounded-xl border border-[#d8e6ff] bg-white px-3 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff]"
                     >
                       {categoryOptions.map((option) => (
                         <option key={option.id} value={option.id}>
@@ -1663,7 +1687,22 @@ export default function AdminPanelPage({
                     </select>
                   </label>
                 </div>
-                <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+
+                {/* Campos de SKU + Precio + Moneda */}
+                <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3">
+                  <label className="block">
+                    <span className="mb-1 block text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
+                      Codigo Interno / SKU <span className="text-[#e74c6f]">*</span>
+                    </span>
+                    <input
+                      type="text"
+                      required
+                      value={product.sku || ""}
+                      onChange={(event) => updateProduct(index, "sku", event.target.value.toUpperCase().trim())}
+                      placeholder="Ej: BD-PA-001"
+                      className="h-11 w-full max-w-full box-border rounded-xl border border-[#d8e6ff] bg-white px-3 py-2 text-sm font-semibold font-mono tracking-wider text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff] md:px-4 md:py-3"
+                    />
+                  </label>
                   <label className="block">
                     <span className="mb-1 block text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
                       Precio
@@ -1676,41 +1715,79 @@ export default function AdminPanelPage({
                       onChange={(event) =>
                         updateProduct(index, "price", Number(event.target.value || 0))
                       }
-                      className="h-11 w-full rounded-xl border border-[#d8e6ff] bg-white px-3 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff]"
+                      className="h-11 w-full max-w-full box-border rounded-xl border border-[#d8e6ff] bg-white px-3 py-2 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff] md:px-4 md:py-3"
                     />
                   </label>
+                </div>
+
+                {/* Campos de Stock Real + Moneda + Stock virtual */}
+                <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3">
                   <label className="block">
-                    <span className="mb-1 block text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
-                      Moneda
+                    <span className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
+                      Inventario Real <span className="text-[#e74c6f]">*</span>
+                      {isLowStock && stockRealVal > 0 && (
+                        <span className="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-extrabold text-red-600">
+                          Stock bajo
+                        </span>
+                      )}
+                      {isOutOfStock && (
+                        <span className="inline-flex items-center rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-extrabold text-white">
+                          AGOTADO
+                        </span>
+                      )}
                     </span>
                     <input
-                      type="text"
-                      value={product.currency || "PEN"}
-                      onChange={(event) => updateProduct(index, "currency", event.target.value)}
-                      className="h-11 w-full rounded-xl border border-[#d8e6ff] bg-white px-3 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff]"
+                      type="number"
+                      required
+                      min="0"
+                      value={stockRealVal}
+                      onChange={(event) => updateProduct(index, "stockReal", Math.max(0, parseInt(event.target.value, 10) || 0))}
+                      placeholder="Unidades disponibles"
+                      className={`h-11 w-full max-w-full box-border rounded-xl border px-3 py-2 text-sm font-semibold text-ink outline-none transition focus:ring-4 md:px-4 md:py-3 ${
+                        isLowStock
+                          ? "border-red-300 bg-red-50 focus:border-red-400 focus:ring-red-100"
+                          : isOutOfStock
+                          ? "border-red-400 bg-red-100 focus:border-red-500 focus:ring-red-200"
+                          : "border-[#d8e6ff] bg-white focus:border-[#7ca2d9] focus:ring-[#dce9ff]"
+                      }`}
                     />
+                    {isLowStock && stockRealVal > 0 && (
+                      <p className="mt-1 text-[11px] font-bold text-red-500">
+                        Quedan {stockRealVal} unidades. Considera reabastecer.
+                      </p>
+                    )}
+                    {isOutOfStock && (
+                      <p className="mt-1 text-[11px] font-bold text-red-600">
+                        Producto sin stock. No se mostrara como disponible.
+                      </p>
+                    )}
                   </label>
-                  {/* #4: Stock field */}
-                  <label className="block">
-                    <span className="mb-1 block text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
-                      Stock ({typeof product.stock === "number" && product.stock === 0 ? "AGOTADO" : typeof product.stock === "number" && product.stock === -1 ? "Ilimitado" : product.stock + " uds"})
-                    </span>
-                    <div className="flex gap-2">
+                  <div className="grid grid-cols-1 gap-2">
+                    <label className="block">
+                      <span className="mb-1 block text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
+                        Moneda
+                      </span>
+                      <input
+                        type="text"
+                        value={product.currency || "PEN"}
+                        onChange={(event) => updateProduct(index, "currency", event.target.value)}
+                        className="h-11 w-full max-w-full box-border rounded-xl border border-[#d8e6ff] bg-white px-3 py-2 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff] md:px-4 md:py-3"
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="mb-1 block text-xs font-extrabold uppercase tracking-[0.16em] text-[#6d87a7]">
+                        Stock Virtual ({typeof product.stock === "number" && product.stock === 0 ? "AGOTADO" : typeof product.stock === "number" && product.stock === -1 ? "Ilimitado" : product.stock + " uds"})
+                      </span>
                       <input
                         type="number"
                         min="-1"
                         value={typeof product.stock === "number" ? product.stock : -1}
                         onChange={(event) => updateProduct(index, "stock", parseInt(event.target.value, 10) || -1)}
                         placeholder="-1 = ilimitado, 0 = agotado"
-                        className="h-11 w-full rounded-xl border border-[#d8e6ff] bg-white px-3 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff]"
+                        className="h-11 w-full max-w-full box-border rounded-xl border border-[#d8e6ff] bg-white px-3 py-2 text-sm font-semibold text-ink outline-none transition focus:border-[#7ca2d9] focus:ring-4 focus:ring-[#dce9ff] md:px-4 md:py-3"
                       />
-                      {typeof product.stock === "number" && product.stock === 0 && (
-                        <span className="inline-flex shrink-0 items-center rounded-full bg-[#ff4757] px-3 py-1.5 text-xs font-extrabold text-white">
-                          AGOTADO
-                        </span>
-                      )}
-                    </div>
-                  </label>
+                    </label>
+                  </div>
                 </div>
                 <div className="mt-3">
                   <TextArea
@@ -1733,7 +1810,8 @@ export default function AdminPanelPage({
                     </button>
                   </div>
                   {(Array.isArray(product.colors) ? product.colors : []).length ? (
-                    <div className="space-y-2">
+                    <div className="overflow-x-auto whitespace-nowrap rounded-lg border border-gray-200">
+                    <div className="space-y-2 min-w-[520px]">
                       {(Array.isArray(product.colors) ? product.colors : []).map((color) => (
                         <div
                           key={color.id}
@@ -1783,6 +1861,7 @@ export default function AdminPanelPage({
                           </button>
                         </div>
                       ))}
+                    </div>
                     </div>
                   ) : (
                     <p className="text-sm font-semibold text-[#6c81a0]">
@@ -1855,7 +1934,8 @@ export default function AdminPanelPage({
                   />
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </article>
       </div>

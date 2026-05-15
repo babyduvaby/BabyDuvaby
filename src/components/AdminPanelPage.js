@@ -1001,7 +1001,7 @@ export default function AdminPanelPage({
         )}
 
         {/* Security & Settings Panel */}
-        <article className="glass-panel rounded-3xl p-5 shadow-candy sm:p-6">
+        <article id="admin-section-ajustes" className="glass-panel rounded-3xl p-5 shadow-candy sm:p-6 scroll-mt-20">
           <h2 className="font-title text-4xl text-ink">Seguridad y Configuracion</h2>
 
           <div className="mt-4 space-y-4">
@@ -1131,7 +1131,7 @@ export default function AdminPanelPage({
           </div>
         </article>
 
-        <article className="glass-panel rounded-3xl p-5 shadow-candy sm:p-6">
+        <article id="admin-section-secciones" className="glass-panel rounded-3xl p-5 shadow-candy sm:p-6 scroll-mt-20">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <h2 className="font-title text-4xl text-ink">Herramientas admin</h2>
             <div className="flex flex-wrap gap-2">
@@ -1285,7 +1285,7 @@ export default function AdminPanelPage({
           </div>
         </article>
 
-        <article className="glass-panel rounded-3xl p-4 shadow-candy sm:p-6">
+        <article id="admin-section-categorias" className="glass-panel rounded-3xl p-4 shadow-candy sm:p-6 scroll-mt-20">
           <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="font-title text-3xl text-ink sm:text-4xl">Categorias</h2>
             <button
@@ -1585,7 +1585,7 @@ export default function AdminPanelPage({
           </div>
         </article>
 
-        <article className="glass-panel rounded-3xl p-5 shadow-candy sm:p-6">
+        <article id="admin-section-productos" className="glass-panel rounded-3xl p-5 shadow-candy sm:p-6 scroll-mt-20">
           <div className="mb-3 flex items-center justify-between gap-3">
             <h2 className="font-title text-4xl text-ink">Modelos y productos</h2>
             <button

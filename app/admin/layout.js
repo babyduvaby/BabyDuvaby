@@ -1,6 +1,7 @@
 import "../../src/index.css";
 import Script from "next/script";
 import AdminServiceWorkerRegistrar from "../../src/components/AdminServiceWorkerRegistrar";
+import Navbar from "../../src/components/admin/Navbar";
 
 export const metadata = {
   metadataBase: new URL("https://baby-duvaby.vercel.app"),
@@ -42,6 +43,10 @@ export default function AdminLayout({ children }) {
   return (
     <>
       <AdminServiceWorkerRegistrar />
+      {/* Navbar fija superior para toda la zona de /admin */}
+      <Navbar />
+      {/* Espaciador para compensar la altura fija de la navbar (h-16 = 4rem) */}
+      <div aria-hidden="true" className="h-16" />
       {children}
     </>
   );
